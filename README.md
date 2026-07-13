@@ -41,4 +41,3 @@ Thay vì chỉ giám sát và chặn nội dung, SAG có thể tự phân loại
 Đang hoàn thiện.
 
 ## Credits
-[Bon-Appetit/porn-domains](https://github.com/Bon-Appetit/porn-domains) is licensed under [CC BY-SA 4.0](https://github.com/Bon-Appetit/porn-domains/blob/main/LICENSE).
