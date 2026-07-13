@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="sag-logo.png" alt="Sigma AI Guardian banner" width="700">
+  <img src="sag-logo.png" alt="Sigma AI Guardian banner" width="67">
 </p>
 
 # Sigma AI Guardian
