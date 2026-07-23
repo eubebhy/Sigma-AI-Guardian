@@ -1,4 +1,4 @@
-# Game themed cases
+# themed cases
 Steam - Free online games - GameVui.vn
 Steam - Downloading: Cyberpunk 2077 (Update 2026)
 Epic Games Launcher - Grand Theft Auto V
@@ -29,4 +29,110 @@ Path of Exile
 Warframe
 Lost Ark
 osu!
-
+Overlay Service
+Performance Monitor
+Session Recorder
+Telemetry Collector
+FPS Counter
+Input Analyzer
+Process Watcher
+Window Tracker
+Detection Engine
+Launch History
+Usage Statistics
+Activity Timeline
+Session Duration
+Crash Reporter
+Event Logger
+Memory Monitor
+Runtime Diagnostics
+Integrity Verification
+Asset Cache
+Patch Downloader
+Steam Web Helper
+Steam Client Bootstrapper
+Steam Crash Handler
+Steam Overlay UI
+Steam Cloud Synchronization
+Epic Online Services
+Epic Background Service
+EA AntiCheat Service
+Easy Anti Cheat Launcher
+EasyAntiCheat_EOS
+BattlEye Launcher
+BattlEye Service
+Riot Vanguard Service
+vgc Service
+vgtray.exe
+GameInput Service
+GameInput Host
+DirectX Shader Compiler
+DXVK Cache Generator
+Vulkan Pipeline Cache
+OpenGL Driver Cache
+NVIDIA Shader Cache
+AMD Shader Cache
+Intel Graphics Shader Cache
+OBS Capture
+OBS Window Capture
+OBS Replay Buffer
+Discord Detection
+Discord Rich Presence
+Discord Overlay
+Xbox Bar
+DVR Service
+Bar Presence Writer
+NVIDIA GeForce Experience Overlay
+NVIDIA ShadowPlay
+NVIDIA Highlights
+AMD Adrenalin Overlay
+MSI Afterburner OSD
+RivaTuner Statistics Server
+Frame Time Analyzer
+PresentMon Capture
+GPU Performance HUD
+Frame Generation Monitor
+Controller Calibration
+Xbox Controller Firmware
+DualSense Wireless Controller
+HID Controller
+Virtual Gamepad Device
+Controller Mapper
+Steam Input
+SDL Controller Database
+Save Synchronization
+Cloud Save Manager
+Backup Scheduler
+Configuration Editor
+Settings Migration
+Installation Manager
+Update Scheduler
+Download Queue
+Repair Utility
+Mod Loader
+Plugin Manager
+Resource Scanner
+File Indexer
+Screenshot Manager
+Clip Recorder
+Instant Replay Buffer
+Streaming Encoder
+Broadcast Service
+Window Enumeration
+Foreground Detector
+Active Session
+Process Enumeration
+Monitor - Invite
+URL Detector
+Steam Link
+Discord Invite
+Epic Store URL
+Steam Store
+Epic Games
+itch.io
+Nexus Mods
+PCGamingWiki
+IGN Walkthrough
+GameFAQs
+Speedrun.com
+Liquipedia

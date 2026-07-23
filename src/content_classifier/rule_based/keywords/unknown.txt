@@ -1,0 +1,305 @@
+video player
+word
+excel
+powerpoint
+pptx
+docx
+scartch
+chrome
+edge
+office
+libreoffice
+microsoft
+python
+code block
+python idle
+anydesk
+goguardian
+net support
+netsupport
+Microsoft Word
+.docx
+.doc
+
+Microsoft Excel
+.xlsx
+.xls
+
+Microsoft PowerPoint
+.pptx
+.ppt
+
+Microsoft Access
+.accdb
+.mdb
+
+Microsoft Publisher
+.pub
+.pubx
+
+Microsoft OneNote
+.one
+.onepkg
+
+Microsoft Outlook
+.pst
+.ost
+
+Visual Studio Code
+Visual Studio
+PyCharm
+IntelliJ IDEA
+CLion
+Rider
+WebStorm
+PhpStorm
+GoLand
+DataGrip
+Android Studio
+Eclipse IDE
+NetBeans
+Code::Blocks
+CodeLite
+Geany
+Spyder
+Thonny
+IDLE
+Cursor
+Windsurf
+Zed
+Vim
+Neovim
+Emacs
+Notepad++
+Sublime Text
+Kate
+KDevelop
+Qt Creator
+Xcode
+
+Veyon
+NetSupport School
+LanSchool
+AB Tutor
+Faronics Insight
+Net Control 2 Classroom
+Classroom Spy Pro
+iTALC
+Mythware Classroom Management
+Classroom Manager
+LanTeacher
+Vision Classroom Management
+Impero Education Pro
+EduIQ Classroom Management
+
+TeamViewer
+AnyDesk
+RustDesk
+Chrome Remote Desktop
+Microsoft Remote Desktop
+NoMachine
+RealVNC Viewer
+TightVNC
+UltraVNC
+TigerVNC
+Remmina
+DWService
+Parsec
+Splashtop
+Zoho Assist
+MeshCentral
+Remote Utilities
+mRemoteNG
+PuTTY
+OpenSSH
+
+Sigma AI goguardian
+SAG
+
+Google Classroom
+Microsoft Teams for Education
+Moodle
+Canvas LMS
+Schoology
+Blackboard Learn
+Brightspace
+Google Meet
+Zoom
+Microsoft Teams
+BigBlueButton
+
+Kahoot!
+Quizizz
+Quizlet
+Blooket
+Nearpod
+Pear Deck
+Edpuzzle
+Padlet
+Flip (Microsoft Flip)
+
+Scratch
+Scratch Desktop
+MIT App Inventor
+Minecraft Education
+Code.org
+Tynker
+Thonny
+Python IDLE
+
+GeoGebra
+Desmos
+PhET Interactive Simulations
+Wolfram Mathematica
+Maple
+JASP
+SPSS
+RStudio
+
+Microsoft Word
+Microsoft Excel
+Microsoft PowerPoint
+OneNote
+LibreOffice Writer
+LibreOffice Calc
+LibreOffice Impress
+
+Visual Studio Code
+PyCharm
+IntelliJ IDEA
+Visual Studio
+Eclipse
+NetBeans
+Code::Blocks
+CLion
+Android Studio
+
+Adobe Acrobat Reader
+Foxit PDF Reader
+SumatraPDF
+Xournal++
+Drawboard PDF
+
+Anki
+RemNote
+Obsidian
+Notion
+Goodnotes for Windows
+
+Duolingo
+Rosetta Stone
+Babbel
+Memrise
+
+VitalSource Bookshelf
+Adobe Digital Editions
+Calibre
+
+Respondus LockDown Browser
+Safe Exam Browser
+Exam.net
+Inspera
+notebook
+llama
+llamacpp
+requests
+urllib3
+httpx
+aiohttp
+
+numpy
+scipy
+pandas
+polars
+
+matplotlib
+plotly
+bokeh
+altair
+
+scikit-learn
+tensorflow
+keras
+torch
+torchvision
+torchaudio
+xgboost
+lightgbm
+catboost
+
+opencv-python
+pillow
+imageio
+
+flask
+django
+fastapi
+starlette
+sqlalchemy
+django-rest-framework
+
+beautifulsoup4
+lxml
+selenium
+playwright
+scrapy
+
+pytest
+hypothesis
+coverage
+
+rich
+click
+typer
+loguru
+tqdm
+
+pydantic
+python-dotenv
+pyyaml
+tomli
+
+jupyter
+ipython
+notebook
+
+pygame
+pyglet
+arcade
+
+cryptography
+pycryptodome
+bcrypt
+passlib
+
+psutil
+watchdog
+pywin32
+pyautogui
+pynput
+evdev
+mss
+pyperclip
+
+paramiko
+fabric
+boto3
+
+openpyxl
+xlsxwriter
+python-docx
+python-pptx
+reportlab
+pypdf
+
+sympy
+networkx
+numba
+dask
+joblib
+
+pytest-asyncio
+uvicorn
+gunicorn
+celery
+redis
