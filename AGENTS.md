@@ -44,20 +44,11 @@ Phần mềm quản lý phòng tin học dành cho giáo viên, tích hợp AI A
 - No non-essential content.
 - Do not provide solutions or over-explain unless explicitly requested, to prevent spoiling the answer for the user.
 
-## Tool Execution & Reporting (Thêm mới đoạn này)
-- Limit user-facing status updates/reports to exactly TWO times per request.
-- Structure the interaction as follows:
-  1. Initial Report: State what you are about to do before triggering any tools (e.g., "Bây giờ tôi sẽ...").
-  2. Silent Execution: Run all necessary tool calls consecutively without printing intermediate text or updates between calls.
-  3. Final Report: Provide the definitive result after all tool calls are finished (e.g., "Tôi đã...").
-- STRICTLY FORBIDDEN: Printing status reports or text commentary between sequential tool calls.
 
 ## Workflow
-1. **Đọc cấu hình:** Đọc file config tại các thư mục đang làm việc trước khi thực hiện.
-2. **Khảo sát:** Đọc mã nguồn liên quan để hiểu ngữ cảnh, giữ nguyên trạng nếu không thuộc phạm vi sửa đổi.
-3. **Chỉnh sửa:** Chỉ can thiệp vào các file được chỉ định trong task.
-4. **Kiểm tra cục bộ:** Ngay sau khi sửa một file Python, chạy lệnh kiểm tra duy nhất file đó:
+Sau dung workflow mac dinh cua m, sau khi lam xong thi buoc cuoi la chay lenh benh duoi de check va fix den khi xong
    ```bash
-   scripts/clean_pyright_check.sh <path_to_python_file>
+   scripts/clean_pyright_check.sh <path_to_python_file_or_directory>
+   ```
 
-btw, venv: ./.pyvenv
+Virtual environment của dự án: `./.pyvenv`.

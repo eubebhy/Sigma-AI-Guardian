@@ -1,20 +1,20 @@
-# Scripts hỗ trợ
+# Script ho tro
 
-Các script trong thư mục này phục vụ phát triển, train model và kiểm tra cục bộ.
-Chúng không phải public runtime API của ứng dụng.
+Cac script trong thu muc nay phuc vu phat trien, huan luyen model va kiem tra cuc bo.
+Chung khong phai API runtime cong khai cua ung dung.
 
-## Build dữ liệu train
+## Tao du lieu huan luyen
 
-- `dedupe_similar_lines.py`: xóa các dòng giống nhau theo threshold.
-- `record_clip_board.py`: ghi nội dung clipboard vào file.
-- `train_model.py`: huấn luyện model từ dữ liệu train hiện có.
+- `dedupe_similar_lines.py`: xoa cac dong giong nhau theo nguong.
+- `record_clip_board.py`: ghi noi dung clipboard vao file.
+- `train_model.py`: huan luyen model tu du lieu huan luyen hien co.
 
-## Khác
+## Khac
 
-- `clean_pyright_check.sh`: chạy Pyright theo cách rút gọn để dễ đọc lỗi.
+- `clean_pyright_check.sh`: chay Pyright theo cach rut gon de de doc loi.
 
-## Ghi chú
+## Ghi chu
 
-- Chạy script từ project root để các path tương đối trỏ đúng dữ liệu trong repo.
-- Script ghi dữ liệu hoặc train model có thể tạo/thay đổi file trong `data/`.
-- Khi sửa file Python, dùng `scripts/clean_pyright_check.sh <path>` để kiểm tra riêng file đó.
+- Chay script tu project root de cac duong dan tuong doi tro dung du lieu trong repo.
+- Script ghi du lieu hoac huan luyen model co the tao/thay doi file trong `data/`.
+- Khi sua file Python, dung `scripts/clean_pyright_check.sh <path>` de kiem tra rieng file do.

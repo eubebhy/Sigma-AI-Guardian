@@ -1,221 +1,128 @@
 # Input Controller
 
-`utils.input_controller` is the stable input API used by the application. It
-hides OS-specific input libraries behind one public module so higher-level code
-does not need to know whether the machine is running Linux or Windows.
+File path: `src/utils/input_controller/README.md`
 
-## Public API
+Vai trò: cung cấp cùng một contract gửi và lắng nghe input cho Linux và Windows.
+Input là tên phím/nút chung, tọa độ hoặc thời lượng; output là thao tác input hoặc
+iterator event đã chuẩn hóa. Mỗi backend được truy cập qua facade riêng:
+
+```text
+input_controller/
+├── types.py                 # kiểu dùng chung
+├── linux/                   # evdev/UInput, Xlib và listener evdev
+│   └── __init__.py          # facade Linux
+└── window/                  # pydirectinput-rgx và pynput
+    └── __init__.py          # facade Windows
+```
+
+## Import
 
 ```python
-from utils.input_controller import (
-    KeyboardEvent,
-    click,
-    keyDown,
-    keyUp,
-    listen_keys,
-    mouseDown,
-    mouseUp,
-    moveTo,
-    position,
+from utils.input_controller import linux
+from utils.input_controller.linux import click, listen_keys
+
+# Trên Windows, tên package theo cấu trúc hiện tại là `window`.
+from utils.input_controller import window
+from utils.input_controller.window import moveTo, press
+```
+
+Import facade Windows không import `pydirectinput` hoặc `pynput` ngay. Dependency
+chỉ được nạp khi API sender được gọi hoặc listener bắt đầu được duyệt.
+
+## Contract 16 API
+
+Các chữ ký dưới đây là chữ ký thật và giống nhau giữa hai facade:
+
+```python
+from collections.abc import Iterator
+
+from utils.input_controller.types import (
+    KeyEvent,
+    Keys,
+    MouseButton,
+    MouseEvent,
 )
 
-click(500, 300)
-moveTo(900, 500, steps=20, duration=0.3)
-mouseDown("left")
-mouseUp("left")
-keyDown("leftctrl")
-keyUp("leftctrl")
-print(position())
-
-
-def on_key(event: KeyboardEvent) -> None:
-    print(event.name, event.event_type, event.text)
-
-
-listener = listen_keys(on_key, typeable_only=True)
-listener.stop()
+def click(button: MouseButton) -> None: ...
+def keyDown(key: Keys) -> None: ...
+def keyUp(key: Keys) -> None: ...
+def listen_keys(timeout: float | None = None) -> Iterator[KeyEvent]: ...
+def listen_mice(timeout: float | None = None) -> Iterator[MouseEvent]: ...
+def mouseDown(button: MouseButton) -> None: ...
+def mouseUp(button: MouseButton) -> None: ...
+def moveRel(
+    x: int,
+    y: int,
+    steps: int = 1,
+    duration: int | float = 0,
+) -> None: ...
+def moveTo(
+    x: int,
+    y: int,
+    steps: int = 1,
+    duration: int | float = 0,
+) -> None: ...
+def position(take_new: bool = False) -> tuple[int, int]: ...
+def press(*keys: Keys, delay: float = 0.067) -> None: ...
+def scroll(amount: int) -> None: ...
+def sideScroll(amount: int) -> None: ...
+def supportedKeys() -> tuple[str, ...]: ...
+def supportedWriteCharacters() -> str: ...
+def write(text: str, delay: float = 0.067) -> None: ...
 ```
 
-Mouse buttons: `left`, `right`, `middle`, `back`, `forward`.
-Keyboard names are normalized by each backend. Common names such as `a`,
-`enter`, `space`, `leftctrl`, and `rightshift` are intended to work through the
-public API.
+`click`, `mouseDown` và `mouseUp` nhận `"left"`, `"right"`, `"middle"`,
+`"forward"` hoặc `"back"`. `keyDown`/`mouseDown` phải được cân bằng bằng lời
+gọi `keyUp`/`mouseUp`. `supportedKeys()` và `supportedWriteCharacters()` cho biết
+input sender thực sự hỗ trợ trên backend hiện tại. `write()` dùng layout US/ANSI.
 
-## File Map
+`press()` chờ `delay` sau event down và sau event up của từng phím. `write()`
+dùng cùng delay khi gọi `press`; ký tự cần Shift còn có delay sau lúc nhấn và
+thả Shift. Đặt `delay=0` để không chờ.
 
-- `__init__.py`: public facade and lazy backend selection.
-- `linux_backend.py`: Linux mouse/keyboard control with `evdev.UInput`.
-- `windows_backend.py`: Windows mouse/keyboard control with `pydirectinput-rgx`.
-- `linux_listener.py`: Linux keyboard listener with `evdev`.
-- `windows_listener.py`: Windows keyboard listener with `pynput`.
-- `types.py`: shared callback types: `KeyboardEvent`, `KeyCallback`, `KeyListener`.
+## Tọa độ và cuộn
 
-The Linux-specific files include `linux` in the file name so readers can tell
-which modules touch `/dev/input` and `/dev/uinput`.
+Tọa độ màn hình là số nguyên `(x, y)`: `x` tăng sang phải, `y` tăng xuống dưới.
+`moveTo` dùng tọa độ tuyệt đối; `moveRel` dùng độ lệch từ vị trí hiện tại.
+`steps` là số bước chuyển động và `duration` là tổng thời gian tính bằng giây.
+`position(take_new=False)` giữ cùng chữ ký trên hai backend; Windows bỏ qua
+`take_new`.
 
-## Backend Selection
+`scroll(amount)` cuộn dọc, số dương lên và số âm xuống. `sideScroll(amount)`
+cuộn ngang, số dương sang phải và số âm sang trái. Giá trị `0` không tạo độ dịch.
 
-Importing `utils.input_controller` does not immediately create devices or start
-keyboard hooks. Backends are loaded only when the matching public API is called.
-This matters because Linux and Windows dependencies are not interchangeable:
-`evdev` is Linux-only, while `pydirectinput-rgx` and `pynput` are only needed for
-Windows behavior.
+## Event và listener
 
-Control calls use this path:
-
-```text
-click/keyDown/moveTo/...
--> __init__._get_backend()
--> Linux: import linux_backend
--> Windows: create WindowsBackend from windows_backend
--> call the selected backend function
-```
-
-Listener calls use a separate but similar path:
-
-```text
-listen_keys(callback, typeable_only)
--> __init__._get_listener_backend()
--> Linux: import linux_listener
--> Windows: import windows_listener
--> call backend listen_keys(...)
--> return a KeyListener-compatible handle with stop()
-```
-
-`_backend_lock` protects the lazy selection step. It prevents two threads from
-creating/importing the same backend at the same time during the first call.
-The lock is not a global input-operation lock. After backend selection, threading
-rules belong to the selected backend module.
-
-## Threading Overview
-
-There are three independent layers of threading concerns:
-
-- Facade lazy loading: `__init__._backend_lock` protects first-time backend
-  selection only.
-- Linux control writes: `linux_backend._pointer_lock` protects multi-step pointer
-  workflows, while `_LinuxInputBackend._lock` protects UInput file descriptors.
-- Listener callbacks: Linux uses a daemon thread owned by `LinuxKeyListener`;
-  Windows uses the hook thread owned by `pynput.keyboard.Listener`.
-
-Application callbacks are called from listener threads. If a callback needs to
-update UI state, database state, or shared AI-agent state, it should hand work to
-the owning thread or a queue instead of doing long blocking work inside the
-listener callback.
-
-## Linux Control Backend
-
-`linux_backend.py` creates two virtual devices with `evdev.UInput`:
-
-- `SAG Virtual Mouse`
-- `SAG Virtual Keyboard`
-
-The virtual mouse uses absolute pointer coordinates, so the same control path is
-usable on both X11 and Wayland. Wayland may not allow reading the real global
-pointer position; in that case `position()` falls back to the last pointer
-coordinate set by SAG.
-
-Linux absolute input detail:
-
-```text
-desktop pixel x/y
--> clamp to current screen size
--> scale to UInput ABS_X/ABS_Y range 0..65535
--> write EV_ABS events
--> write SYN_REPORT via evdev's syn()
-```
-
-This conversion is why the backend needs both screen size and the `_ABS_MAX`
-constant. Desktop code should not pass already-scaled evdev values; the public
-API always expects pixels.
-
-The backend keeps virtual devices open for long-running performance. If a write
-fails with `OSError`, the backend closes the broken device, recreates it, and
-retries the write once. This handles cases where a virtual input device is
-removed or its descriptor becomes invalid.
-
-Linux permission requirements:
-
-- read `/dev/input/event*` for listening;
-- write `/dev/uinput` for control;
-- load the `uinput` kernel module.
-
-Use group/udev permissions when possible instead of running the whole app as
-root.
-
-## Windows Control Backend
-
-`windows_backend.py` imports `pydirectinput` from the `pydirectinput-rgx`
-package only when Windows control is first used.
-
-The backend disables implicit delays:
-
-- sets `pydirectinput.PAUSE = 0`;
-- passes `_pause=False` on calls;
-- passes `duration=0` and `interval=0` when the underlying API has those
-  parameters.
-
-Only `moveTo(..., duration=...)` intentionally waits, because `duration` is part
-of the public SAG API.
-
-## Keyboard Listener
-
-`listen_keys(callback, typeable_only=False)` is the one public listener API on
-both supported operating systems.
-
-The callback receives:
+Các kiểu trong `utils.input_controller.types` được dùng chung:
 
 ```python
-KeyboardEvent(
-    name="a",
-    event_type="down",  # or "press" / "up"
-    text="a",           # None for non-text keys
+KeyEvent = tuple[str, Literal["down", "up", "hold"]]
+MouseEvent = (
+    tuple[str, Literal["down", "up"]]
+    | tuple[str, int]
 )
 ```
 
-When `typeable_only=True`, listeners only emit keys that can produce text, such
-as letters, digits, spaces, and punctuation. Control keys such as `esc`, `ctrl`,
-`alt`, and `super` are filtered out.
+Keyboard trả tên `KEY_*`, ví dụ `("KEY_A", "down")`. Mouse trả nút `BTN_*`,
+chuyển động `REL_X`/`REL_Y` và cuộn `REL_WHEEL`/`REL_HWHEEL`.
 
-Linux listener behavior:
+`timeout` là thời gian tối đa của mỗi lần chờ nội bộ, không phải thời hạn sống
+của iterator và không làm iterator tự kết thúc khi chưa có event. Listener tiếp
+tục chờ cho tới khi caller đóng generator hoặc backend lỗi. Trên Windows, đóng
+generator luôn gọi `stop()` rồi `join()` hook nền; hook chết ngoài ý muốn gây
+`RuntimeError`. Trên Linux, generator đọc các device vật lý trong vòng lặp
+`select()` và kết thúc khi caller đóng generator.
 
-- scans all `/dev/input/event*` keyboard devices;
-- listens to all physical keyboards at the same time;
-- does not grab devices, so input still reaches the desktop;
-- rescans to handle keyboard hot-plug and removal;
-- ignores SAG virtual devices by name to avoid callback loops.
+## Điều kiện và giới hạn backend
 
-Linux evdev key state detail:
+Linux cần `evdev`, `python-xlib`, kernel module `uinput`, quyền ghi
+`/dev/uinput`, quyền đọc `/dev/input/event*`, và phiên X11 có `DISPLAY` để đọc
+hoặc di chuyển con trỏ. Backend hiện không hỗ trợ Wayland cho API dựa trên Xlib.
 
-```text
-event.value == 1 -> key down
-event.value == 0 -> key up
-event.value == 2 -> repeat while held
-```
-
-The public API reports repeat events as `event_type="press"`.
-`typeable_only=True` is implemented from a small US-style printable-key table in
-`linux_listener.py`; it is intended for simple character monitoring, not full IME
-or arbitrary layout reconstruction.
-
-Windows listener behavior:
-
-- uses `pynput.keyboard.Listener`;
-- keeps the same `KeyboardEvent` contract as Linux;
-- returns a handle with `stop()`.
-
-Callback exceptions are caught inside listener backends so one bad callback call
-does not kill long-running input monitoring.
-
-## Maintenance Notes
-
-When adding a new public input API:
-
-1. Add the function to `__init__.py` first, with the public contract documented.
-2. Add the same method to `_ControlBackend` if it is a control API.
-3. Implement it in both `linux_backend.py` and `windows_backend.py`.
-4. Keep OS-specific imports inside backend files or lazy selection functions.
-5. Update this README with any new input/output formats or threading assumptions.
-
-When changing listener event shape, update `types.py` first. That file is the
-contract between OS-specific backends and the rest of the application.
+Windows cần `pydirectinput-rgx` để gửi input và `pynput` để hook listener.
+Keyboard sender chỉ gõ các ký tự US/ANSI do helper công bố và chỉ ánh xạ các tên
+phím Windows hỗ trợ; text đầu ra còn phụ thuộc keyboard layout đang active.
+Ứng dụng đích có đặc quyền cao hơn có thể không nhận input. Mouse movement được
+nội suy thành tọa độ tuyệt đối để tránh mouse acceleration. Listener phụ thuộc
+khả năng cài global hook của phiên desktop hiện tại; `pynput` không thể phân biệt
+hoàn hảo một số phím keypad và navigation có cùng biểu diễn trên Windows.

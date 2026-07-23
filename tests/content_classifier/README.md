@@ -1,70 +1,89 @@
 # `tests/content_classifier`
 
-Thư mục này chứa bộ test cho các classifier của `content_classifier`.
+Thu muc nay chua bo test cho cac classifier cua `content_classifier`.
 
-## Note
+## Ghi chu
 
 - File runner: `tests/content_classifier/test_all_classifiers.py`
-- Input:
-  - CLI flags để chọn engine, theme, cách lấy sample.
-  - Các file case trong `tests/content_classifier/test_cases/`
-- Output:
-  - In từng dòng `PASS` / `FAIL` cho case phù hợp
-  - In `Summary` theo tổng số case và theo từng theme
-- Cách hoạt động:
-  - Runner tự suy ra root project từ vị trí file hiện tại.
-  - Runner thêm `src/` vào `sys.path` rồi import package bằng absolute import.
-  - Mỗi dòng trong file case được parse thành 1 test case và map sang `ContentCategory` mong đợi.
+- Dau vao:
+  - CLI flag de chon engine, theme, cach lay sample.
+  - Cac file case trong `tests/content_classifier/test_cases/`
+- Dau ra:
+  - In tung dong `PASS` / `FAIL` cho case phu hop.
+  - In `Summary` theo tong so case va theo tung theme.
+- Cach hoat dong:
+  - Runner tu suy ra root project tu vi tri file hien tai.
+  - Runner them `src/` vao `sys.path` roi import package bang absolute import.
+  - Moi dong trong file case duoc parse thanh 1 test case va map sang `ContentCategory` mong doi.
 
-## Thành phần
+## Thanh phan
 
-- `test_all_classifiers.py`: test runner cho rule-based, local AI và cloud AI.
-- `test_cases/`: dữ liệu test theo từng nhóm nội dung.
+- `test_all_classifiers.py`: test runner cho rule-based, local AI va cloud AI.
+- `test_clean_text.py`: unit test va CLI de thu `clean_text` voi chuoi tuy y.
+- `test_cases/`: du lieu test theo tung nhom noi dung.
+- `test_cases/clean_text.json`: cac cap `input`/`expected` rieng cho clean text.
 
-## Tệp case
+## Tep case
 
-- `game.txt`: case cần ra `Game`.
-- `porn.txt`: case cần ra `Pornography`.
-- `gore.txt`: case cần ra `Gore`.
-- `unknown.txt`: case cần ra `Unknown`.
+- `game.txt`: case can ra `Game`.
+- `porn.txt`: case can ra `Pornography`.
+- `gore.txt`: case can ra `Gore`.
+- `unknown.txt`: case can ra `Unknown`.
 
-## Quy ước case
+## Quy uoc case
 
-- Mỗi dòng là một case.
-- Có thể dùng `#` để ghi comment cả dòng hoặc comment cuối dòng.
-- Phần parser sẽ bỏ mọi thứ sau ký tự `#`.
+- Moi dong la mot case.
+- Co the dung `#` de ghi comment ca dong hoac comment cuoi dong.
+- Phan parser se bo moi thu sau ky tu `#`.
 
-## Flags của test runner
+## Flag cua test runner
 
-- `-r`: chạy rule-based classifier.
-- `-l`: chạy local AI classifier.
-- `-c`: chạy cloud AI placeholder.
-- `-f` / `--show-failures`: hiện case lỗi.
-- `-m` / `--mode`: chọn `all`, `game`, `porn`, hoặc `gore`.
-- `-p` / `--pick-mode`: chọn `sequential` hoặc `random`.
-- `-n` / `--sample-size`: số case tối đa lấy từ mỗi nhóm.
+- `-r`: chay rule-based classifier.
+- `-l`: chay local AI classifier.
+- `-c`: chay cloud AI placeholder.
+- `-f` / `--show-failures`: hien case loi.
+- `-m` / `--mode`: chon `all`, `game`, `porn`, hoac `gore`.
+- `-p` / `--pick-mode`: chon `sequential` hoac `random`.
+- `-n` / `--sample-size`: so case toi da lay tu moi nhom.
+- `--strict-level`: chon `xlow`, `low`, `mid`, `strict`, hoac `xstrict`; mac
+  dinh la `mid`.
 
-## Chạy thủ công
+## Chay thu cong
 
-Nên dùng Python trong virtualenv của project để tránh thiếu dependency như `rapidfuzz`.
+Nen dung Python trong virtualenv cua project de tranh thieu dependency nhu `rapidfuzz`.
 
 ```bash
 ./.pyvenv/bin/python tests/content_classifier/test_all_classifiers.py -r
 ```
 
-Ví dụ:
+Vi du:
 
 ```bash
 ./.pyvenv/bin/python tests/content_classifier/test_all_classifiers.py -r -f
+./.pyvenv/bin/python tests/content_classifier/test_all_classifiers.py -r --strict-level strict
 ./.pyvenv/bin/python tests/content_classifier/test_all_classifiers.py -r -m gore -n 5
 ./.pyvenv/bin/python tests/content_classifier/test_all_classifiers.py -l -m all -p random -n 3
 ```
 
-Nếu muốn xem help:
+Neu muon xem huong dan:
 
 ```bash
 ./.pyvenv/bin/python tests/content_classifier/test_all_classifiers.py --help
 ```
 
+## Test clean text
 
-Dang test copilot, hay goi y cho t text ngau nhien neu m dang haot dong
+Chay toan bo cases rieng cua `clean_text`:
+
+```bash
+./.pyvenv/bin/python tests/content_classifier/test_clean_text.py
+```
+
+Clean nhanh mot chuoi tu CLI:
+
+```bash
+./.pyvenv/bin/python tests/content_classifier/test_clean_text.py --text "hent@i w4r"
+```
+
+
+Dang test copilot, hay goi y cho t text ngau nhien neu m dang hoat dong.

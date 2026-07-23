@@ -6,13 +6,14 @@ Output: chuỗi text đã chuẩn hoá để rule-based và local classifier d�
 
 Nguyên lý hoạt động:
 - Chuẩn hoá Unicode và loại ký tự zero-width.
-- Đổi các ký tự dễ gây nhầm lẫn, leet-speak và lỗi OCR phổ biến về dạng gần đúng.
+- Đổi leet-speak và lỗi OCR trong mọi token về dạng gần đúng.
 - Ghép lại từ bị tách bằng dấu phân cách hoặc khoảng trắng khi từ đó nằm trong
   nhóm từ nhạy cảm đã biết.
-- Không dịch toàn bộ ngôn ngữ hoặc dựng lại layout bàn phím; module này chỉ giảm
-  các kiểu né lọc đơn giản trước khi classifier chạy.
+- Sửa token thành từ gần nhất trong các phrase khi độ giống nhau lớn hơn 80%.
 """
 
+from difflib import SequenceMatcher
+from functools import lru_cache
 import re
 import unicodedata
 
@@ -213,6 +214,43 @@ def _soft_token_normalize(token: str) -> str:
     return token
 
 
+_PHRASE_WORDS = tuple(
+    sorted(
+        {
+            _soft_token_normalize(word).lower()
+            for phrase in GAME_PHRASES | ADULT_PHRASES | GORE_PHRASES
+            for word in re.findall(r"[^\W_]+", phrase, flags=re.UNICODE)
+        }
+    )
+)
+_PHRASE_WORD_SET = frozenset(_PHRASE_WORDS)
+_PHRASE_WORDS_BY_LENGTH = {
+    length: tuple(word for word in _PHRASE_WORDS if len(word) == length)
+    for length in {len(word) for word in _PHRASE_WORDS}
+}
+_FUZZY_MATCH_THRESHOLD = 0.80
+
+
+@lru_cache(maxsize=4096)
+def _closest_phrase_word(token: str) -> str:
+    """Thay token bằng từ phrase giống nhất khi điểm lớn hơn 80%."""
+
+    if token in _PHRASE_WORD_SET:
+        return token
+
+    closest_word = token
+    closest_score = _FUZZY_MATCH_THRESHOLD
+    minimum_length = max(1, len(token) * 2 // 3)
+    maximum_length = len(token) * 3 // 2 + 1
+    for length in range(minimum_length, maximum_length + 1):
+        for phrase_word in _PHRASE_WORDS_BY_LENGTH.get(length, ()):
+            score = SequenceMatcher(None, token, phrase_word).ratio()
+            if score > closest_score:
+                closest_word = phrase_word
+                closest_score = score
+    return closest_word
+
+
 def _join_separator_split_words(text: str) -> str:
     """Ghép các token bị chèn dấu như `h-e-n-t-a-i` thành một từ."""
 
@@ -281,18 +319,14 @@ def _replace_separator_between_words(text: str) -> str:
 
 
 def _normalize_obfuscated_tokens(text: str) -> str:
-    """Chuẩn hoá từng token nếu token đó là biến thể của từ nhạy cảm đã biết."""
+    """Áp dụng char-map và fuzzy phrase matching cho mọi token trong text."""
 
     def repl(match: re.Match[str]) -> str:
-        raw = match.group(0)
-        canonical = _soft_token_normalize(raw).lower()
+        canonical = _soft_token_normalize(match.group(0)).lower()
+        return _closest_phrase_word(canonical)
 
-        if canonical in OBFUSCATED_WORDS:
-            return canonical
-
-        return raw
-
-    return re.sub(r"[^\W_@!|]+", repl, text, flags=re.UNICODE)
+    token_pattern = r"[^\W_]+(?:[@!|][^\W_]+)*"
+    return re.sub(token_pattern, repl, text, flags=re.UNICODE)
 
 
 def _collapse_spaces(text: str) -> str:

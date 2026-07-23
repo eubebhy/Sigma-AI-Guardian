@@ -6,7 +6,8 @@ Note:
   - Test case dir input: `tests/content_classifier/test_cases/`
   - Source dir duoc them vao `sys.path`: `src/`
 - Chuan input:
-  - CLI flags chon engine va cach lay sample.
+  - CLI flags chon engine, strict level va cach lay sample.
+  - `--custom-input` de phan loai truc tiep mot chuoi tuy chinh.
   - Moi test case la 1 dong text trong cac file `.txt`.
 - Chuan output:
   - In tung dong PASS/FAIL neu case pass hoac co `--show-failures`.
@@ -24,7 +25,8 @@ import argparse
 import random
 import sys
 from pathlib import Path
-from typing import Callable, Literal, TypeAlias
+from typing import Callable, Literal, TypeAlias, cast
+import time
 
 CASE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = CASE_DIR.parent.parent
@@ -34,8 +36,9 @@ if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
 from content_classifier.tags import ContentCategory
+from content_classifier.types import StrictLevel
 
-ClassifierFunc: TypeAlias = Callable[[str], ContentCategory]
+ClassifierFunc: TypeAlias = Callable[[str, StrictLevel], ContentCategory]
 TestCase: TypeAlias = tuple[str, ContentCategory, str]
 DisplayMode: TypeAlias = Literal["summary", "failures", "successes", "all"]
 
@@ -48,6 +51,13 @@ THEME_TO_EXPECTED = {
 }
 MODE_CHOICES = ("all", "game", "porn", "gore")
 CASE_PICK_CHOICES = ("sequential", "random")
+STRICT_LEVEL_CHOICES: tuple[StrictLevel, ...] = (
+    "xlow",
+    "low",
+    "mid",
+    "strict",
+    "xstrict",
+)
 
 
 def parse_arguments() -> tuple[argparse.Namespace, list[str]]:
@@ -115,11 +125,37 @@ def parse_arguments() -> tuple[argparse.Namespace, list[str]]:
         default=10,
         help="Maximum number of cases to take from each selected theme",
     )
+    _ = parser.add_argument(
+        "-i",
+        "--custom-input",
+        help="Classify this text instead of loading test cases",
+    )
+    _ = parser.add_argument(
+        "--strict-level",
+        choices=STRICT_LEVEL_CHOICES,
+        default="mid",
+        help="Select classifier strictness (default: mid)",
+    )
 
     return parser.parse_known_args()
 
 
 args, _ = parse_arguments()
+strict_level: StrictLevel = cast(StrictLevel, args.strict_level)
+
+
+def _run_custom_input(
+    engine_name: str,
+    classifier_func: ClassifierFunc,
+    text: str,
+    selected_strict_level: StrictLevel,
+) -> None:
+    """Phan loai va in ket qua cua mot chuoi do nguoi dung cung cap."""
+
+    actual_tag = classifier_func(text, selected_strict_level)
+    print(f"=== {engine_name} | strict={selected_strict_level} ===")
+    print(f"Input: {text}")
+    print(f"Result: {actual_tag.name}")
 
 
 def _load_cases_from_file(
@@ -191,9 +227,13 @@ class BaseClassifierTest:
         return False
 
     def _run_test_case(
-        self, classifier_func: ClassifierFunc, text: str, expected_tag: ContentCategory
+        self,
+        classifier_func: ClassifierFunc,
+        text: str,
+        expected_tag: ContentCategory,
+        selected_strict_level: StrictLevel,
     ) -> tuple[ContentCategory, bool]:
-        actual_tag = classifier_func(text)
+        actual_tag = classifier_func(text, selected_strict_level)
         return actual_tag, actual_tag == expected_tag
 
     def _update_theme_stats(
@@ -243,6 +283,7 @@ class BaseClassifierTest:
         engine_name: str,
         classifier_func: ClassifierFunc,
         test_cases: list[TestCase],
+        selected_strict_level: StrictLevel,
     ) -> None:
         total_cases = len(test_cases)
         passed_count = 0
@@ -252,11 +293,15 @@ class BaseClassifierTest:
         }
         failed_cases: list[tuple[str, str, ContentCategory, ContentCategory]] = []
 
-        print(f"=== {engine_name} ===")
+        start_time = time.time()
+        print(f"=== {engine_name} | strict={selected_strict_level} ===")
 
         for text, expected_tag, theme in test_cases:  # Tach cho nay ra lam 1 ham
             actual_tag, is_passed = self._run_test_case(
-                classifier_func, text, expected_tag
+                classifier_func,
+                text,
+                expected_tag,
+                selected_strict_level,
             )
             self._update_theme_stats(theme_stats, theme, is_passed)
             if is_passed:
@@ -267,18 +312,36 @@ class BaseClassifierTest:
             self._print_case_result(theme, text, actual_tag, is_passed)
 
         self._print_summary(total_cases, passed_count, failed_count, theme_stats)
+        print(f"DONE {time.time() - start_time}")
 
 
 def run_selected_tests() -> None:
     tester = BaseClassifierTest()
-    test_cases = load_test_cases(args.mode, args.sample_size, args.pick_mode)
+    test_cases = (
+        []
+        if args.custom_input is not None
+        else load_test_cases(args.mode, args.sample_size, args.pick_mode)
+    )
 
     if args.main_classifier or not any(
         [args.rule_based_engine, args.local_ai_classifier, args.cloud_ai_classifier]
     ):
         from content_classifier import content_classifier
 
-        tester.run_classifier_test("main-classifier", content_classifier, test_cases)
+        if args.custom_input is not None:
+            _run_custom_input(
+                "main-classifier",
+                content_classifier,
+                args.custom_input,
+                strict_level,
+            )
+        else:
+            tester.run_classifier_test(
+                "main-classifier",
+                content_classifier,
+                test_cases,
+                strict_level,
+            )
 
     if args.rule_based_engine:  # Cac phan test rieng module kieu nay tao mot ham rieng de test, tranh repeat code.
         try:
@@ -287,9 +350,20 @@ def run_selected_tests() -> None:
             print("=== rule-based-engine ===")
             print(f"TODO: rule-based engine is unavailable: {exc}")
         else:
-            tester.run_classifier_test(
-                "rule-based-engine", rule_based_classifier, test_cases
-            )
+            if args.custom_input is not None:
+                _run_custom_input(
+                    "rule-based-engine",
+                    rule_based_classifier,
+                    args.custom_input,
+                    strict_level,
+                )
+            else:
+                tester.run_classifier_test(
+                    "rule-based-engine",
+                    rule_based_classifier,
+                    test_cases,
+                    strict_level,
+                )
 
     if args.local_ai_classifier:
         try:
@@ -298,9 +372,20 @@ def run_selected_tests() -> None:
             print("=== local-ai-classifier ===")
             print(f"TODO: local AI backend is unavailable: {exc}")
         else:
-            tester.run_classifier_test(
-                "local-ai-classifier", local_ai_classifier, test_cases
-            )
+            if args.custom_input is not None:
+                _run_custom_input(
+                    "local-ai-classifier",
+                    local_ai_classifier,
+                    args.custom_input,
+                    strict_level,
+                )
+            else:
+                tester.run_classifier_test(
+                    "local-ai-classifier",
+                    local_ai_classifier,
+                    test_cases,
+                    strict_level,
+                )
 
     if args.cloud_ai_classifier:
         print("=== cloud-ai-classifier ===")

@@ -19,10 +19,14 @@ SRC_ROOT = PROJECT_ROOT / "src"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
+# `linux` cung cấp API public để chạy action. Hai module cụ thể chỉ được dùng
+# trong `_prepare_devices()` để tạo trước UInput object trước action đầu tiên.
 from utils.input_controller import linux
 from utils.input_controller.linux import sendinput_kb, sendinput_mouse
 from utils.input_controller.types import Keys, MouseButton
 
+# Mỗi command giữ nguyên flag và các giá trị đi kèm. Danh sách command giúp CLI
+# thực thi đúng thứ tự người dùng nhập, kể cả khi các loại flag xen kẽ nhau.
 Command: TypeAlias = tuple[str, tuple[str, ...]]
 _ARG_COUNTS = {
     "--key-down": 1,
@@ -32,6 +36,7 @@ _ARG_COUNTS = {
     "--mouse-down": 1,
     "--mouse-up": 1,
     "--click": 1,
+    "--spam-click": 2,
     "--move-to": 2,
     "--move-rel": 2,
     "--scroll": 1,
@@ -41,7 +46,6 @@ _ARG_COUNTS = {
     "--list-keys": 0,
 }
 _MOUSE_BUTTONS = {"left", "right", "middle", "forward", "back"}
-_DEVICE_READY_DELAY = 0.67
 
 
 def _build_parser() -> argparse.ArgumentParser:
@@ -58,6 +62,7 @@ def _build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--mouse-down", metavar="BUTTON")
     parser.add_argument("--mouse-up", metavar="BUTTON")
     parser.add_argument("--click", metavar="BUTTON")
+    parser.add_argument("--spam-click", nargs=2, metavar=("BUTTON", "COUNT"))
     parser.add_argument("--move-to", nargs=2, metavar=("X", "Y"))
     parser.add_argument("--move-rel", nargs=2, metavar=("X", "Y"))
     parser.add_argument("--scroll", metavar="AMOUNT")
@@ -72,6 +77,8 @@ def _parse_commands(
     parser: argparse.ArgumentParser,
     arguments: list[str],
 ) -> list[Command]:
+    """Đọc tuần tự argv vì argparse Namespace không giữ thứ tự giữa các flag."""
+
     commands: list[Command] = []
     index = 0
     while index < len(arguments):
@@ -88,11 +95,15 @@ def _parse_commands(
 
 
 def _prepare_devices() -> None:
-    """Tạo virtual devices và chờ Xorg/libinput attach trước action đầu tiên."""
+    """Tạo virtual devices và chờ Xorg nhận diện chủ động qua XInput2.
 
+    `_get_ui()` lưu UInput object trong biến module, nên các API public gọi sau
+    đó dùng lại đúng device này thay vì tạo một device mới.
+    """
+
+    # Mỗi `_get_ui()` chỉ trả về sau khi device đã xuất hiện trong XInput2.
     sendinput_kb._get_ui()
     sendinput_mouse._get_ui()
-    time.sleep(_DEVICE_READY_DELAY)
 
 
 def _execute(command: Command, parser: argparse.ArgumentParser) -> None:
@@ -117,13 +128,22 @@ def _execute(command: Command, parser: argparse.ArgumentParser) -> None:
         else:
             linux.press(key)
 
-    elif action in {"--mouse-down", "--mouse-up", "--click"}:
+    elif action in {"--mouse-down", "--mouse-up", "--click", "--spam-click"}:
         if values[0] not in _MOUSE_BUTTONS:
             parser.error(f"unsupported mouse button: {values[0]}")
 
         button = cast(MouseButton, values[0])
 
-        if action == "--mouse-down":
+        if action == "--spam-click":
+            count = int(values[1])
+            if count < 1:
+                parser.error("--spam-click COUNT must be greater than zero")
+            started = time.perf_counter()
+            for _ in range(count):
+                linux.click(button)
+            elapsed = time.perf_counter() - started
+            print(f"spam-click: {count / elapsed:.2f} CPS")
+        elif action == "--mouse-down":
             linux.mouseDown(button)
 
         elif action == "--mouse-up":
@@ -163,9 +183,12 @@ def main() -> None:
     if arguments == ["--help"] or arguments == ["-h"]:
         parser.print_help()
         return
+    # Parse và kiểm tra toàn bộ chuỗi trước để input sai không tạo device thật.
     commands = _parse_commands(parser, arguments)
-    print(f"Preparing virtual devices for {_DEVICE_READY_DELAY:.2f}s", flush=True)
+    print("Preparing virtual devices", flush=True)
     _prepare_devices()
+
+    # Device đã sẵn sàng; mọi action dưới đây tái sử dụng chúng đến khi CLI thoát.
     for command in commands:
         _execute(command, parser)
 

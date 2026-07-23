@@ -1,21 +1,21 @@
 # `content_classifier.local`
 
-Nhóm module này phụ trách classifier chạy model scikit-learn cục bộ qua
+Nhom module nay phu trach classifier chay model scikit-learn cuc bo qua
 `joblib`.
 
-## Thành phần
+## Thanh phan
 
-- `ai_assistant.py`: wrapper lazy-load model và dự đoán.
-- `classifier.py`: lớp/hàm bọc mức cao hơn để gọi local AI classifier.
+- `ai_assistant.py`: wrapper lazy-load model va du doan.
+- `classifier.py`: lop/ham boc muc cao hon de goi local AI classifier.
 
-## Dữ liệu liên quan
+## Du lieu lien quan
 
-- Model runtime hiện được lưu trong `data/models/` và được load từ file
+- Model runtime hien duoc luu trong `data/models/` va duoc load tu file
   `Ritchie.pkl`.
-- Dữ liệu train dùng cho model nằm trong `data/training/`.
+- Du lieu huan luyen dung cho model nam trong `data/training/`.
 
-## Ghi chú
+## Ghi chu
 
-- Giữ module gọn, tránh tạo thêm file nếu chưa thật sự cần.
-- Nếu `scikit-learn` thiếu type stub, chỉ ignore đúng dòng báo lỗi liên quan đến
-  thư viện này.
+- Giu module gon, tranh tao them file neu chua that su can.
+- Neu `scikit-learn` thieu type stub, chi ignore dung dong bao loi lien quan den
+  thu vien nay.

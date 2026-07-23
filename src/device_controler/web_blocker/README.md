@@ -1,28 +1,28 @@
 # Web Blocker
 
-`src/device_controler/web_blocker` chặn website bằng cách thêm domain vào hosts
-file của hệ điều hành.
+`src/device_controler/web_blocker` chan website bang cach them domain vao hosts
+file cua he dieu hanh.
 
-## Input
+## Dau vao
 
-- `block(file_path)`: nhận file text chứa domain hoặc URL, mỗi dòng một giá trị.
-- `unblock(file_path)`: nhận cùng format file để xoá domain khỏi block state.
+- `block(file_path)`: nhan file text chua domain hoac URL, moi dong mot gia tri.
+- `unblock(file_path)`: nhan cung dinh dang file de xoa domain khoi trang thai block.
 
-## Output
+## Dau ra
 
-- Hosts file được cập nhật trong block nằm giữa marker của SAG.
-- Nếu nội dung không đổi, module không ghi lại hosts file.
+- Hosts file duoc cap nhat trong block nam giua marker cua SAG.
+- Neu noi dung khong doi, module khong ghi lai hosts file.
 
-## Nguyên lý
+## Nguyen ly
 
-Module đọc danh sách domain, chuẩn hoá về hostname, đọc hosts hiện tại, thay đổi
-block của SAG trong bộ nhớ rồi ghi atomic replace. Cách này giữ phần hosts bên
-ngoài marker không thuộc quyền quản lý của module.
+Module doc danh sach domain, chuan hoa ve hostname, doc hosts hien tai, thay doi
+block cua SAG trong bo nho roi ghi atomic replace. Cach nay giu phan hosts ben
+ngoai marker khong thuoc quyen quan ly cua module.
 
-## Quyền hệ thống
+## Quyen he thong
 
-- Linux: thường cần quyền ghi `/etc/hosts`.
-- Windows: thường cần quyền admin để ghi `C:\Windows\System32\drivers\etc\hosts`.
+- Linux: thuong can quyen ghi `/etc/hosts`.
+- Windows: thuong can quyen admin de ghi `C:\Windows\System32\drivers\etc\hosts`.
 
-for coding agents:
-Very big file, don't read: ./porn-sites.txt
+Cho coding agent:
+File rat lon, khong doc: `./porn-sites.txt`.

@@ -11,6 +11,7 @@ device, rồi gọi `_get_ui()` để bắt capability và event.
 
 from __future__ import annotations
 
+import argparse
 import importlib
 import sys
 from collections.abc import Iterator
@@ -20,7 +21,6 @@ from types import ModuleType
 from typing import Callable, ClassVar, cast
 from unittest.mock import patch
 
-import evdev
 from evdev import ecodes
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
@@ -30,6 +30,7 @@ if str(SRC_ROOT) not in sys.path:
 
 from utils.input_controller import linux as linux_api
 from utils.input_controller.linux import listener
+from utils.input_controller.linux import utils as linux_utils
 
 
 class _FakeUInput:
@@ -42,6 +43,8 @@ class _FakeUInput:
         self.name = name
         self.writes: list[tuple[int, int, int]] = []
         self.synced = 0
+        self.fd = 10
+        self.closed = False
 
     def write(self, event_type: int, code: int, value: int) -> None:
         self.writes.append((event_type, code, value))
@@ -49,15 +52,9 @@ class _FakeUInput:
     def syn(self) -> None:
         self.synced += 1
 
-
-class _FakePointer:
-    root_x = 10
-    root_y = 20
-
-
-class _FakeRoot:
-    def query_pointer(self) -> _FakePointer:
-        return _FakePointer()
+    def close(self) -> None:
+        self.fd = -1
+        self.closed = True
 
 
 class _FakeEvent:
@@ -90,7 +87,10 @@ def _load_module(module_name: str) -> tuple[ModuleType, _FakeUInput]:
     # Import không được mở `/dev/uinput`; device chỉ tạo khi `_get_ui()` được gọi.
     sys.modules.pop(module_name, None)
     _FakeUInput.last_instance = None
-    with patch.object(evdev, "UInput", _FakeUInput):
+    with (
+        patch.object(linux_utils, "UInput", _FakeUInput),
+        patch.object(linux_utils, "_wait_for_xinput_device") as wait,
+    ):
         module = importlib.import_module(module_name)
         assert _FakeUInput.last_instance is None
         get_ui = cast(Callable[[], object], getattr(module, "_get_ui"))
@@ -98,6 +98,7 @@ def _load_module(module_name: str) -> tuple[ModuleType, _FakeUInput]:
 
     fake = _FakeUInput.last_instance
     assert fake is not None
+    wait.assert_called_once_with(fake.name)
     return module, fake
 
 
@@ -133,7 +134,7 @@ def test_keyboard_supports_basic_keys_and_helpers() -> None:
     ]
 
     # Bàn phím ảo phải khai báo các phím phổ biến để app khác nhận đúng.
-    assert fake.name == "Sigma Virtual Keyboard"
+    assert fake.name.startswith("Sigma Virtual Keyboard ")
     assert fake.capabilities[ecodes.EV_REP] == []
     for code in expected_keys:
         assert code in fake.capabilities[ecodes.EV_KEY]
@@ -157,7 +158,6 @@ def test_keyboard_supports_basic_keys_and_helpers() -> None:
         expected_writes.extend(
             [
                 (ecodes.EV_KEY, code, 1),
-                (ecodes.EV_KEY, code, 2),
                 (ecodes.EV_KEY, code, 0),
             ],
         )
@@ -170,10 +170,39 @@ def test_keyboard_supports_basic_keys_and_helpers() -> None:
     module.press("a", delay=0)
     assert fake.writes == [
         (ecodes.EV_KEY, ecodes.KEY_A, 1),
-        (ecodes.EV_KEY, ecodes.KEY_A, 2),
         (ecodes.EV_KEY, ecodes.KEY_A, 0),
     ]
     assert fake.synced == synced_before_press + 2
+
+
+def test_ui_health_cache_closes_and_recreates_dead_devices() -> None:
+    """Sender cache health ngắn và đóng device chết trước khi tạo generation mới."""
+
+    old_ui = _FakeUInput({}, name="old")
+    replacement = _FakeUInput({}, name="replacement")
+    manager = linux_utils.UInputManager("Test Device", {})
+    with (
+        patch.object(
+            linux_utils,
+            "create_ui",
+            side_effect=[old_ui, replacement],
+        ) as create,
+        patch.object(
+            linux_utils.time,
+            "monotonic",
+            side_effect=[0.0, 4.9, 5.1, 10.2],
+        ),
+        patch.object(linux_utils, "ui_alive", side_effect=[True, False]) as alive,
+    ):
+        assert manager.get_ui() is old_ui
+        assert manager.get_ui() is old_ui
+        assert manager.get_ui() is old_ui
+        assert manager.get_ui() is replacement
+
+    assert alive.call_count == 2
+    assert old_ui.closed
+    assert create.call_args_list[0].args[0] == "Test Device-1"
+    assert create.call_args_list[1].args[0] == "Test Device-2"
 
 
 def test_linux_package_exports_public_api() -> None:
@@ -224,7 +253,42 @@ def test_control_cli_prepares_devices_before_actions() -> None:
     ):
         prepare()
 
-    assert calls == ["kb", "mouse", 0.67]
+    assert calls == ["kb", "mouse"]
+
+
+def test_control_cli_spam_clicks_without_delay() -> None:
+    """Spam click phải gọi đủ số click liên tiếp để đo CPS tối đa."""
+
+    module = _load_control_cli()
+    build_parser = cast(
+        Callable[[], argparse.ArgumentParser],
+        getattr(module, "_build_parser"),
+    )
+    parse_commands = cast(
+        Callable[
+            [argparse.ArgumentParser, list[str]],
+            list[tuple[str, tuple[str, ...]]],
+        ],
+        getattr(module, "_parse_commands"),
+    )
+    execute = cast(
+        Callable[[tuple[str, tuple[str, ...]], argparse.ArgumentParser], None],
+        getattr(module, "_execute"),
+    )
+    parser = build_parser()
+    command = parse_commands(parser, ["--spam-click", "left", "100"])[0]
+    clicks: list[str] = []
+    with (
+        patch.object(
+            getattr(module, "linux"),
+            "click",
+            side_effect=clicks.append,
+        ),
+        patch.object(module.time, "perf_counter", side_effect=[10.0, 10.25]),
+    ):
+        execute(command, parser)
+
+    assert clicks == ["left"] * 100
 
 
 def test_mouse_supports_click_buttons() -> None:
@@ -244,7 +308,11 @@ def test_mouse_move_rel_writes_relative_events() -> None:
     """`moveRel()` phải phát REL_X/REL_Y theo từng bước."""
 
     module, fake = _load_module("utils.input_controller.linux.sendinput_mouse")
-    module.moveRel(10, -5, steps=2)
+    with (
+        patch.object(module, "position", side_effect=[(10, 20), (20, 15)]),
+        patch.object(module.time, "sleep"),
+    ):
+        module.moveRel(10, -5, steps=2)
 
     assert fake.writes == [
         (ecodes.EV_REL, ecodes.REL_X, 5),
@@ -259,15 +327,60 @@ def test_mouse_move_to_uses_current_position() -> None:
     """`moveTo()` phải đổi tọa độ tuyệt đối thành move tương đối."""
 
     module, fake = _load_module("utils.input_controller.linux.sendinput_mouse")
-    setattr(module, "_root", _FakeRoot())
     move_to = cast(Callable[[int, int], None], getattr(module, "moveTo"))
-    move_to(15, 17)
+    with (
+        patch.object(
+            module,
+            "position",
+            side_effect=[(10, 20), (10, 20), (15, 17)],
+        ),
+        patch.object(module.time, "sleep"),
+    ):
+        move_to(15, 17)
 
     assert fake.writes == [
         (ecodes.EV_REL, ecodes.REL_X, 5),
         (ecodes.EV_REL, ecodes.REL_Y, -3),
     ]
     assert fake.synced == 1
+
+
+def test_mouse_move_rel_corrects_overshoot() -> None:
+    """`moveRel()` phải đọc sai số thật và gửi correction ngược chiều."""
+
+    module, fake = _load_module("utils.input_controller.linux.sendinput_mouse")
+    with (
+        patch.object(
+            module,
+            "position",
+            side_effect=[(0, 0), (12, 0), (10, 0)],
+        ),
+        patch.object(module.time, "sleep"),
+    ):
+        module.moveRel(10, 0)
+
+    assert fake.writes == [
+        (ecodes.EV_REL, ecodes.REL_X, 10),
+        (ecodes.EV_REL, ecodes.REL_Y, 0),
+        (ecodes.EV_REL, ecodes.REL_X, -2),
+        (ecodes.EV_REL, ecodes.REL_Y, 0),
+    ]
+
+
+def test_mouse_move_rel_reports_unreachable_target() -> None:
+    """`moveRel()` phải báo lỗi thay vì âm thầm dừng sai tọa độ."""
+
+    module, _ = _load_module("utils.input_controller.linux.sendinput_mouse")
+    with (
+        patch.object(module, "position", return_value=(0, 0)),
+        patch.object(module.time, "sleep"),
+    ):
+        try:
+            module.moveRel(1, 0)
+        except RuntimeError as error:
+            assert str(error) == "Mouse could not reach target: (1, 0)"
+        else:
+            raise AssertionError("moveRel() did not report unreachable target")
 
 
 def test_mouse_scroll_writes_vertical_and_horizontal_events() -> None:
@@ -334,11 +447,15 @@ def test_listener_detects_devices_and_reports_missing_devices() -> None:
 
 def main() -> None:
     test_keyboard_supports_basic_keys_and_helpers()
+    test_ui_health_cache_closes_and_recreates_dead_devices()
     test_linux_package_exports_public_api()
     test_control_cli_prepares_devices_before_actions()
+    test_control_cli_spam_clicks_without_delay()
     test_mouse_supports_click_buttons()
     test_mouse_move_rel_writes_relative_events()
     test_mouse_move_to_uses_current_position()
+    test_mouse_move_rel_corrects_overshoot()
+    test_mouse_move_rel_reports_unreachable_target()
     test_mouse_scroll_writes_vertical_and_horizontal_events()
     test_listener_normalizes_kb_and_mouse_events()
     test_listener_detects_devices_and_reports_missing_devices()

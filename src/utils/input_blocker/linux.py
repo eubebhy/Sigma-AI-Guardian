@@ -15,7 +15,6 @@ Yêu cầu: process cần quyền đọc/grab các thiết bị trong `/dev/inpu
 
 from evdev import InputDevice, list_devices
 from pathlib import Path
-import threading
 
 _grabbed_devices: dict[str, InputDevice] = {}
 

@@ -1,0 +1,6 @@
+[Content-classifier]
+# low / balance / strict
+strict_level = 'balance'
+
+[logger]
+log_dir = '.'

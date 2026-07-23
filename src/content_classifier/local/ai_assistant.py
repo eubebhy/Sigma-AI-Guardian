@@ -35,7 +35,7 @@ def _idle_timeout_seconds(model_path: Path) -> float:
         return _DEFAULT_IDLE_TIMEOUT_SECONDS
 
     timeout = _DEFAULT_IDLE_TIMEOUT_SECONDS * (size_bytes / _GB)
-    return max(1.0, timeout)
+    return max(6.7, timeout)
 
 
 class LocalAI:

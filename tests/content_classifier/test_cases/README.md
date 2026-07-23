@@ -1,15 +1,15 @@
-# Test cases
+# Case test
 
-Các file trong thư mục này là dữ liệu đầu vào cho test runner:
+Cac file trong thu muc nay la du lieu dau vao cho test runner:
 
 - `game.txt`
 - `porn.txt`
 - `gore.txt`
 - `unknown.txt`
 
-Mỗi dòng là một case độc lập.
+Moi dong la mot case doc lap.
 
-Ghi chú:
+Ghi chu:
 
-- Không cần thêm cấu trúc phức tạp.
-- Giữ nội dung case ngắn gọn và đúng với nhóm phân loại tương ứng.
+- Khong can them cau truc phuc tap.
+- Giu noi dung case ngan gon va dung voi nhom phan loai tuong ung.

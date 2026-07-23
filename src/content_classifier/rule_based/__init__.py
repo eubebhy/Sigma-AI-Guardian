@@ -1,67 +1,102 @@
-"""Bộ phân loại rule-based.
+"""Phân loại nội dung bằng điểm tương đồng với kho từ khóa.
 
 File path: `src/content_classifier/rule_based/__init__.py`
-Input: text gốc cần phân loại.
-Output: một `ContentCategory` duy nhất.
-Nguyên lý: chuẩn hoá văn bản rồi dò từ khoá theo thứ tự ưu tiên; nhãn khớp đầu
-tiên được trả về, nếu không khớp thì trả về `Unknown`.
+Input: văn bản cần phân loại và mức kiểm duyệt từ `xlow` đến `xstrict`.
+Output: category có từ khóa giống văn bản nhất khi điểm đạt ngưỡng tương ứng.
+Nguyên lý: tách text đã được main API chuẩn hoá thành từng từ, dùng
+`difflib.SequenceMatcher` chấm với kho từ khóa rồi trả category có điểm cao nhất.
 """
 
-# Built in lib
+from difflib import SequenceMatcher
 from pathlib import Path
-from typing import Any, cast
+from typing import Final
 
-# Third party lib
-from rapidfuzz import fuzz  # type: ignore[import-not-found]
-
-# Project's modules
-from content_classifier.clean_obfuscate_text import clean_text
 from content_classifier.tags import ContentCategory
+from content_classifier.types import StrictLevel
 
 
-def _parse_keyword(keywords_file_path: str):
-    """Ham nay lam viec theo quy uoc trong data/keywords/readme.txt"""
-    with open(keywords_file_path, "r") as f:
-        data = f.readlines()
-    data = [part.lower().strip() for line in data for part in line.split("|")]
-    return data
+_THRESHOLDS: Final[dict[StrictLevel, float]] = {
+    "xlow": 0.967,
+    "low": 0.9067,
+    "mid": 0.8067,
+    "strict": 0.7067,
+    "xstrict": 0.67,
+}
 
 
-def _had_keyword(text: str, keyword_list: list[str], threshold: float = 100.0) -> bool:
-    """
-    Kiểm tra xem chuỗi text có chứa từ khóa nào (kể cả dính liền như xxxhentai)
-    bằng thư viện rapidfuzz với cơ chế partial_ratio.
-    """
-
-    text = clean_text(text=text)
-    text_lower = text.lower()
-    fuzz_api = cast(Any, fuzz)
-
-    for keyword in keyword_list:
-        # fuzz.partial_ratio sẽ tự động tìm đoạn khớp nhất của keyword trong text_lower
-        # Ví dụ: fuzz.partial_ratio("hentai", "xxxhentai") -> Kết quả: 100.0
-        score = float(fuzz_api.partial_ratio(keyword.lower(), text_lower))
-        if score >= threshold:
-            return True
-
-    return False
+def _similarity(text: str, keyword: str) -> float:
+    """Trả độ tương đồng giữa hai chuỗi trong khoảng từ 0.0 đến 1.0."""
+    if " " in text:
+        raise RuntimeError("Chi duoc truyen tung tu vao ham nay")
+    ratio = SequenceMatcher(None, text, keyword).ratio()
+    # Phat nhung tu co chieu dai duoi 7 ki tu
+    # Vi duoi 7 ki tu rat de gap tu trung nhau
+    ratio *= min(len(text), 7) / 7
+    return ratio
 
 
-kw_dir = Path(__file__).parent / "keywords"
-
-pornography_words = _parse_keyword(str(kw_dir / "pornography.txt"))
-game_words = _parse_keyword(str(kw_dir / "game.txt"))
-gore_words = _parse_keyword(str(kw_dir / "gore.txt"))
+def _has_keyword(text: str, keyword: str) -> bool:
+    """Tra ve true neu keyword xuat hien ben trong text"""
+    return keyword in text
 
 
-def rule_based_classifier(text: str) -> ContentCategory:
-    if _had_keyword(text, pornography_words):
-        return ContentCategory.Pornography
+def _parse_keywords(file_path: Path) -> tuple[str, ...]:
+    """Đọc từ khóa, bỏ dòng trống và phần chú thích bắt đầu bằng `#`."""
 
-    if _had_keyword(text, game_words):
-        return ContentCategory.Game
+    keywords: list[str] = []
+    with file_path.open(encoding="utf-8") as keyword_file:
+        for line in keyword_file:
+            keyword = line.partition("#")[0].strip().lower()
+            if keyword:
+                keywords.append(keyword)
+    return tuple(keywords)
 
-    if _had_keyword(text, gore_words):
-        return ContentCategory.Gore
+
+_KEYWORD_DIRECTORY: Final[Path] = Path(__file__).parent / "keywords"
+_KEYWORDS_BY_CATEGORY: Final[tuple[tuple[tuple[str, ...], ContentCategory], ...]] = (
+    (
+        _parse_keywords(_KEYWORD_DIRECTORY / "pornography.txt"),
+        ContentCategory.Pornography,
+    ),
+    (_parse_keywords(_KEYWORD_DIRECTORY / "game.txt"), ContentCategory.Game),
+    (_parse_keywords(_KEYWORD_DIRECTORY / "gore.txt"), ContentCategory.Gore),
+    (_parse_keywords(_KEYWORD_DIRECTORY / "unknown.txt"), ContentCategory.Unknown),
+)
+
+
+def rule_based_classifier(
+    text: str,
+    strict_level: StrictLevel,
+) -> ContentCategory:
+    """Trả category có từ khóa giống văn bản nhất và đạt ngưỡng kiểm duyệt."""
+
+    words = text.lower().split()
+
+    best_score = 0.0
+    best_category = ContentCategory.Unknown
+
+    text = " ".join(set(text.lower().split()))  # Loai bo cac tu trung lap
+    # Lay danh sach keywords va category cua chung
+    for keywords, category in _KEYWORDS_BY_CATEGORY:
+        # Tim xem tu nao trong text khop nhat voi cac keyword
+        category_score = max(
+            (_similarity(word, keyword) for word in words for keyword in keywords),
+            default=0.0,
+        )
+        for keyword in keywords:
+            if _has_keyword(text=text, keyword=keyword):
+                category_score += 0.067
+
+        # Neu category hien tai giong nhat thi cap nhat best_category
+        if category_score > best_score:
+            best_score = category_score
+            best_category = category
+
+    # Su ly threshold theo strict_level
+    if best_score >= _THRESHOLDS[strict_level]:
+        return best_category
 
     return ContentCategory.Unknown
+
+
+__all__ = ["rule_based_classifier"]

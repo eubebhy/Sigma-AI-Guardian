@@ -1,32 +1,33 @@
 # `content_classifier`
 
-Package này chứa các module phân loại nội dung của dự án.
+Package nay chua cac module phan loai noi dung cua du an.
 
-## Thông tin module
+## Thong tin module
 
 - `file path`: `src/content_classifier/`
-- `input`: chuỗi văn bản đầu vào cần phân loại.
-- `output`: nhãn `ContentCategory` tương ứng với nội dung đầu vào.
-- `nguyên lý hoạt động`: các classifier trong package này chuẩn hóa text, so khớp theo quy tắc hoặc suy luận từ model cục bộ, rồi trả về danh mục phù hợp.
+- `input`: chuoi van ban dau vao can phan loai.
+- `output`: nhan `ContentCategory` tuong ung voi noi dung dau vao.
+- `nguyen ly hoat dong`: cac classifier trong package nay chuan hoa text, so khop theo quy tac hoac suy luan tu model cuc bo, roi tra ve danh muc phu hop.
 
-## Thành phần
+## Thanh phan
 
-- `tags.py`: định nghĩa `ContentCategory`.
-- `clean_obfuscate_text.py`: chuẩn hóa text trước khi so khớp từ khóa.
-- `rule_based/`: classifier dựa trên từ khóa.
-- `local/`: classifier chạy model scikit-learn cục bộ qua `joblib`.
-- `cloud/`: chỗ dành cho classifier chạy qua dịch vụ cloud, hiện chưa triển khai.
+- `tags.py`: dinh nghia `ContentCategory`.
+- `clean_obfuscate_text.py`: chuan hoa text truoc khi so khop tu khoa.
+- `rule_based/`: classifier dua tren tu khoa.
+- `local/`: classifier chay model scikit-learn cuc bo qua `joblib`.
+- `cloud/`: cho danh cho classifier chay qua dich vu cloud, hien chua trien khai.
 
-## Quy ước
+## Quy uoc
 
-- Mỗi module chỉ nên làm một việc rõ ràng.
-- Hàm nội bộ nên bắt đầu bằng `_`.
-- Giữ tên file và tên package khớp với layout hiện tại trong `src/content_classifier/`.
+- Moi module chi nen lam mot viec ro rang.
+- Ham noi bo nen bat dau bang `_`.
+- Giu ten file va ten package khop voi layout hien tai trong `src/content_classifier/`.
 
 ```python
-def classify(text: str) -> ContentCategory:
-    """Phân loại văn bản đầu vào và trả về ContentCategory tương ứng."""
+def classify(text: str, strict_level: str) -> ContentCategory:
+    """Phan loai van ban dau vao va tra ve ContentCategory tuong ung."""
     pass
 ```
 
 Sau do trong ./__init__.py se tong hop cac api phan loai lai va tao thanh 1 api duy nhat.
+

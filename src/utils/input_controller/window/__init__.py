@@ -1,0 +1,47 @@
+"""Facade Windows cho gửi và lắng nghe sự kiện bàn phím, chuột.
+
+File path: `src/utils/input_controller/window/__init__.py`
+Input: lời gọi theo contract chung của input controller.
+Output: 16 API Windows có cùng chữ ký và thứ tự export với backend Linux.
+Nguyên lý: chỉ re-export các module con; dependency nền tảng được import lazy bên
+trong từng API để package vẫn import được trên Linux.
+"""
+
+from utils.input_controller.window.listener import listen_keys, listen_mice
+from utils.input_controller.window.sendinput_kb import (
+    keyDown,
+    keyUp,
+    press,
+    supportedKeys,
+    supportedWriteCharacters,
+    write,
+)
+from utils.input_controller.window.sendinput_mouse import (
+    click,
+    mouseDown,
+    mouseUp,
+    moveRel,
+    moveTo,
+    position,
+    scroll,
+    sideScroll,
+)
+
+__all__ = [
+    "click",
+    "keyDown",
+    "keyUp",
+    "listen_keys",
+    "listen_mice",
+    "mouseDown",
+    "mouseUp",
+    "moveRel",
+    "moveTo",
+    "position",
+    "press",
+    "scroll",
+    "sideScroll",
+    "supportedKeys",
+    "supportedWriteCharacters",
+    "write",
+]

@@ -1,40 +1,40 @@
-# Source Layout
+# Bo cuc source
 
-`src/` chứa các package runtime của Sigma AI Guardian. Code trong thư mục này
-được import bởi ứng dụng, script hỗ trợ và test.
+`src/` chua cac package runtime cua Sigma AI Guardian. Code trong thu muc nay
+duoc import boi ung dung, script ho tro va test.
 
 ## `device_controler`
 
-Nhóm module điều khiển máy học sinh hoặc môi trường desktop.
+Nhom module dieu khien may hoc sinh hoac moi truong desktop.
 
-- `browser_tab`: mở URL bằng browser phù hợp.
+- `browser_tab`: mo URL bang browser phu hop.
 - `process_killer`: kill process theo blacklist.
-- `screen_capture`: chụp màn hình bằng MSS.
-- `screenlocker`: lock màn hình và chặn input.
-- `web_blocker`: thêm/xoá domain trong hosts file.
+- `screen_capture`: chup man hinh bang MSS.
+- `screenlocker`: khoa man hinh va chan input.
+- `web_blocker`: them/xoa domain trong hosts file.
 
-Input/output chi tiết nằm trong docstring đầu từng module.
+Dau vao/dau ra chi tiet nam trong docstring dau tung module.
 
 ## `system_monitor`
 
-Cung cấp API thu thập trạng thái hệ thống.
+Cung cap API thu thap trang thai he thong.
 
-- `clipboard_tracker`: đọc clipboard hiện tại.
-- `keylogger`: gom phím thành chuỗi text tạm thời.
-- `windows_tracker`: đọc tiêu đề cửa sổ active và các cửa sổ đang mở.
+- `clipboard_tracker`: doc clipboard hien tai.
+- `keylogger`: gom phim thanh chuoi text tam thoi.
+- `windows_tracker`: doc tieu de cua so active va cac cua so dang mo.
 
 ## `utils`
 
-Chứa chức năng dùng lại cho nhiều package, không phụ thuộc feature cấp cao.
+Chua chuc nang dung lai cho nhieu package, khong phu thuoc feature cap cao.
 
-- `input_blocker`: chặn/mở chặn input theo OS.
-- `input_controller`: gửi và lắng nghe input cross-platform.
+- `input_blocker`: chan/mo chan input theo OS.
+- `input_controller`: gui va lang nghe input da nen tang.
 
-Packages in this directory are intended to be imported by other packages. They should not import feature packages or depend on higher-level project components.
-Put new functionality here when more than one packages needs it.
+Cac package trong thu muc nay duoc thiet ke de package khac import. Chung khong nen import package feature hoac phu thuoc thanh phan cap cao hon cua project.
+Dat chuc nang moi o day khi nhieu hon mot package can dung no.
 
-## Rules
+## Quy tac
 
-* The main APIs of all plugins and packages must not block the main thread.
-* Long-running operations must run in daemon threads with `daemon=True`.
-* Module phức tạp phải có docstring đầu file nêu `file path`, input, output và nguyên lý hoạt động.
+* API chinh cua moi plugin va package khong duoc chan main thread.
+* Tac vu chay lau phai chay trong daemon thread voi `daemon=True`.
+* Module phuc tap phai co docstring dau file neu `file path`, input, output va nguyen ly hoat dong.

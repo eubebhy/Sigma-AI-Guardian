@@ -1,21 +1,26 @@
 """Bộ phân loại local.
 
 File path: `src/content_classifier/local/classifier.py`
-Input: text gốc cần phân loại.
+Input: text gốc và mức kiểm duyệt từ `xlow` đến `xstrict`.
 Output: một `ContentCategory` duy nhất.
-Nguyên lý: chuẩn hoá văn bản, chạy mô hình local, chọn nhãn có xác suất cao nhất
-và rơi về `Unknown` khi kết quả không đủ rõ hoặc khi model trả về nhãn nội bộ
-đã được gộp về `Unknown` trong quá trình train.
+Nguyên lý: chạy mô hình local với text đã được main API chuẩn hoá, chọn nhãn có
+xác suất cao nhất và rơi về `Unknown` khi kết quả không đủ rõ.
 """
 
 from pathlib import Path
 from typing import Final
 
 from content_classifier.local.ai_assistant import LocalAI
-from content_classifier.clean_obfuscate_text import clean_text
 from content_classifier.tags import ContentCategory
+from content_classifier.types import StrictLevel
 
-UNKNOWN_MARGIN_THRESHOLD: Final[float] = 0.067
+UNKNOWN_MARGIN_THRESHOLDS: Final[dict[StrictLevel, float]] = {
+    "xlow": 0.3,
+    "low": 0.167,
+    "mid": 0.067,
+    "strict": 0.0367,
+    "xstrict": 0.0067,
+}
 MODEL_LABEL_TO_CATEGORY: Final[dict[str, ContentCategory]] = {
     ContentCategory.Pornography.name.lower(): ContentCategory.Pornography,
     ContentCategory.Gore.name.lower(): ContentCategory.Gore,
@@ -28,10 +33,14 @@ def _map_label_to_category(label: str) -> ContentCategory | None:
     return MODEL_LABEL_TO_CATEGORY.get(label.lower())
 
 
-def local_ai_classifier(text: str) -> ContentCategory:
+def local_ai_classifier(
+    text: str,
+    strict_level: StrictLevel = "mid",
+) -> ContentCategory:
+    """Phân loại text khi chênh lệch dự đoán đạt ngưỡng kiểm duyệt."""
+
     model_path = Path(__file__).resolve().parents[3] / "data" / "models" / "Ritchie.pkl"
     ai = LocalAI(model_path=model_path)
-    text = clean_text(text)
     try:
         predictions = ai.predict(text, k=2)
     finally:
@@ -44,7 +53,8 @@ def local_ai_classifier(text: str) -> ContentCategory:
     top_label, top_probability = ranked_predictions[0]
     if len(ranked_predictions) > 1:
         _, second_probability = ranked_predictions[1]
-        if top_probability - second_probability < UNKNOWN_MARGIN_THRESHOLD:
+        margin = top_probability - second_probability
+        if margin < UNKNOWN_MARGIN_THRESHOLDS[strict_level]:
             return ContentCategory.Unknown
 
     category = _map_label_to_category(top_label)
