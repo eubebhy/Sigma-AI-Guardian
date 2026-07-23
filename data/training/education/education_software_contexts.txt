@@ -1349,22 +1349,22 @@ student group slide uses LibreOffice Calc for mở file Excel
 student group slide uses Microsoft Whiteboard for brainstorm ý tưởng thuyết trình
 student group slide uses Thonny for xem biến thay đổi
 sửa lỗi indentation
-teacher said open Blender and check Render
-teacher said open Code::Blocks and check Console application
-teacher said open Desmos and check scientific calculator
-teacher said open GitHub Desktop and check Clone repository
-teacher said open Google Chrome and check Incognito disabled
-teacher said open Google Classroom and check Assigned
-teacher said open Google Forms and check Short answer
-teacher said open Google Meet and check Camera off
-teacher said open Google Search and check Tools
-teacher said open Google Slides and check Speaker notes
-teacher said open Kahoot and check Leaderboard
-teacher said open LibreOffice Impress and check Presentation mode
-teacher said open LibreOffice Writer and check Insert Table
-teacher said open Microsoft Clipchamp and check trim
-teacher said open Microsoft Excel and check AVERAGE
-teacher said open Microsoft Forms and check Export to Excel
+open Blender and check Render
+open Code::Blocks and check Console application
+open Desmos and check scientific calculator
+open GitHub Desktop and check Clone repository
+open Google Chrome and check Incognito disabled
+open Google Classroom and check Assigned
+open Google Forms and check Short answer
+open Google Meet and check Camera off
+open Google Search and check Tools
+open Google Slides and check Speaker notes
+open Kahoot and check Leaderboard
+open LibreOffice Impress and check Presentation mode
+open LibreOffice Writer and check Insert Table
+open Microsoft Clipchamp and check trim
+open Microsoft Excel and check AVERAGE
+open Microsoft Forms and check Export to Excel
 teacher said open Microsoft Notepad and check tab indentation
 teacher said open Microsoft OneDrive and check Download
 teacher said open Microsoft Paint and check Pencil
@@ -1446,60 +1446,60 @@ thầy yêu cầu lưu bài đếm điểm bằng Scratch trước khi hết gi�
 thầy yêu cầu lưu bài đổi block sang Python bằng PictoBlox trước khi hết giờ
 timeline
 tìm mail giáo viên
-tìm trên Chrome: cách dùng Accuracy trong Quizizz
-tìm trên Chrome: cách dùng Attachment trong Microsoft Outlook
-tìm trên Chrome: cách dùng Bing search trong Microsoft Edge
-tìm trên Chrome: cách dùng Collect responses trong Microsoft Forms
-tìm trên Chrome: cách dùng Console trong Replit
-tìm trên Chrome: cách dùng Data Type trong Microsoft Access
-tìm trên Chrome: cách dùng Data validation trong Google Sheets
-tìm trên Chrome: cách dùng Documents trong Microsoft File Explorer
-tìm trên Chrome: cách dùng Download as PPTX trong Google Slides
-tìm trên Chrome: cách dùng Eraser trong Microsoft Paint
-tìm trên Chrome: cách dùng File > Save to your computer trong Scratch Desktop
-tìm trên Chrome: cách dùng Footnote trong WPS Writer
-tìm trên Chrome: cách dùng Insert Table trong Microsoft Word
-tìm trên Chrome: cách dùng Insert Video trong Microsoft PowerPoint
-tìm trên Chrome: cách dùng Insert table trong Google Docs
-tìm trên Chrome: cách dùng Learn mode trong Quizlet
-tìm trên Chrome: cách dùng Markup trong Microsoft Photos
-tìm trên Chrome: cách dùng Master Slide trong LibreOffice Impress
-tìm trên Chrome: cách dùng Microphone muted trong Google Meet
-tìm trên Chrome: cách dùng New project trong Code::Blocks
-tìm trên Chrome: cách dùng Nộp bài trong OLM
-tìm trên Chrome: cách dùng Open in VS Code trong GitHub Desktop
-tìm trên Chrome: cách dùng Page trong Microsoft OneNote
-tìm trên Chrome: cách dùng Raise hand trong Microsoft Teams
-tìm trên Chrome: cách dùng Render trong Blender
-tìm trên Chrome: cách dùng Replace trong Microsoft Notepad
-tìm trên Chrome: cách dùng Run trong PyCharm Edu
-tìm trên Chrome: cách dùng Scientific mode trong Windows Calculator
-tìm trên Chrome: cách dùng Section trong Google Forms
-tìm trên Chrome: cách dùng Selection Tool trong Audacity
-tìm trên Chrome: cách dùng Sent trong Gmail
-tìm trên Chrome: cách dùng Slider trong GeoGebra
-tìm trên Chrome: cách dùng Sort & Filter trong Microsoft Excel
-tìm trên Chrome: cách dùng Spellcheck trong LibreOffice Writer
-tìm trên Chrome: cách dùng Storage trong Google Drive
-tìm trên Chrome: cách dùng Stream trong Google Classroom
-tìm trên Chrome: cách dùng Terminal trong Visual Studio Code
-tìm trên Chrome: cách dùng Tools trong Google Search
-tìm trên Chrome: cách dùng Variables panel trong Thonny
-tìm trên Chrome: cách dùng WPS Spreadsheets trong WPS Spreadsheets
-tìm trên Chrome: cách dùng custom extension trong TurboWarp
-tìm trên Chrome: cách dùng ink pen trong Microsoft Whiteboard
-tìm trên Chrome: cách dùng khối chuyển động màu xanh trong ScratchJr
-tìm trên Chrome: cách dùng new tab trong Google Chrome
-tìm trên Chrome: cách dùng open the box trong Wordwall
-tìm trên Chrome: cách dùng print() trong Python IDLE
-tìm trên Chrome: cách dùng reaction trong Padlet
-tìm trên Chrome: cách dùng scientific calculator trong Desmos
-tìm trên Chrome: cách dùng sprite Mèo trong Scratch
-tìm trên Chrome: cách dùng sprite device trong mBlock
-tìm trên Chrome: cách dùng stage trong PictoBlox
-tìm trên Chrome: cách dùng transcript trong YouTube
-tìm trên Chrome: cách dùng transition trong Microsoft Clipchamp
-tìm trên Chrome: cách dùng translate sentence trong Duolingo
+Accuracy trong Quizizz
+Attachment trong Microsoft Outlook
+Bing search trong Microsoft Edge
+Collect responses trong Microsoft Forms
+Console trong Replit
+Data Type trong Microsoft Access
+Data validation trong Google Sheets
+Documents trong Microsoft File Explorer
+Download as PPTX trong Google Slides
+Eraser trong Microsoft Paint
+File > Save to your computer trong Scratch Desktop
+Footnote trong WPS Writer
+Insert Table trong Microsoft Word
+Insert Video trong Microsoft PowerPoint
+Insert table trong Google Docs
+Learn mode trong Quizlet
+Markup trong Microsoft Photos
+Master Slide trong LibreOffice Impress
+Microphone muted trong Google Meet
+New project trong Code::Blocks
+Nộp bài trong OLM
+Open in VS Code trong GitHub Desktop
+Page trong Microsoft OneNote
+Raise hand trong Microsoft Teams
+Render trong Blender
+Replace trong Microsoft Notepad
+Run trong PyCharm Edu
+Scientific mode trong Windows Calculator
+Section trong Google Forms
+Selection Tool trong Audacity
+Sent trong Gmail
+Slider trong GeoGebra
+Sort & Filter trong Microsoft Excel
+Spellcheck trong LibreOffice Writer
+Storage trong Google Drive
+Stream trong Google Classroom
+Terminal trong Visual Studio Code
+Tools trong Google Search
+Variables panel trong Thonny
+WPS Spreadsheets trong WPS Spreadsheets
+custom extension trong TurboWarp
+ink pen trong Microsoft Whiteboard
+khối chuyển động màu xanh trong ScratchJr
+new tab trong Google Chrome
+open the box trong Wordwall
+print() trong Python IDLE
+reaction trong Padlet
+scientific calculator trong Desmos
+sprite Mèo trong Scratch
+sprite device trong mBlock
+stage trong PictoBlox
+transcript trong YouTube
+transition trong Microsoft Clipchamp
+translate sentence trong Duolingo
 tính trung bình môn
 tính tổng bằng công thức
 tạo icon cho bài Scratch
@@ -1520,3 +1520,33 @@ xuất slide sang PDF
 đăng ý tưởng nhóm
 đẩy code lên GitHub
 đồng bộ thư mục bài tập
+chrome - anh anime miku - Brave Browser
+chrome - anh anime dep 4k - Firefox
+chrome - anh anime cute wallpapers - Opera
+chrome - anh anime phong canh - Edge
+chrome - anh anime boy ngau - Safari
+chrome - anh anime fanart - Vivaldi
+chrome - anh anime chill - Google Chrome
+chrome - anh anime meme - Firefox
+chrome - anh anime background - Edge
+chrome - anh anime sketch - Brave Browser
+Pascal - BAI2.PAS - Free Pascal IDE
+Pascal - DE1_BAI1.PAS - Turbo Pascal
+Pascal - BAP_TAP_PASCAL.PAS - Visual Studio Code
+Pascal - BAI1_THI_HSG.PAS - Notepad++
+Pascal - TIN_HOC_8_BAI1.PAS - Free Pascal
+Pascal - KTRA_1TIET.PAS - Lazarus
+Pascal - SAP_XEP_MANG.PAS - Code::Blocks
+Pascal - PHUONG_TRINH_BAC_2.PAS - Sublime Text
+Pascal - THUAT_TOAN_DEM.PAS - VS Code
+Pascal - BAI1_KIEU_TEP.PAS - Turbo Pascal
+NetSupport School - Student Client
+NetSupport School - Tutor Console
+NetSupport School - Tech Console
+NetSupport School - Class Manager
+NetSupport School - Control Panel
+NetSupport School - Teacher Assistant
+NetSupport School - Remote Control
+NetSupport School - Student Register
+NetSupport School - Broadcast Screen
+NetSupport School - Session Monitor

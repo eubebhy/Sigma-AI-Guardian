@@ -1338,3 +1338,140 @@ Arduino IDE hiện thông báo đã lưu bài vào thư mục lớp
 clipboard từ Arduino IDE: Serial Monitor - kiểm tra code setup và loop
 máy số 13 phòng Tin: lưu file .ino cho bài STEM
 cô nhắc lưu file trước khi thoát Arduino IDE sau khi cài library cảm biến nhiệt độ
+Inkscape
+Untitled 1 - Inkscape
+Open Inkscape application
+Create new SVG document
+SVG drawing canvas
+Select Rectangle tool
+Select Ellipse tool
+Select Star Polygon tool
+Select Bezier tool
+Select Node editing tool
+Move pointer over toolbar
+Hover over drawing tools
+Rectangle created successfully
+Ellipse created successfully
+Polygon created successfully
+Star created successfully
+Drag object on canvas
+Resize selected object
+Rotate selected object
+Duplicate selected object
+Multiple objects selected
+Align and distribute objects
+Bring object to front
+Send object to back
+Lower object one step
+Raise object one step
+Fill and Stroke dialog
+Change fill color
+Change stroke color
+Adjust stroke width
+Select dashed stroke style
+Apply linear gradient
+Apply radial gradient
+Edit gradient handles
+Modify gradient colors
+Switch star polygon mode
+Increase star corners
+Adjust rounded parameter
+Adjust spoke ratio
+Path Union executed
+Path Difference executed
+Path Intersection executed
+Path Division executed
+Combine vector shapes
+Undo previous action
+Redo previous action
+Save SVG document
+Ctrl D
+Ctrl S
+Ctrl Z
+Ctrl Shift Z
+Thai flag design
+Laos flag design
+Myanmar flag design
+United Kingdom flag
+Heart shape construction
+Cloud vector drawing
+Flower vector illustration
+Balloon vector design
+Watermelon vector graphic
+Foreground application Inkscape
+Window focus Inkscape
+Active window Untitled SVG
+Clipboard contains SVG object
+File saved drawing.svg
+Export vector graphic
+vector_design.svg
+drawing_practice.svg
+org.inkscape.Inkscape
+Path menu opened
+Fill and Stroke panel
+Layers reordered
+Object duplicated
+Canvas zoom increased
+Canvas zoom decreased
+Select multiple objects
+Người dùng mở Inkscape
+Mở tài liệu SVG mới
+Quan sát vùng vẽ
+Quan sát thanh công cụ
+Quan sát bảng màu
+Chọn công cụ hình chữ nhật
+Chọn công cụ hình tròn
+Chọn công cụ ngôi sao
+Kéo chuột để tạo hình
+Di chuyển đối tượng
+Thay đổi kích thước hình
+Xoay đối tượng
+Đổi màu tô
+Đổi màu đường viền
+Điều chỉnh độ dày viền
+Chọn kiểu nét đứt
+Áp dụng tô chuyển sắc
+Điều chỉnh điểm gradient
+Đưa đối tượng lên trên
+Đưa đối tượng xuống dưới
+Căn chỉnh nhiều đối tượng
+Nhân bản đối tượng
+Ghép các hình
+Cắt các hình
+Tạo hình trái tim
+Vẽ lá cờ Thái Lan
+Vẽ lá cờ Lào
+Vẽ lá cờ Myanmar
+Vẽ cờ Vương quốc Anh
+Vẽ bông hoa
+Vẽ chùm bóng
+Vẽ miếng dưa hấu
+Lưu tệp SVG
+Python là một ngôn ngữ lập trình tuyệt vời, với cú pháp ngữ pháp đơn giản dễ hiểu, nhưng lại thực hiện được nhiều tác vụ chỉ với số lượng dòng lệnh cực ngắn. Với ưu thế của mình, Python đã nhanh chóng được giới lập trình viên yêu mến, và hiện tại thì Python đã trở thành ngôn ngữ được ưu chuộng nhất thế giới, cũng như đang từng bước phát triển tại Việt Nam.
+Nhằm đáp ứng nhu cầu học lập trình python cho người mới bắt đầu ở mọi lứa tuổi, cũng như mang những kiến thức lập trình chắt lọc từ Nhật Bản về Việt Nam mà chuyên đề Python cơ bản - lập trình python cho người mới bắt đầu đã được ra đời.
+Ngôn ngữ C++ đang rất phổ biến và trở nên quen thuộc với chúng ta. Nhiều bạn sinh viên hay nhiều người học khác trong những năm đầu khi tiếp xúc với C++ thường khá bỡ ngỡ với ngôn ngữ này. Bên cạnh loạt bài hướng dẫn các khái niệm để cung cấp kiến thức cơ bản và nâng cao về C++, VietJack giới thiệu các bạn tuyển tập Bài tập C++ có giải.
+Loạt bài về Bài tập C++ có giải này được trình bày theo các chủ đề, từ cơ bản tới nâng cao, được sưu tập từ nhiều nguồn tài liệu đa dạng khác nhau, giúp bạn kiểm tra kiến thức, kỹ năng liên quan tới ngôn ngữ C++. Với mỗi bài tập, chúng tôi cung cấp lời giải và phần comment hợp lý, giúp bạn hiểu nhanh hơn vấn đề.
+Python For Loops
+A for loop is used for iterating over a sequence (that is either a list, a tuple, a dictionary, a set, or a string).
+
+This is less like the for keyword in other programming languages, and works more like an iterator method as found in other object-orientated programming languages.
+
+With the for loop we can execute a set of statements, once for each item in a list, tuple, set etc.
+Home » C++ Exercises » Basic C+ Programming Exercises for Beginners: 50+ Coding Problems with Solutions
+Basic C+ Programming Exercises for Beginners: 50+ Coding Problems with Solutions
+Updated on: January 7, 2026 | 2 Comments
+
+This comprehensive guide provides 57 basic C++ programming exercises designed specifically for beginners.
+
+Each exercise includes a clear practice problem, a helpful hint, a complete C++ solution, and a detailed explanation. This ensures you not only solve the problem but deeply understand why the solution works.
+
+Also, See: C++ Exercises with 10 topic-wise sets and 300+ practice questions.
+
+What You’ll Practice
+The exercises and coding challenges cover the following fundamental C++ programming topics:
+
+I/O & Variables: Focuses on basic console input/output (std::cin, std::cout), data types, and arithmetic.
+Control Flow: Covers conditional logic using if-else, switch, and logical operators.
+Loops: Explores for and while loops for accumulation, sequences (like Fibonacci), and number manipulation.
+Arrays & Strings: Introduces arrays (1D/2D), basic array operations, and string manipulation.
+Functions & Pointers: Addresses code modularity (functions, overloading), pass by reference, basic structs, pointers, and file handling.

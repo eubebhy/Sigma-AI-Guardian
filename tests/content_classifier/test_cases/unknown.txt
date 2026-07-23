@@ -25,3 +25,421 @@ Logo_Rua.exe
 Pascal - BAI1.PAS
 Dev-C++ - [Project1] main.cpp
 Unikey NT 4.3 RC4
+st
+suckless terminal
+WSL
+Window subsystem for linux
+Clang
+Gcc
+tcc
+a
+e
+c
+d
+g
+brave-browser - anime background
+brave-browser - ChatGPT - new chat
+Camera - IMG_20260722_081433.jpg
+Photos - Previewing school_project_photo.png
+File Manager - DCIM/Camera
+MTP Device Connected - Android Phone
+Clipboard: IMG_20260722_081433.jpg
+File Copy - DCIM/Camera/IMG_20260722_081433.jpg -> Desktop/Bai7
+File Delete - Downloads/anh_thuc_hanh_02.jpg
+Trash - anh_thuc_hanh_02.jpg
+Windows Explorer - This PC\Android Phone\Internal storage\DCIM\Camera
+Thunar - /run/user/1000/gvfs/mtp:host=Android/DCIM
+Upload File Dialog - Desktop/Bai7/anh_nhom_3.png
+Google Drive - Upload complete: anh_nhom_3.png
+Zoom - Sending file anh_thuc_hanh.jpg
+Network Upload - 2.4 MB completed
+File Manager - Pictures/Camera Roll
+Gallery - Recently Deleted
+Device Permission - Allow access to photos and media
+USB MTP Transfer Active
+Clipboard Image MIME - image/png
+Open With - Image Viewer
+Google Translate - Vietnamese to English
+translate.google.com/?sl=vi&tl=en
+Clipboard: Trí tuệ nhân tạo hỗ trợ học tập
+Google Translate - Listening to English pronunciation
+Microphone permission granted - translate.google.com
+Language swap - English to Vietnamese
+Typed text: Computer networks connect devices
+Clipboard: Máy tính giúp xử lí thông tin nhanh chóng
+Google Translate - Document translation
+LibreOffice Writer - bai_tap_dich_van_ban.odt
+Ctrl+A Ctrl+C detected in Writer
+Ctrl+V detected in Google Translate
+Clipboard changed: The Internet provides access to global resources
+Google Translate - Result copied
+LibreOffice Writer - translated_notes.odt
+PDF Viewer - bai_doc_tieng_anh.pdf
+Selection copied from PDF - 428 characters
+Browser focus changed: PDF Viewer -> Google Translate
+Audio playback - translate.google.com
+Input language changed - Vietnamese
+Input language changed - English
+Google Chrome - igiaoduc.vn
+iGiaoDuc - Tin học lớp 10
+Online lesson - Bài 10 Khai thác tài nguyên Internet
+Video playback started - igiaoduc.vn
+Video paused at 00:04:18
+Video seek - 00:04:18 -> 00:06:02
+Fullscreen video enabled
+Volume changed - 60%
+Learning page active for 18 minutes
+Firefox - Kho học liệu số
+Edge - Bài giảng Tin học 10
+Chrome - tìm kiếm thuật toán Euclid Python
+Google Search - cách dùng range trong Python
+Google Search - bài tập Inkscape lớp 10
+Search query: tài liệu học Python cơ bản PDF
+Search query: ví dụ câu lệnh if else
+Search query: cách vẽ gradient trong Inkscape
+Browser tabs open: 7
+New tab - YouTube bài giảng vòng lặp for
+Open educational PDF - danh_sach_python.pdf
+Download complete - bai_tap_tin_hoc_10.pdf
+History entry - loigiaihay.com/giai-tin-hoc-10-bai-20
+Bookmark added - Python list methods
+Browser tab switched - Search results -> Online lesson
+Inkscape - New document 1
+Inkscape - Rectangle tool selected
+Inkscape - Ellipse tool selected
+Inkscape - Stars and Polygons tool
+Inkscape - Fill and Stroke
+Inkscape - Stroke style: dashed
+Inkscape - Linear gradient applied
+Inkscape - Radial gradient applied
+Inkscape - Object raised to top
+Inkscape - Object lowered one step
+Inkscape - Duplicate object Ctrl+D
+Inkscape - Undo
+Inkscape - Redo
+Inkscape - Align and Distribute
+Inkscape - Path Union
+Inkscape - Path Difference
+Inkscape - Path Intersection
+Inkscape - Path Division
+Inkscape - Node tool active
+Inkscape - Convert object to path
+Inkscape - Insert new node
+Inkscape - Delete selected nodes
+Inkscape - Make selected nodes smooth
+Inkscape - Bézier Pen active
+Inkscape - Text tool active
+IDLE - Untitled
+Thonny - bai16.py
+Visual Studio Code - bai17_bien.py
+Terminal - python3 bai18_input.py
+Python Shell input: 2 + 3 * 4
+Python Shell output: 14
+Python Shell input: print("Xin chào lớp 10")
+Python Shell output: Xin chào lớp 10
+SyntaxError: invalid syntax
+SyntaxError: unterminated string literal
+File Save - bai16_lenh_dau_tien.py
+Code typed: x = 10
+Code typed: x = x + 5
+Code typed: print(x)
+Code typed: a, b = 7, 3
+Python output: 15
+Python output: 2.3333333333333335
+Python output: 2
+Python output: 1
+Python output: 343
+Code typed: ten = "Tin học"
+Code typed: print(ten * 3)
+SyntaxError: invalid decimal literal
+SyntaxError: cannot assign to keyword
+File Save - doi_giay_thanh_thoi_gian.py
+Code typed: giay = 100000
+Code typed: ngay = giay // 86400
+Code typed: giay_con_lai = giay % 86400
+Program run - doi_giay_thanh_thoi_gian.py
+Program output: 1 ngày 3 giờ 46 phút 40 giây
+Code typed: s = input("Nhập dữ liệu: ")
+Python stdin: 125
+Python output: <class 'str'>
+Code typed: n = int(input("Nhập số nguyên: "))
+Python stdin: 42
+Code typed: x = float(input("Nhập số thực: "))
+Python stdin: 3.14
+ValueError: invalid literal for int() with base 10
+Code typed: a = float(input("Nhập cạnh a: "))
+Code typed: p = (a + b + c) / 2
+Code typed: S = (p*(p-a)*(p-b)*(p-c))**0.5
+Program output: Diện tích tam giác = 6.0
+Code typed: if n % 2 == 0:
+IndentationError: expected an indented block
+Code typed: if 0 <= x <= 10:
+Code typed: print("Thuộc đoạn")
+Code typed: else:
+Program run with stdin: 12
+Program output: Không thuộc đoạn
+Code typed: if year % 400 == 0 or year % 4 == 0 and year % 100 != 0:
+Program output: Năm nhuận
+Code typed: for i in range(10):
+Code typed: tong += i
+Program output: 45
+Code typed: for i in range(1, n + 1):
+Code typed: tich *= i
+Python stdin: 6
+Program output: 720
+Code typed: while i <= 100:
+Code typed: i += 2
+Program output: Tổng số chẵn = 2550
+Code typed: print(i, end=" ")
+Program output: 1 2 3 4 5 6 7 8 9 10
+Code typed: A = [3, 7, 2, 9]
+Code typed: print(A[2])
+Python output: 2
+IndexError: list index out of range
+Code typed: A.append(11)
+Code typed: A.insert(0, 5)
+Code typed: A.remove(7)
+NameError: name 'local_value' is not defined
+Code typed: def split_even_odd_index(values):
+Code typed: return values[::2], values[1::2]
+Program output: ([1, 3, 5], [2, 4, 6])
+ZeroDivisionError: division by zero
+TypeError: can only concatenate str to str
+ValueError: could not convert string to float
+Traceback - bai29_loi.py line 12
+Debugger breakpoint set - line 18
+Debugger step over - variable n = 7
+Watch expression - total = 28
+Temporary debug print: i=4 total=10
+Test case input: -5
+Expected: yêu cầu nhập lại
+Actual: chương trình kết thúc
+Code patched - add while x <= 0
+Program rerun - validation passed
+Test case input: 0
+Test case input: 1
+Test case input: 2024
+Test result: leap year branch passed
+Nested loop detected - multiplication table
+Program output grid - 10 rows x 10 columns
+File Save - bang_cuu_chuong.py
+File Save - kiem_tra_so_nguyen_to.py
+File Save - sap_xep_ten_hoc_sinh.py
+Python stdin: HocSinh_A
+Python stdin: HocSinh_B
+List sort executed - key=student_name
+Program output: HocSinh_A, HocSinh_B
+Code typed: for d in range(2, int(n**0.5) + 1):
+Performance test - n=999983
+Execution time: 0.0038 seconds
+Python run completed - exit code 0
+Python run failed - exit code 1
+Active window sequence: Thonny -> Python Shell -> Thonny
+Clipboard: def gcd(a, b):
+Clipboard pasted into code editor
+File modified - bai32_on_tap.py
+Autosave complete - bai32_on_tap.py
+GNOME Camera - Capture mode
+Windows Camera - Photo saved to Camera Roll
+Cheese Webcam Booth - New photo
+Android Camera - Rear camera active
+Samsung Gallery - School Practice Album
+Google Photos - Recently captured
+Windows Photos - Viewing IMG_1048.jpeg
+Eye of GNOME - anh_thiet_bi_so.png
+Gwenview - Previewing bai7_camera.jpg
+Shotwell - Importing photos from device
+Nautilus - Android Phone/DCIM/Camera
+Thunar - Removable Devices/Phone Storage
+Dolphin - mtp:/Internal shared storage/Pictures
+Windows Explorer - Portable Device\DCIM
+Files - Copying 4 photos to Documents
+File transfer completed - 4 items
+USB device connected - Portable Media Player
+MTP authorization accepted
+Android File Transfer - Internal Storage
+Bluetooth File Transfer - Receiving image
+Nearby Share - Sending bai_thuc_hanh.jpg
+Quick Share - Transfer completed
+AirDroid Web - Device connected
+KDE Connect - Send file to classroom PC
+LocalSend - Received anh_nhom.png
+Syncthing - Pictures folder synchronized
+Dropbox - Uploading school_photo.jpeg
+OneDrive - Syncing Desktop/Bai7
+Google Drive - My Drive/Bai tap Tin hoc
+MEGA - Upload completed
+Nextcloud Files - anh_thuc_hanh.png
+pCloud Drive - School Documents
+File picker - Select a photo to upload
+Upload progress - 74 percent
+Upload successful - anh_bai7.jpg
+Download complete - tai_lieu_thiet_bi_so.pdf
+Rename file - IMG_1048.jpg to bai7_nhom2.jpg
+Move file - Downloads to Documents/TinHoc10
+Copy operation - Pictures to USB Drive
+Delete confirmation - Move image to Trash
+Restore from Trash - bai7_camera.jpg
+File properties - JPEG image 1920x1080
+Image metadata - Created 08:14
+Image Viewer - Rotate clockwise
+Image Viewer - Zoom 125 percent
+Image Viewer - Slideshow mode
+Image Editor - Crop tool active
+Paint - Resize image
+Pinta - Annotating classroom photo
+Krita - Opened reference image
+GIMP - Export Image as PNG
+Google Meet - Presenting browser tab
+Google Meet - File attachment opened
+Zoom Workplace - Chat file uploaded
+Microsoft Teams - Class assignment attachment
+Zalo Web - Sending bai_thuc_hanh.jpg
+Telegram Desktop - Uploaded classroom image
+Google Classroom - Turn in assignment
+Microsoft Teams - Assignment submitted
+Moodle - Upload submission
+Canvas Student - File submission
+Schoology - Add attachment
+K12Online - Nộp bài thực hành
+LMS - Submission status completed
+Google Chrome - translate.google.com
+Microsoft Edge - Bing Translator
+Firefox - DeepL Translate
+Cốc Cốc - Google Dịch
+Google Translate - Detect language
+Google Translate - Vietnamese selected
+Google Translate - English selected
+Google Translate - Speaker playback
+Google Translate - Voice input active
+Google Translate - Translation copied
+DeepL - Vietnamese to English
+Bing Translator - Swap languages
+LibreTranslate - Text translation
+Google Docs - bai_dich_truc_tuyen
+LibreOffice Writer - van_ban_can_dich.odt
+Microsoft Word - bai_tap_dich.docx
+OnlyOffice Document Editor - tai_lieu_hoc_tap.docx
+WPS Writer - noi_dung_bai10.docx
+Evince - giao_trinh_tin_hoc.pdf
+Okular - bai_doc_tieng_anh.pdf
+Adobe Acrobat Reader - lesson_document.pdf
+Document Viewer - Text selection active
+Clipboard - copied paragraph from lesson PDF
+Clipboard - translated paragraph
+Writer - Paste Special Unformatted Text
+Browser tab - iGiaoDuc
+Browser tab - Hành trang số
+Browser tab - Kho học liệu số
+Browser tab - Bài giảng điện tử Tin học 10
+Browser tab - Video bài học thiết bị số
+Browser tab - Bài học mạng máy tính
+Browser tab - Thực hành khai thác Internet
+Video player - Lesson paused
+Video player - Playback speed 1.25x
+Video player - Captions enabled
+Video player - Enter fullscreen
+Video player - Exit fullscreen
+Audio player - Pronunciation replayed
+Browser history - educational resource opened
+Bookmark - Tin học 10 Kết nối tri thức
+Download manager - bai_giang_tin_hoc_10.pptx
+Google Search - ứng dụng thiết bị số thông dụng
+Google Search - cách sao chép ảnh từ điện thoại
+Google Search - kho học liệu Tin học lớp 10
+Google Search - cách tải tài liệu lên Google Drive
+Google Search - phần mềm thiết kế đồ họa vector
+Inkscape - Welcome Screen
+Inkscape - New from Template
+Inkscape - A4 Landscape document
+Inkscape - Page Resize
+Inkscape - Rectangle and Square tool
+Inkscape - Circle Ellipse and Arc tool
+Inkscape - Stars and Polygons tool
+Inkscape - Draw Bezier Curves
+Inkscape - Draw Freehand Lines
+Inkscape - Create and Edit Text
+Inkscape - Select and Transform Objects
+Inkscape - Edit Paths by Nodes
+Inkscape - Pick Colors from Image
+Inkscape - Fill bounded areas
+Inkscape - Create Gradients
+Inkscape - Mesh Gradient tool
+Inkscape - Spray Objects
+Inkscape - Eraser tool
+Inkscape - Connector tool
+Inkscape - Measure tool
+Inkscape - Fill and Stroke dialog
+Inkscape - Object Properties
+Inkscape - Layers and Objects
+Inkscape - Align and Distribute dialog
+Inkscape - Transform dialog
+Inkscape - Document Properties
+Inkscape - XML Editor
+Inkscape - Swatches palette
+Inkscape - Stroke width changed
+Inkscape - Stroke dash pattern selected
+Inkscape - Opacity adjusted
+Inkscape - Blur adjusted
+Inkscape - Linear gradient created
+Inkscape - Gradient stop color changed
+Inkscape - Radial gradient edited
+Inkscape - Duplicate selected objects
+Inkscape - Clone selected object
+Inkscape - Group selected objects
+Inkscape - Ungroup selected objects
+Inkscape - Raise selection
+Inkscape - Lower selection
+Inkscape - Move selection to top
+Inkscape - Move selection to bottom
+Inkscape - Flip selection horizontally
+Inkscape - Rotate selection 90 degrees
+Inkscape - Path Union
+Inkscape - Path Difference
+Inkscape - Path Intersection
+Inkscape - Path Exclusion
+Inkscape - Path Division
+Inkscape - Path Cut Path
+Inkscape - Object to Path
+Inkscape - Stroke to Path
+Inkscape - Simplify Path
+Inkscape - Insert Nodes
+Inkscape - Delete Nodes
+Inkscape - Join Selected Nodes
+Inkscape - Break Path at Selected Nodes
+Inkscape - Make Nodes Smooth
+Inkscape - Make Nodes Symmetric
+Inkscape - Text Put on Path
+Inkscape - Remove Text from Path
+Inkscape - Flow Text into Frame
+Inkscape - Font Family changed
+Inkscape - Font Size 36 pt
+Inkscape - Letter spacing adjusted
+Inkscape - Baseline shift changed
+Inkscape - Guideline dragged from ruler
+Inkscape - Snap to Guides enabled
+Inkscape - Snap to Nodes enabled
+Inkscape - Export PNG Image
+Inkscape - Export Selection
+Inkscape - Save As SVG
+Inkscape - Save a Copy
+Inkscape - flag_thailand.svg
+Inkscape - flag_laos.svg
+Inkscape - flag_myanmar.svg
+Inkscape - flag_united_kingdom.svg
+Inkscape - rounded_flower.svg
+Inkscape - heart_and_tree.svg
+Inkscape - balloon_cluster.svg
+Inkscape - watermelon_slice.svg
+Inkscape - mouse_drawing.svg
+Inkscape - summer_text_path.svg
+Inkscape - book_fair_poster.svg
+Inkscape - birthday_card.svg
+Inkscape - christmas_card.svg
+Inkscape - save_resources_logo.svg
+Inkscape - beach_landscape.svg
+Inkscape - classroom_logo_practice.svg
+Inkscape - unsaved changes detected
+Inkscape - autosave recovered
+Inkscape - Export completed: beach_scene.png
+tk $2
