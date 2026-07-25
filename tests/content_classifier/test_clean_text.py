@@ -22,7 +22,7 @@ CASE_FILE = TEST_DIRECTORY / "test_cases" / "clean_text.json"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
-from content_classifier.clean_obfuscate_text import clean_text
+from content_classifier.clean_text import clean_text
 
 
 def _load_cases() -> list[tuple[str, str]]:
