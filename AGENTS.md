@@ -22,10 +22,35 @@ Phần mềm quản lý phòng tin học dành cho giáo viên, tích hợp AI A
 * **Tính di động (Portable):** Mã nguồn phải đảm bảo tính độc lập, sao chép sang thư mục khác vẫn hoạt động bình thường.
 
 ### Python
-* **Chuẩn mực:** Tuân thủ nghiêm ngặt PEP 8.
-* **Type Hinting cực đoan:** Khai báo kiểu dữ liệu đầy đủ và chặt chẽ cho mọi thành phần để vượt qua bộ kiểm tra cấu trúc ở chế độ nghiêm ngặt (`Pyright strict mode`). Không làm phức tạp hóa logic chỉ để phục vụ type hint.
-* **Import:** Bắt buộc sử dụng Absolute Import (Import tuyệt đối).
-* **Nội hàm hóa (Inline hàm ngắn):** Các hàm hoặc thành phần bổ trợ có độ dài `< 5 dòng` không được tách riêng biệt. Phải gộp trực tiếp vào hàm chính/phương thức gọi nó và viết ghi chú giải thích bằng tiếng Việt.
+* Follow PEP 8 extreme strictly.
+* Use complete type hints compatible with Pyright strict mode.
+* Do not complicate logic only to satisfy typing.
+* Use absolute imports.
+* Avoid unnecessarily complex, obscure, or high-level Python syntax and tools.
+* Prefer explicit code when it is easier for beginners to understand.
+* Always use junior python syntax instead of senior syntax
+
+## Modules and Packages
+
+* Each module should have one primary responsibility.
+* Internal functions start with `_`.
+* Public functions use normal names.
+* Do not create a new module when the code is too small to justify one.
+* Merge very small package-level helpers into the most relevant existing module or `__init__.py` only when this matches the existing project structure.
+
+## Classes
+
+* Keep methods only when they require object state.
+* Move state-independent logic to module-level functions.
+* Do not introduce a class when functions are sufficient.
+
+## Functions
+
+* Keep functions at or below 20 lines when this does not make the code harder to understand.
+* Split longer functions into clear single-responsibility functions.
+* Extract a main code block longer than 10 lines only when extraction improves clarity.
+* Do not create a helper shorter than five lines unless it removes duplication, names an important concept, or matches existing architecture.
+* Otherwise, inline short logic and add a concise explanatory comment when necessary.
 
 ### Module & Class
 * **Module:**
