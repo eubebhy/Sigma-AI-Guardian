@@ -50,5 +50,17 @@
   {
     "input": "hent@i!",
     "expected": "hentai!"
+  },
+  {
+    "input": "rule 34",
+    "expected": "rule 34"
+  },
+  {
+    "input": "g0r3",
+    "expected": "gore"
+  },
+  {
+    "input": "g4m3",
+    "expected": "game"
   }
 ]
