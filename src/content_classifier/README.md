@@ -12,7 +12,7 @@ Package nay chua cac module phan loai noi dung cua du an.
 ## Thanh phan
 
 - `tags.py`: dinh nghia `ContentCategory`.
-- `clean_obfuscate_text.py`: chuan hoa text truoc khi so khop tu khoa.
+- `clean_text.py`: chuan hoa text truoc khi so khop tu khoa.
 - `rule_based/`: classifier dua tren tu khoa.
 - `local/`: classifier chay model scikit-learn cuc bo qua `joblib`.
 - `cloud/`: cho danh cho classifier chay qua dich vu cloud, hien chua trien khai.
