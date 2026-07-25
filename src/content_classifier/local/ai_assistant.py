@@ -22,6 +22,7 @@ from sklearn.pipeline import Pipeline  # type: ignore[import-not-found]
 
 _GB = 1073741824  # 1024 ** 3 bytes
 _DEFAULT_IDLE_TIMEOUT_SECONDS = 167.0
+_model = None
 
 
 def _idle_timeout_seconds(model_path: Path) -> float:
@@ -86,12 +87,19 @@ class LocalAI:
 
     def _load_model(self) -> Any:
         """Load the model once and keep it cached until it is unloaded."""
+        global _model
+
         with self._lock:
             if self._model is not None:
                 self._last_used_at = time.monotonic()
                 return self._model
 
+            if _model is not None:
+                self._model = _model
+                return self._model
+
             self._model = joblib.load(self._model_path)
+            _model = self._model
             return self._model
 
     def _unload_model(self) -> None:
