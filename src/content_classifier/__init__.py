@@ -12,6 +12,16 @@ from content_classifier.clean_obfuscate_text import clean_text
 from content_classifier.tags import ContentCategory
 from content_classifier.types import StrictLevel
 
+_CLASSIFIER_CACHE: list[tuple[str, StrictLevel, ContentCategory]] = []
+
+
+def _get_cached_result(text: str, strict_level: StrictLevel) -> ContentCategory | None:
+    """Trả kết quả đã cache của cùng text và mức kiểm duyệt."""
+    for cached_text, cached_level, result in _CLASSIFIER_CACHE:
+        if cached_text == text and cached_level == strict_level:
+            return result
+    return None
+
 
 def rule_based_classifier(
     text: str,
@@ -37,6 +47,12 @@ def content_classifier(
 ) -> ContentCategory:
 
     text = clean_text(text)
+
+    # Lay cache neu co
+    cached_result = _get_cached_result(text, strict_level)
+    if cached_result is not None:
+        return cached_result
+
     letter_count = len(text.replace(" ", ""))
     word_count = len(text.split())
 
@@ -44,20 +60,23 @@ def content_classifier(
     if letter_count <= 2:
         return ContentCategory.Unknown
 
-    # Cum tu ngan dien hinh
-    if strict_level in ["xlow"]:
-        if letter_count == 3 or word_count <= 3 and letter_count <= 25:
-            return rule_based_classifier(text, strict_level)
+    # Neu co 3 ki tu thi de rule eng
+    if letter_count == 3:
+        result = rule_based_classifier(text, strict_level)
 
-    # Kiem tra bang rule engine truoc
-    # Rule engine co che don gian, neu match kha nang cao dung
-    rule_result = rule_based_classifier(text, strict_level)
-    if rule_result != ContentCategory.Unknown:
-        return rule_result
+    # Neu strict_level = xlow thi chap nhan bo qua cac cum tu ngan
+    elif strict_level == "xlow" and (word_count <= 3 and letter_count <= 25):
+        result = rule_based_classifier(text, strict_level)
 
-    # Neu rule engne khong match, gia dinh chuoi phuc tap nen de AI su ly
-    local_result = local_ai_classifier(text, strict_level)
-    if local_result != ContentCategory.Unknown:
-        return local_result
+    else:
+        # Rule engine duoc uu tien; local AI chi xu ly khi rule khong match.
+        # Giai thich: Rule engine don gian, neu da match thi thuong dung
+        result = rule_based_classifier(text, strict_level)
+        if result == ContentCategory.Unknown:
+            result = local_ai_classifier(text, strict_level)
 
-    return ContentCategory.Unknown
+    if len(_CLASSIFIER_CACHE) >= 256:
+        _CLASSIFIER_CACHE.pop(0)
+
+    _CLASSIFIER_CACHE.append((text, strict_level, result))
+    return result
