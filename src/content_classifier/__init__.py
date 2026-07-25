@@ -8,7 +8,7 @@ cấm là mọi nhãn khác `Unknown`; nếu cả hai engine đều phát hiện
 thì ưu tiên rule-based vì match theo luật thường rõ ràng hơn AI.
 """
 
-from content_classifier.clean_obfuscate_text import clean_text
+from content_classifier.clean_text import clean_text
 from content_classifier.tags import ContentCategory
 from content_classifier.types import StrictLevel
 
