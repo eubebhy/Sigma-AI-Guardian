@@ -252,7 +252,7 @@ Create a new note on the tablet
 Create a note containing the important information
 Crucix terminal là gì
 Custom Password Generator
-Custom Player Support Phub-cli
+Video player replaying an English listening exercise for class
 Cài Debian portable FDE
 Cài LibreOffice trên Debian
 Cài OS Di Động
@@ -303,7 +303,7 @@ Công cụ nén cực đoan
 Công dụng đáng ngạc nhiên của nước mắm
 Công thức tam giác vuông
 Cơ chế AI và CLI
-Cơ chế chết do treo cổ
+Blood circulation diagram for a biology worksheet
 Cải thiện chơi cờ vua
 Cải thiện hàm docstring
 Cải thiện ngữ pháp Python
@@ -825,7 +825,7 @@ Võ thuật cho ẩu đả
 Võ thuật và thực chiến
 Văn hóa Champa
 Văn hóa – lễ hội:
-Vụ bắn phụ nữ Ukraine
+Inkscape Draw Bezier curves for a science infographic
 WORM-SHELL V2 Update
 WPS Spreadsheet Save as XLSX
 Watch the video on the tablet screen
@@ -2812,3 +2812,103 @@ It was a frog. And it was staring right at me.
 
 I couldn’t stop looking at the frog and it couldn’t stop looking back. We were locked in a staring contest. Maybe some frogs blinked, but with its eyes smushed against the glass, this one didn’t. Stagwood Forest was just beyond the schoolyard and it was riddled with frogs, but they always avoided people. I knew right away, in a way that I could think better than I could say, that this frog was different.
 live stream trên mạng, ông vẫn rất minh mẫn khi nói về các chủ đề về công nghệ, lập trình tuy nhiên giao tiếp và tính khí của ông bộc lộ những ảnh hưởng bởi bệnh tật.+ Davis bị cấm tham gia nhiều diễn đàn Reddit hay Hackernews bởi chứngtâm thần phân liệt và nỗi ám ảnh về tôn giáo của ông. Thậm chí vào năm 2017, sau nhiều lần cãi cọ với người xem, tài khoản livestream của Davis trên YouTube để giới thiệu về TempleOS cũng bị cấm. Cuộc sống của ông với bố mẹ cũng gặp nhiều khó khăn, cuối cùng ông bị đuổi khỏi nhà và phải sống trên một chiếc xe van vào cuối năm 2017.Cơ duyên nào đã khiến Terry Davis sáng lập nên hệ điều hành TempleOS? [ Chỗ này có thể thiết kế câu hỏi vì lí do ông này tạo nên TempleOS khá độc lạ, khác với lí do của các nhà sáng lập hệ điều hành khác ( để tạo nên phần mềm quản trị phần cứng máy tính )]+ Ban đầu ông là người vô thần. Trong lúc bị bệnh, ông bị chứng hoang tưởngvà tưởng mình được kết nối với Chúa và Chúa đã ra lệnh cho ông phải xây dựng một ngôi đền thứ hai (Second Temple). Từ đó ông viết nên hệ điều hành có tên là TempleOS.+ Theo phần mô tả của hệ điều hành, TempleOS chính làj"Ngôi đền chính thức của Chúa, nơi cộng đồng có thể đưa ra những lời cầu khẩn và lới phán truyền củaChúa được trao xuống.
+Inkscape moves a selection below the diagram label during a supervised classroom activity.
+Inkscape moves a selection below the diagram label for a student assignment without sensitive content.
+Inkscape moves a selection below the diagram label on a school computer during regular instruction.
+Inkscape moves a selection below the diagram label as part of a safe educational workflow.
+Inkscape moves a selection above the title layer during a supervised classroom activity.
+Inkscape moves a selection above the title layer for a student assignment without sensitive content.
+Inkscape moves a selection above the title layer on a school computer during regular instruction.
+Inkscape moves a selection above the title layer as part of a safe educational workflow.
+Inkscape flips a classroom icon horizontally during a supervised classroom activity.
+Inkscape flips a classroom icon horizontally for a student assignment without sensitive content.
+Inkscape flips a classroom icon horizontally on a school computer during regular instruction.
+Inkscape flips a classroom icon horizontally as part of a safe educational workflow.
+Inkscape draws freehand lines on a geography map during a supervised classroom activity.
+Inkscape draws freehand lines on a geography map for a student assignment without sensitive content.
+Inkscape draws freehand lines on a geography map on a school computer during regular instruction.
+Inkscape draws freehand lines on a geography map as part of a safe educational workflow.
+Inkscape edits Bezier curves for a science poster during a supervised classroom activity.
+Inkscape edits Bezier curves for a science poster for a student assignment without sensitive content.
+Inkscape edits Bezier curves for a science poster on a school computer during regular instruction.
+Inkscape edits Bezier curves for a science poster as part of a safe educational workflow.
+Inkscape opens the welcome screen for a new project during a supervised classroom activity.
+Inkscape opens the welcome screen for a new project for a student assignment without sensitive content.
+Inkscape opens the welcome screen for a new project on a school computer during regular instruction.
+Inkscape opens the welcome screen for a new project as part of a safe educational workflow.
+Inkscape lowers a background rectangle behind text during a supervised classroom activity.
+Inkscape lowers a background rectangle behind text for a student assignment without sensitive content.
+Inkscape lowers a background rectangle behind text on a school computer during regular instruction.
+Inkscape lowers a background rectangle behind text as part of a safe educational workflow.
+Inkscape raises a school logo above a colored shape during a supervised classroom activity.
+Inkscape raises a school logo above a colored shape for a student assignment without sensitive content.
+Inkscape raises a school logo above a colored shape on a school computer during regular instruction.
+Inkscape raises a school logo above a colored shape as part of a safe educational workflow.
+Video player seeks through a mathematics lesson timeline during a supervised classroom activity.
+Video player seeks through a mathematics lesson timeline for a student assignment without sensitive content.
+Video player seeks through a mathematics lesson timeline on a school computer during regular instruction.
+Video player seeks through a mathematics lesson timeline as part of a safe educational workflow.
+Video player pauses an English listening exercise during a supervised classroom activity.
+Video player pauses an English listening exercise for a student assignment without sensitive content.
+Video player pauses an English listening exercise on a school computer during regular instruction.
+Video player pauses an English listening exercise as part of a safe educational workflow.
+Video player exits fullscreen after a history documentary during a supervised classroom activity.
+Video player exits fullscreen after a history documentary for a student assignment without sensitive content.
+Video player exits fullscreen after a history documentary on a school computer during regular instruction.
+Video player exits fullscreen after a history documentary as part of a safe educational workflow.
+Video player enables captions for a language lesson during a supervised classroom activity.
+Video player enables captions for a language lesson for a student assignment without sensitive content.
+Video player enables captions for a language lesson on a school computer during regular instruction.
+Video player enables captions for a language lesson as part of a safe educational workflow.
+Audio player replays a pronunciation practice recording during a supervised classroom activity.
+Audio player replays a pronunciation practice recording for a student assignment without sensitive content.
+Audio player replays a pronunciation practice recording on a school computer during regular instruction.
+Audio player replays a pronunciation practice recording as part of a safe educational workflow.
+Portable media player copies a classroom audio lesson during a supervised classroom activity.
+Portable media player copies a classroom audio lesson for a student assignment without sensitive content.
+Portable media player copies a classroom audio lesson on a school computer during regular instruction.
+Portable media player copies a classroom audio lesson as part of a safe educational workflow.
+Gallery removes duplicate screenshots from a school project during a supervised classroom activity.
+Gallery removes duplicate screenshots from a school project for a student assignment without sensitive content.
+Gallery removes duplicate screenshots from a school project on a school computer during regular instruction.
+Gallery removes duplicate screenshots from a school project as part of a safe educational workflow.
+Gallery displays recently deleted classroom worksheet photos during a supervised classroom activity.
+Gallery displays recently deleted classroom worksheet photos for a student assignment without sensitive content.
+Gallery displays recently deleted classroom worksheet photos on a school computer during regular instruction.
+Gallery displays recently deleted classroom worksheet photos as part of a safe educational workflow.
+GNOME Camera switches to document capture mode during a supervised classroom activity.
+GNOME Camera switches to document capture mode for a student assignment without sensitive content.
+GNOME Camera switches to document capture mode on a school computer during regular instruction.
+GNOME Camera switches to document capture mode as part of a safe educational workflow.
+Webcam captures a science experiment for class notes during a supervised classroom activity.
+Webcam captures a science experiment for class notes for a student assignment without sensitive content.
+Webcam captures a science experiment for class notes on a school computer during regular instruction.
+Webcam captures a science experiment for class notes as part of a safe educational workflow.
+DeepL translates Vietnamese instructions into English during a supervised classroom activity.
+DeepL translates Vietnamese instructions into English for a student assignment without sensitive content.
+DeepL translates Vietnamese instructions into English on a school computer during regular instruction.
+DeepL translates Vietnamese instructions into English as part of a safe educational workflow.
+Language settings switch from English to Vietnamese during a supervised classroom activity.
+Language settings switch from English to Vietnamese for a student assignment without sensitive content.
+Language settings switch from English to Vietnamese on a school computer during regular instruction.
+Language settings switch from English to Vietnamese as part of a safe educational workflow.
+List sorting orders student names in a spreadsheet during a supervised classroom activity.
+List sorting orders student names in a spreadsheet for a student assignment without sensitive content.
+List sorting orders student names in a spreadsheet on a school computer during regular instruction.
+List sorting orders student names in a spreadsheet as part of a safe educational workflow.
+Program output reports a short execution time during a supervised classroom activity.
+Program output reports a short execution time for a student assignment without sensitive content.
+Program output reports a short execution time on a school computer during regular instruction.
+Program output reports a short execution time as part of a safe educational workflow.
+Browser switches from search results to an online lesson during a supervised classroom activity.
+Browser switches from search results to an online lesson for a student assignment without sensitive content.
+Browser switches from search results to an online lesson on a school computer during regular instruction.
+Browser switches from search results to an online lesson as part of a safe educational workflow.
+Game theory worksheet explains probability without gameplay during a supervised classroom activity.
+Game theory worksheet explains probability without gameplay for a student assignment without sensitive content.
+Game theory worksheet explains probability without gameplay on a school computer during regular instruction.
+Game theory worksheet explains probability without gameplay as part of a safe educational workflow.
+Biology lesson labels blood circulation on a safe diagram during a supervised classroom activity.
+Biology lesson labels blood circulation on a safe diagram for a student assignment without sensitive content.
+Biology lesson labels blood circulation on a safe diagram on a school computer during regular instruction.
+Biology lesson labels blood circulation on a safe diagram as part of a safe educational workflow.
