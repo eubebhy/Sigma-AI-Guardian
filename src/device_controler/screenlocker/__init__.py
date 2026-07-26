@@ -23,8 +23,8 @@ from utils import input_blocker
 
 FONT_PATH = Path(__file__).with_name("TempleOS.ttf")
 BACKGROUND_COLOR = "#ab0101"
-TEXT_COLOR = "#f9ecec"
-HEADER_TEXT = "Oops, system locked by SIGMA AI GUARDIAN"
+TEXT_COLOR = "#FFFFFF"
+HEADER_TEXT = "Oops, system is locked by SIGMA AI GUARDIAN"
 BODY_TEXT = """
 Your workstation has been restricted for one of the following reasons:
 
