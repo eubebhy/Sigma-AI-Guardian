@@ -10,17 +10,18 @@ chờ Xorg nhận diện rồi giữ device sống trong suốt phiên điều k
 
 import os
 import time
+from collections.abc import Sequence
 from typing import Final
 
 from evdev import ecodes
 
 from utils.input_controller.linux.types import UInputDevice
 from utils.input_controller.linux.utils import UInputManager
-from utils.input_controller.types import Keys
+from utils.input_controller.types import Key
 
 
 # Ký tự có thể gõ trực tiếp trên layout US/ANSI bằng một phím vật lý.
-_DIRECT_CHARS: Final[dict[str, Keys]] = {
+_DIRECT_CHARS: Final[dict[str, Key]] = {
     "a": "a",
     "b": "b",
     "c": "c",
@@ -75,7 +76,7 @@ _DIRECT_CHARS: Final[dict[str, Keys]] = {
 
 
 # Ký tự cần giữ Shift trên layout US/ANSI để app nhận đúng ký tự in ra.
-_SHIFT_CHARS: Final[dict[str, Keys]] = {
+_SHIFT_CHARS: Final[dict[str, Key]] = {
     "A": "a",
     "B": "b",
     "C": "c",
@@ -274,7 +275,7 @@ def _get_ui() -> UInputDevice:
     return _ui_manager.get_ui()
 
 
-def keyDown(key: Keys) -> None:
+def keyDown(key: Key) -> None:
     """Nhấn và giữ một phím trên virtual keyboard."""
 
     ui = _get_ui()
@@ -285,7 +286,7 @@ def keyDown(key: Keys) -> None:
     ui.syn()
 
 
-def keyUp(key: Keys) -> None:
+def keyUp(key: Key) -> None:
     """Thả một phím đang được giữ trên virtual keyboard."""
 
     ui = _get_ui()
@@ -294,32 +295,30 @@ def keyUp(key: Keys) -> None:
     ui.syn()
 
 
-def press(*keys: Keys, delay: float = 0.067) -> None:
-    """Nhấn rồi thả lần lượt các phím, có delay ngắn giữa down/up."""
-    for key in keys:
+def press(keys: Key | Sequence[Key]) -> None:
+    """Nhấn rồi thả lần lượt một phím hoặc một dãy phím."""
+
+    key_names = (keys,) if isinstance(keys, str) else keys
+    for key in key_names:
         keyDown(key)
-        if delay:
-            time.sleep(delay)
         keyUp(key)
-        if delay:
-            time.sleep(delay)
 
 
-def write(text: str, delay: float = 0.067) -> None:
+def write(message: str, interval: float = 0.0) -> None:
     """Gõ chuỗi text theo layout US/ANSI bằng `press` và Shift khi cần."""
 
-    for character in text:
+    for character in message:
         if character in _DIRECT_CHARS:
-            press(_DIRECT_CHARS[character], delay=delay)
+            press(_DIRECT_CHARS[character])
+            if interval:
+                time.sleep(interval)
             continue
         if character in _SHIFT_CHARS:
             keyDown("leftshift")
-            if delay:
-                time.sleep(delay)
-            press(_SHIFT_CHARS[character], delay=delay)
+            press(_SHIFT_CHARS[character])
             keyUp("leftshift")
-            if delay:
-                time.sleep(delay)
+            if interval:
+                time.sleep(interval)
             continue
         raise ValueError(f"Unsupported character: {character!r}")
 

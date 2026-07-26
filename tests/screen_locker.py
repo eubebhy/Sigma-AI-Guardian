@@ -1,57 +1,68 @@
-"""Test screenlocker an toàn, mặc định không khóa màn hình thật."""
+"""Khóa màn hình thật để kiểm tra thủ công screen locker.
+
+File path: `tests/screen_locker.py`.
+Input: `--delay` là thời gian chờ trước khi khóa; `--seconds` là thời gian khóa.
+Output: in trạng thái ra terminal, khóa thật, rồi tự mở khóa sau thời lượng chọn.
+"""
 
 from __future__ import annotations
 
 import argparse
 import sys
+import threading
 import time
 from pathlib import Path
 
+
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 SRC_ROOT = PROJECT_ROOT / "src"
-SCREENLOCKER_PATH = SRC_ROOT / "device_controler" / "screenlocker" / "__init__.py"
 if str(SRC_ROOT) not in sys.path:
     sys.path.insert(0, str(SRC_ROOT))
 
 
-def test_unlock_shortcut_calls_unlock() -> None:
-    """Shortcut thoát lock UI phải gọi đúng API unlock hiện có."""
-
-    source = SCREENLOCKER_PATH.read_text(encoding="utf-8")
-    assert "lambda _: unlock()" in source
-    assert "lambda _: unblock()" not in source
+def _non_negative_seconds(value: str) -> float:
+    seconds = float(value)
+    if seconds < 0:
+        raise argparse.ArgumentTypeError("seconds must be non-negative")
+    return seconds
 
 
 def _build_parser() -> argparse.ArgumentParser:
+    """Tạo CLI cho thời điểm khóa và thời lượng khóa thật."""
+
     parser = argparse.ArgumentParser()
-    parser.add_argument("--manual", action="store_true")
-    parser.add_argument("--seconds", type=float, default=20.0)
+    parser.add_argument("--delay", type=_non_negative_seconds, default=5.0)
+    parser.add_argument("--seconds", type=_non_negative_seconds, default=20.0)
     return parser
 
 
-def _run_manual(seconds: float) -> None:
+def _run_lock_test(delay: float, seconds: float) -> None:
+    """Chờ, khóa thật trong thời lượng yêu cầu rồi luôn mở khóa."""
+
     from device_controler.screenlocker import lock, unlock
 
-    print("Screen lock in 1s")
-    time.sleep(1)
-    print(f"Unlock in {seconds}")
-    time.sleep(0.2)
+    print(f"Screen locks in {delay:g} seconds.")
+    time.sleep(delay)
+    print(f"Screen locked for {seconds:g} seconds.")
+    unlock_timer: threading.Timer | None = None
     try:
         lock()
+        unlock_timer = threading.Timer(seconds, unlock)
+        unlock_timer.start()
         time.sleep(seconds)
     finally:
+        if unlock_timer is not None:
+            unlock_timer.cancel()
         unlock()
-    print("Screen unlocked")
+    print("Screen unlocked.")
 
 
 def main() -> None:
-    args = _build_parser().parse_args()
-    if args.manual:
-        _run_manual(args.seconds)
-        return
-    test_unlock_shortcut_calls_unlock()
+    """Chạy vòng đời kiểm thử screen locker thật."""
+
+    arguments = _build_parser().parse_args()
+    _run_lock_test(arguments.delay, arguments.seconds)
 
 
 if __name__ == "__main__":
     main()
-    print("PASS: screen_locker")

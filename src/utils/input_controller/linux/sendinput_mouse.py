@@ -7,6 +7,7 @@ event đầu tiên có thể bị mất vì Xorg chưa attach xong.
 
 import os
 import time
+from math import ceil
 from typing import Final, Protocol, cast
 import subprocess
 
@@ -19,6 +20,8 @@ from utils.input_controller.types import MouseButton
 
 # Đổi tên nút public sang BTN_* code mà Linux input subsystem sử dụng.
 _BUTTON_CODES: Final[dict[MouseButton, int]] = {
+    "primary": ecodes.BTN_LEFT,
+    "secondary": ecodes.BTN_RIGHT,
     "left": ecodes.BTN_LEFT,
     "right": ecodes.BTN_RIGHT,
     "middle": ecodes.BTN_MIDDLE,
@@ -40,11 +43,13 @@ class _Root(Protocol):
 
 _display: Display | None = None
 _root: _Root | None = None
+_configured_device_name: str | None = None
+_MOVEMENT_INTERVAL: Final[float] = 0.1
 _DEVICE_NAME: Final[str] = f"Sigma Virtual Mouse {os.getpid()}"
 _ui_manager = UInputManager(
     _DEVICE_NAME,
     {
-        ecodes.EV_KEY: list(_BUTTON_CODES.values()),
+        ecodes.EV_KEY: list(dict.fromkeys(_BUTTON_CODES.values())),
         ecodes.EV_REL: [
             ecodes.REL_X,
             ecodes.REL_Y,
@@ -57,8 +62,14 @@ _ui_manager = UInputManager(
 
 def _get_ui() -> UInputDevice:
     """Tạo virtual mouse ở lần sử dụng đầu tiên."""
+
+    global _configured_device_name
+
     ui = _ui_manager.get_ui()
     device_name = ui.name
+    if _configured_device_name == device_name:
+        return ui
+
     subprocess.run(
         [
             "xinput",
@@ -80,6 +91,7 @@ def _get_ui() -> UInputDevice:
         ],
         check=True,
     )
+    _configured_device_name = device_name
     return ui
 
 
@@ -103,7 +115,15 @@ def _get_root() -> _Root:
     raise RuntimeError("Cannot connect to X server") from last_error
 
 
-def click(button: MouseButton) -> None:
+def click(
+    x: int | None = None,
+    y: int | None = None,
+    button: MouseButton = "primary",
+) -> None:
+    """Click tại tọa độ chỉ định hoặc giữ nguyên vị trí hiện tại."""
+
+    if x is not None or y is not None:
+        moveTo(x, y)
     mouseDown(button)
     mouseUp(button)
 
@@ -133,33 +153,34 @@ def position(take_new: bool = False) -> tuple[int, int]:
     return newx, newy
 
 
-def moveTo(x: int, y: int, steps: int = 1, duration: int | float = 0) -> None:
-    """Di chuyen de toa DO (X, Y) tren mang hinh"""
+def moveTo(x: int | None, y: int | None, duration: float = 0.0) -> None:
+    """Di chuyển đến tọa độ tuyệt đối, giữ nguyên trục có giá trị ``None``."""
 
     current_x, current_y = position()
-    moveRel(x - current_x, y - current_y, steps, duration)
+    target_x = current_x if x is None else x
+    target_y = current_y if y is None else y
+    moveRel(target_x - current_x, target_y - current_y, duration)
 
 
-def moveRel(x: int, y: int, steps: int = 1, duration: int | float = 0) -> None:
-    """Di chuyen tuong doi dden toa do (x, y) tren mang hinh tu vi tri hien tai
-    x > 0       Qua phia
-    x < 0       Qua tri
-    y > 0       Xuong duoi
-    y < 0       Len tren"""
+def moveRel(x: int | None, y: int | None, duration: float = 0.0) -> None:
+    """Di chuyển theo độ lệch, xem ``None`` là độ lệch bằng không."""
 
-    curx, cury = position()
-    goalx, goaly = curx + x, cury + y
     ui = _get_ui()
-    step_delay = duration / steps
+    steps = max(1, ceil(duration / _MOVEMENT_INTERVAL))
+    remaining_x = 0 if x is None else x
+    remaining_y = 0 if y is None else y
+    step_duration = duration / steps
 
-    for step_left in range(steps, 0, -1):
-        curx, cury = position()
-        nextx = int((goalx - curx) / step_left)
-        nexty = int((goaly - cury) / step_left)
-        ui.write(ecodes.EV_REL, ecodes.REL_X, nextx)
-        ui.write(ecodes.EV_REL, ecodes.REL_Y, nexty)
+    for steps_left in range(steps, 0, -1):
+        step_x = int(remaining_x / steps_left)
+        step_y = int(remaining_y / steps_left)
+        ui.write(ecodes.EV_REL, ecodes.REL_X, step_x)
+        ui.write(ecodes.EV_REL, ecodes.REL_Y, step_y)
         ui.syn()
-        time.sleep(step_delay)
+        remaining_x -= step_x
+        remaining_y -= step_y
+        if step_duration:
+            time.sleep(step_duration)
 
 
 def scroll(amount: int) -> None:

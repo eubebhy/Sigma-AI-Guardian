@@ -2,12 +2,11 @@
 
 File path: `src/utils/input_controller/window/__init__.py`
 Input: lời gọi theo contract chung của input controller.
-Output: 16 API Windows có cùng chữ ký và thứ tự export với backend Linux.
+Output: bảy API sender có cùng chữ ký với backend Linux.
 Nguyên lý: chỉ re-export các module con; dependency nền tảng được import lazy bên
 trong từng API để package vẫn import được trên Linux.
 """
 
-from utils.input_controller.window.listener import listen_keys, listen_mice
 from utils.input_controller.window.sendinput_kb import (
     keyDown,
     keyUp,
@@ -26,6 +25,7 @@ from utils.input_controller.window.sendinput_mouse import (
     scroll,
     sideScroll,
 )
+from utils.input_controller.window.listener import listen_keys, listen_mice
 
 __all__ = [
     "click",

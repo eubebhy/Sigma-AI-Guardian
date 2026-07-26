@@ -1,0 +1,9 @@
+=== main-classifier | strict=low ===
+
+Summary
+Total: 400 | Passed: 273 | Failed: 127
+ game: 44/100 passed, 56 failed
+ porn: 58/100 passed, 42 failed
+ gore: 73/100 passed, 27 failed
+unknown: 98/100 passed, 2 failed
+DONE 46.62739276885986

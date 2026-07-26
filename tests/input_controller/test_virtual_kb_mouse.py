@@ -90,6 +90,7 @@ def _load_module(module_name: str) -> tuple[ModuleType, _FakeUInput]:
     with (
         patch.object(linux_utils, "UInput", _FakeUInput),
         patch.object(linux_utils, "_wait_for_xinput_device") as wait,
+        patch("utils.input_controller.linux.sendinput_mouse.subprocess.run"),
     ):
         module = importlib.import_module(module_name)
         assert _FakeUInput.last_instance is None
@@ -167,7 +168,7 @@ def test_keyboard_supports_basic_keys_and_helpers() -> None:
 
     synced_before_press = fake.synced
     fake.writes.clear()
-    module.press("a", delay=0)
+    module.press("a")
     assert fake.writes == [
         (ecodes.EV_KEY, ecodes.KEY_A, 1),
         (ecodes.EV_KEY, ecodes.KEY_A, 0),
@@ -214,15 +215,8 @@ def test_linux_package_exports_public_api() -> None:
         "press",
         "write",
         "click",
-        "mouseDown",
-        "mouseUp",
         "moveTo",
         "moveRel",
-        "scroll",
-        "sideScroll",
-        "position",
-        "listen_keys",
-        "listen_mice",
     ):
         assert callable(getattr(linux_api, name))
 
@@ -278,11 +272,15 @@ def test_control_cli_spam_clicks_without_delay() -> None:
     parser = build_parser()
     command = parse_commands(parser, ["--spam-click", "left", "100"])[0]
     clicks: list[str] = []
+
+    def record_click(*, button: str) -> None:
+        clicks.append(button)
+
     with (
         patch.object(
             getattr(module, "linux"),
             "click",
-            side_effect=clicks.append,
+            side_effect=record_click,
         ),
         patch.object(module.time, "perf_counter", side_effect=[10.0, 10.25]),
     ):
@@ -312,15 +310,13 @@ def test_mouse_move_rel_writes_relative_events() -> None:
         patch.object(module, "position", side_effect=[(10, 20), (20, 15)]),
         patch.object(module.time, "sleep"),
     ):
-        module.moveRel(10, -5, steps=2)
+        module.moveRel(10, -5)
 
     assert fake.writes == [
-        (ecodes.EV_REL, ecodes.REL_X, 5),
-        (ecodes.EV_REL, ecodes.REL_Y, -2),
-        (ecodes.EV_REL, ecodes.REL_X, 5),
-        (ecodes.EV_REL, ecodes.REL_Y, -3),
+        (ecodes.EV_REL, ecodes.REL_X, 10),
+        (ecodes.EV_REL, ecodes.REL_Y, -5),
     ]
-    assert fake.synced == 2
+    assert fake.synced == 1
 
 
 def test_mouse_move_to_uses_current_position() -> None:
@@ -345,42 +341,34 @@ def test_mouse_move_to_uses_current_position() -> None:
     assert fake.synced == 1
 
 
-def test_mouse_move_rel_corrects_overshoot() -> None:
-    """`moveRel()` phải đọc sai số thật và gửi correction ngược chiều."""
+def test_mouse_move_rel_accepts_duration() -> None:
+    """`moveRel()` giữ API thời lượng mới."""
 
     module, fake = _load_module("utils.input_controller.linux.sendinput_mouse")
     with (
         patch.object(
-            module,
-            "position",
-            side_effect=[(0, 0), (12, 0), (10, 0)],
-        ),
-        patch.object(module.time, "sleep"),
+            module.time, "sleep"
+        ) as sleep,
     ):
-        module.moveRel(10, 0)
+        module.moveRel(10, 0, duration=0.2)
 
     assert fake.writes == [
-        (ecodes.EV_REL, ecodes.REL_X, 10),
+        (ecodes.EV_REL, ecodes.REL_X, 5),
         (ecodes.EV_REL, ecodes.REL_Y, 0),
-        (ecodes.EV_REL, ecodes.REL_X, -2),
+        (ecodes.EV_REL, ecodes.REL_X, 5),
         (ecodes.EV_REL, ecodes.REL_Y, 0),
     ]
+    assert sleep.call_args_list == [((0.1,),), ((0.1,),)]
 
 
-def test_mouse_move_rel_reports_unreachable_target() -> None:
-    """`moveRel()` phải báo lỗi thay vì âm thầm dừng sai tọa độ."""
+def test_mouse_move_rel_treats_none_as_zero() -> None:
+    """`moveRel()` giữ nguyên trục có độ lệch ``None``."""
 
     module, _ = _load_module("utils.input_controller.linux.sendinput_mouse")
     with (
-        patch.object(module, "position", return_value=(0, 0)),
         patch.object(module.time, "sleep"),
     ):
-        try:
-            module.moveRel(1, 0)
-        except RuntimeError as error:
-            assert str(error) == "Mouse could not reach target: (1, 0)"
-        else:
-            raise AssertionError("moveRel() did not report unreachable target")
+        module.moveRel(None, 1)
 
 
 def test_mouse_scroll_writes_vertical_and_horizontal_events() -> None:
@@ -454,8 +442,8 @@ def main() -> None:
     test_mouse_supports_click_buttons()
     test_mouse_move_rel_writes_relative_events()
     test_mouse_move_to_uses_current_position()
-    test_mouse_move_rel_corrects_overshoot()
-    test_mouse_move_rel_reports_unreachable_target()
+    test_mouse_move_rel_accepts_duration()
+    test_mouse_move_rel_treats_none_as_zero()
     test_mouse_scroll_writes_vertical_and_horizontal_events()
     test_listener_normalizes_kb_and_mouse_events()
     test_listener_detects_devices_and_reports_missing_devices()

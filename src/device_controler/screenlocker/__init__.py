@@ -1,102 +1,263 @@
-# pyright: reportMissingImports=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false
-"""
-File path: src/device_controler/screenlocker/__init__.py
-Input contract:
-- block(): khong nhan tham so.
-- unlock(): khong nhan tham so.
-Output contract:
-- block() chan input va hien thi lock UI fullscreen bang daemon thread.
-- unlock() mo input va tat lock UI neu dang chay.
-Operating principle:
-- chup man hinh, ghep lock banner, tao Tkinter fullscreen trong thread rieng.
+# pyright: reportMissingImports=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false, reportUnknownParameterType=false, reportAttributeAccessIssue=false
+"""Khóa màn hình đa monitor trên Windows và Linux.
+
+File path: `src/device_controler/screenlocker/__init__.py`.
+Input: `lock()` và `unlock()` không nhận tham số.
+Output: `lock()` phủ mọi monitor bằng thông báo khóa rồi chặn input. `unlock()` mở
+input và yêu cầu UI thread đóng các overlay.
+Nguyên lý: Pillow dựng một ảnh khóa theo đúng độ phân giải từng monitor; Tkinter
+chỉ hiển thị ảnh toàn màn hình. `unlock()` chỉ set event để UI thread tự đóng cửa sổ.
 """
 
-from pathlib import Path
-from typing import Any
+from __future__ import annotations
+
 import threading
 import tkinter as tk
+from pathlib import Path
 
-from PIL import Image, ImageGrab, ImageTk
+from PIL import Image, ImageDraw, ImageFont, ImageTk
 
+from device_controler import screen_capture
 from utils import input_blocker
 
-IMAGE_PATH = Path(__file__).resolve().parents[3] / "assets" / "lock_banner.png"
 
+FONT_PATH = Path(__file__).with_name("TempleOS.ttf")
+BACKGROUND_COLOR = "#ab0101"
+TEXT_COLOR = "#f9ecec"
+HEADER_TEXT = "Oops, system locked by SIGMA AI GUARDIAN"
+BODY_TEXT = """
+Your workstation has been restricted for one of the following reasons:
 
-_root: tk.Tk | None = None
-_thread: threading.Thread | None = None
+The administrator has manually locked your machine.
+The system automatically locked it after detecting prohibited or unauthorized 
+activity.
+
+Contact your administrator immediately.
+While waiting for unlock, you are strictly required to follow these rules:
+
+    1. Do not turn off the computer. Keep the power supply stable at all times.
+    
+    2. Do not attempt to bypass, force-close, restart, or interfere with the
+       locking system in any way.
+
+    3. Remain at the computer and wait for the administrator to unlock it. 
+
+Improper shutdown or unauthorized interference with the system may result in 
+UNINTENDED CONSEQUENCES.
+"""
 _lock = threading.Lock()
+_thread: threading.Thread | None = None
+_stop_event: threading.Event | None = None
 
 
 class App:
-    def __init__(self, root: tk.Tk, lock_image: Any) -> None:
-        self.root = root
-        self.root.configure(bg="black")
-        # self.root.bind("<Control-Shift-Q>", lambda _: unlock())
-        self.root.attributes("-fullscreen", True)
-        self.root.attributes("-topmost", True)
-        self.root.overrideredirect(True)
+    """Tạo một overlay topmost cho một monitor."""
 
-        self.tk_img = ImageTk.PhotoImage(lock_image)
-        self.label = tk.Label(root, bg="black", image=self.tk_img)
-        self.label.pack(expand=True, fill="both")
-        self.force_fullscreen()
-        self.root.bind("<Configure>", self.force_fullscreen)
-
-    def force_fullscreen(self, event: Any | None = None) -> None:
-        w = self.root.winfo_screenwidth()
-        h = self.root.winfo_screenheight()
-        self.root.attributes("-fullscreen", True)
-        self.root.attributes("-topmost", True)
-        self.root.overrideredirect(True)
-        self.root.geometry(f"{w}x{h}+0+0")
+    def __init__(
+        self,
+        root: tk.Tk | tk.Toplevel,
+        image: Image.Image,
+        region: screen_capture.ScreenRegion,
+    ) -> None:
+        photo = ImageTk.PhotoImage(image)
+        root.configure(bg="black")
+        root.attributes("-topmost", True)
+        root.overrideredirect(True)
+        root.geometry(f"{region.width}x{region.height}{region.left:+d}{region.top:+d}")
+        label = tk.Label(root, bg="black", image=photo)
+        label.image = photo
+        label.pack(expand=True, fill="both")
 
 
-def _create_lock_image() -> Any:
-    screenshot = ImageGrab.grab().convert("RGB")
-    banner = Image.open(IMAGE_PATH).convert("RGBA")
-    scale = min(screenshot.width / banner.width, screenshot.height / banner.height)
-    size = (int(banner.width * scale), int(banner.height * scale))
-    banner = banner.resize(size, Image.Resampling.LANCZOS)
+def _font_size(region: screen_capture.ScreenRegion) -> int:
+    """Đặt glyph vuông bằng một phần hai mươi lăm chiều rộng monitor."""
 
-    # Ghép banner vào giữa ảnh chụp màn hình để tạo hiệu ứng lock.
-    lock_image = screenshot.convert("RGBA")
-    position = (
-        (screenshot.width - banner.width) // 2,
-        (screenshot.height - banner.height) // 2,
+    return max(8, min(region.width // 25, region.height // 12))
+
+
+def _wrap_text(
+    draw: ImageDraw.ImageDraw,
+    text: str,
+    font: ImageFont.FreeTypeFont,
+    max_width: int,
+) -> str:
+    """Trả body nguyên văn để giữ mọi khoảng trắng, tab và ASCII art."""
+
+    del draw, font, max_width
+    return text
+
+
+def _fit_body_font_size(
+    region: screen_capture.ScreenRegion,
+    header_height: int,
+    padding: int,
+) -> int:
+    """Giảm font body đến khi bounding box nằm trọn trong monitor."""
+
+    draw = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+    smallest_size = 1
+    low = smallest_size
+    high = _font_size(region)
+    best_size = smallest_size
+    while low <= high:
+        font_size = (low + high) // 2
+        font = ImageFont.truetype(FONT_PATH, font_size)
+        body = _wrap_text(draw, BODY_TEXT, font, region.width - (padding * 2))
+        bounds = draw.multiline_textbbox(
+            (0, header_height + (font_size * 2)),
+            body,
+            font=font,
+            spacing=font_size // 2,
+        )
+        if bounds[2] <= region.width - padding and bounds[3] <= region.height - padding:
+            best_size = font_size
+            low = font_size + 1
+        else:
+            high = font_size - 1
+    return best_size
+
+
+def _create_lock_image(region: screen_capture.ScreenRegion) -> Image.Image:
+    """Dựng ảnh khóa responsive gồm header và body cho một monitor."""
+
+    image = Image.new("RGB", (region.width, region.height), BACKGROUND_COLOR)
+    draw = ImageDraw.Draw(image)
+    body_font_size = _font_size(region)
+    header_font_size = body_font_size
+    header_font = ImageFont.truetype(FONT_PATH, header_font_size)
+    padding = max(16, round(region.width * 0.012))
+    while (
+        draw.textbbox((0, 0), HEADER_TEXT, font=header_font)[2] > region.width - padding
+        and header_font_size > 8
+    ):
+        header_font_size -= 1
+        header_font = ImageFont.truetype(FONT_PATH, header_font_size)
+    header_y = body_font_size // 3
+    header_bottom = draw.textbbox((0, header_y), HEADER_TEXT, font=header_font)[3]
+    header_gap = header_font_size
+    separator_height = 20
+    separator_y = header_bottom + header_gap + (separator_height // 2)
+    body_top = header_bottom + header_gap + separator_height
+    body_font_size = _fit_body_font_size(region, body_top, padding)
+    body_font = ImageFont.truetype(FONT_PATH, body_font_size)
+    draw.text(
+        (0, header_y),
+        HEADER_TEXT,
+        font=header_font,
+        fill=TEXT_COLOR,
     )
-    lock_image.alpha_composite(banner, position)
-    return lock_image.convert("RGB")
+    draw.line(
+        (0, separator_y, region.width, separator_y),
+        fill=TEXT_COLOR,
+        width=separator_height,
+    )
+    body = _wrap_text(draw, BODY_TEXT, body_font, region.width - (padding * 2))
+    draw.multiline_text(
+        (0, body_top + (body_font_size * 2)),
+        body,
+        font=body_font,
+        fill=TEXT_COLOR,
+        spacing=body_font_size // 2,
+    )
+    return image
 
 
-def _run_ui(lock_image: Any) -> None:
-    global _root
+def _close_when_unlocked(
+    root: tk.Tk,
+    windows: list[tk.Tk | tk.Toplevel],
+    stop_event: threading.Event,
+) -> None:
+    """Đóng overlay trên UI thread ngay khi `unlock()` gửi tín hiệu."""
+
+    if not stop_event.is_set():
+        root.after(100, _close_when_unlocked, root, windows, stop_event)
+        return
+    for window in reversed(windows):
+        window.destroy()
+
+
+def _create_windows(
+    regions: list[screen_capture.ScreenRegion],
+) -> tuple[tk.Tk, list[tk.Tk | tk.Toplevel]]:
+    """Tạo một cửa sổ overlay cho từng monitor."""
+
     root = tk.Tk()
-    with _lock:
-        _root = root
-    App(root, lock_image)
-    root.mainloop()
+    windows: list[tk.Tk | tk.Toplevel] = [root]
+    for index, region in enumerate(regions):
+        window = root if index == 0 else tk.Toplevel(root)
+        if window is not root:
+            windows.append(window)
+        App(window, _create_lock_image(region), region)
+    return root, windows
+
+
+def _run_ui(
+    regions: list[screen_capture.ScreenRegion],
+    ready_event: threading.Event,
+    failed_event: threading.Event,
+    stop_event: threading.Event,
+) -> None:
+    """Tạo overlay và chạy Tk event loop trên UI thread."""
+
+    try:
+        root, windows = _create_windows(regions)
+        ready_event.set()
+        _close_when_unlocked(root, windows, stop_event)
+        root.mainloop()
+    except Exception:
+        failed_event.set()
+        ready_event.set()
+
+
+def _start_ui(
+    regions: list[screen_capture.ScreenRegion],
+) -> tuple[threading.Event, threading.Event, threading.Event]:
+    """Khởi động UI thread và trả event báo trạng thái khởi tạo."""
+
+    global _stop_event, _thread
+    ready_event = threading.Event()
+    failed_event = threading.Event()
+    _stop_event = threading.Event()
+    _thread = threading.Thread(
+        target=_run_ui,
+        args=(regions, ready_event, failed_event, _stop_event),
+        daemon=True,
+    )
+    _thread.start()
+    return ready_event, failed_event, _stop_event
 
 
 def lock() -> None:
-    global _thread
+    """Phủ mọi monitor và chặn input sau khi overlay sẵn sàng."""
+
+    global _stop_event, _thread
     with _lock:
         if _thread is not None and _thread.is_alive():
             return
-        lock_image = _create_lock_image()
-        _thread = threading.Thread(target=_run_ui, args=(lock_image,), daemon=True)
-        _thread.start()
+        regions = screen_capture.get_monitors()
+        if not regions:
+            raise RuntimeError("No monitors were found")
+        ready_event, failed_event, stop_event = _start_ui(regions)
+
+    if not ready_event.wait(timeout=5.0):
+        raise RuntimeError("Screen locker UI did not start within 5 seconds")
+    if failed_event.is_set():
+        raise RuntimeError("Screen locker UI failed to start")
+    if stop_event.is_set():
+        return
     input_blocker.block()
+    if stop_event.is_set():
+        input_blocker.unblock()
 
 
 def unlock() -> None:
-    global _root
-    input_blocker.unblock()
+    """Mở input và yêu cầu UI thread đóng overlay an toàn."""
+
     with _lock:
-        root = _root
-        _root = None
-    if root is not None:
-        root.after(0, root.destroy)
+        stop_event = _stop_event
+    if stop_event is not None:
+        stop_event.set()
+    input_blocker.unblock()
 
 
 __all__ = ["lock", "unlock"]

@@ -8,6 +8,11 @@ Nguyên lý: dùng MSS làm backend chụp cross-platform, giữ instance dùng 
 tránh overhead và giảm mẫu khi `sharpness < 1.0` để nhẹ dữ liệu hơn.
 """
 
-from device_controler.screen_capture.capture import ScreenCapture, ScreenRegion, capture
+from device_controler.screen_capture.capture import (
+    ScreenCapture,
+    ScreenRegion,
+    capture,
+    get_monitors,
+)
 
-__all__ = ["ScreenCapture", "ScreenRegion", "capture"]
+__all__ = ["ScreenCapture", "ScreenRegion", "capture", "get_monitors"]

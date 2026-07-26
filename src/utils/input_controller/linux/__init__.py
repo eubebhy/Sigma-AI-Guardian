@@ -1,6 +1,11 @@
-"""API Linux cho gửi và lắng nghe sự kiện bàn phím, chuột."""
+"""Backend gửi input Linux theo tập con API PyAutoGUI.
 
-from utils.input_controller.linux.listener import listen_keys, listen_mice
+File path: `src/utils/input_controller/linux/__init__.py`.
+Input: lời gọi sender chuẩn hóa từ facade package cha.
+Output: bảy hàm sender dùng virtual evdev/UInput.
+Nguyên lý: module chỉ re-export sender; listener vẫn nằm tại `listener.py`.
+"""
+
 from utils.input_controller.linux.sendinput_kb import (
     keyDown,
     keyUp,
@@ -19,6 +24,7 @@ from utils.input_controller.linux.sendinput_mouse import (
     scroll,
     sideScroll,
 )
+from utils.input_controller.linux.listener import listen_keys, listen_mice
 
 __all__ = [
     "click",

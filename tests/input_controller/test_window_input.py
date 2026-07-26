@@ -34,9 +34,9 @@ class _KeyboardSender(Protocol):
 
     def keyUp(self, key: str) -> None: ...
 
-    def press(self, *keys: str, delay: float = 0.067) -> None: ...
+    def press(self, keys: str | list[str]) -> None: ...
 
-    def write(self, text: str, delay: float = 0.067) -> None: ...
+    def write(self, message: str, interval: float = 0.0) -> None: ...
 
     def supportedKeys(self) -> tuple[str, ...]: ...
 
@@ -44,7 +44,12 @@ class _KeyboardSender(Protocol):
 
 
 class _MouseSender(Protocol):
-    def click(self, button: str) -> None: ...
+    def click(
+        self,
+        x: int | None = None,
+        y: int | None = None,
+        button: str = "primary",
+    ) -> None: ...
 
     def mouseDown(self, button: str) -> None: ...
 
@@ -54,18 +59,16 @@ class _MouseSender(Protocol):
 
     def moveTo(
         self,
-        x: int,
-        y: int,
-        steps: int = 1,
-        duration: int | float = 0,
+        x: int | None,
+        y: int | None,
+        duration: float = 0.0,
     ) -> None: ...
 
     def moveRel(
         self,
-        x: int,
-        y: int,
-        steps: int = 1,
-        duration: int | float = 0,
+        x: int | None,
+        y: int | None,
+        duration: float = 0.0,
     ) -> None: ...
 
     def scroll(self, amount: int) -> None: ...
@@ -169,6 +172,7 @@ class _FakePyDirectInput(ModuleType):
         super().__init__("pydirectinput")
         self.calls: list[tuple[str, str, bool]] = []
         self.failed_calls: set[tuple[str, str]] = set()
+        self.KEYBOARD_MAPPING = {"a": 1, "A": 1, "ctrlleft": 1}
 
     def keyDown(self, key: str, *, _pause: bool = True) -> bool:
         self.calls.append(("down", key, _pause))
@@ -177,6 +181,21 @@ class _FakePyDirectInput(ModuleType):
     def keyUp(self, key: str, *, _pause: bool = True) -> bool:
         self.calls.append(("up", key, _pause))
         return ("up", key) not in self.failed_calls
+
+    def press(self, keys: tuple[str, ...], *, _pause: bool) -> bool:
+        self.calls.append(("press", " ".join(keys), _pause))
+        return True
+
+    def write(
+        self,
+        text: str,
+        *,
+        interval: float,
+        auto_shift: bool,
+        _pause: bool,
+    ) -> None:
+        del interval, auto_shift
+        self.calls.append(("write", text, _pause))
 
 
 class _FakeMousePyDirectInput(ModuleType):
@@ -187,8 +206,15 @@ class _FakeMousePyDirectInput(ModuleType):
         self.calls: list[tuple[object, ...]] = []
         self.current_position = (10, 20)
 
-    def click(self, *, button: str, _pause: bool = True) -> None:
-        self.calls.append(("click", button, _pause))
+    def click(
+        self,
+        x: int | None = None,
+        y: int | None = None,
+        *,
+        button: str,
+        _pause: bool = True,
+    ) -> None:
+        self.calls.append(("click", x, y, button, _pause))
 
     def mouseDown(self, *, button: str, _pause: bool = True) -> None:
         self.calls.append(("down", button, _pause))
@@ -209,6 +235,16 @@ class _FakeMousePyDirectInput(ModuleType):
         _pause: bool = True,
     ) -> None:
         self.calls.append(("moveTo", x, y, duration, _pause))
+
+    def moveRel(
+        self,
+        x: int,
+        y: int,
+        *,
+        duration: float = 0,
+        _pause: bool = True,
+    ) -> None:
+        self.calls.append(("moveRel", x, y, duration, _pause))
 
     def scroll(self, clicks: int, *, _pause: bool = True) -> None:
         self.calls.append(("scroll", clicks, _pause))
@@ -303,7 +339,7 @@ class WindowExportTests(unittest.TestCase):
 
 
 class WindowKeyboardTests(unittest.TestCase):
-    """Kiểm tra contract keyboard sender Windows."""
+    """Kiểm tra keyboard wrapper Windows."""
 
     fake: _FakePyDirectInput
     sender: _KeyboardSender
@@ -319,7 +355,7 @@ class WindowKeyboardTests(unittest.TestCase):
         sys.modules.pop("pydirectinput", None)
         sys.modules.pop("utils.input_controller.window.sendinput_kb", None)
 
-    def test_maps_modifier_and_disables_global_pause(self) -> None:
+    def test_key_events_delegate_to_pydirectinput(self) -> None:
         self.sender.keyDown("leftctrl")
         self.sender.keyUp("leftctrl")
 
@@ -328,76 +364,24 @@ class WindowKeyboardTests(unittest.TestCase):
             [("down", "ctrlleft", False), ("up", "ctrlleft", False)],
         )
 
-    def test_press_sends_each_down_before_up(self) -> None:
-        self.sender.press("a", "enter", delay=0)
+    def test_press_delegates_to_pydirectinput(self) -> None:
+        self.sender.press(["a", "enter"])
 
-        self.assertEqual(
-            self.fake.calls,
-            [
-                ("down", "a", False),
-                ("up", "a", False),
-                ("down", "enter", False),
-                ("up", "enter", False),
-            ],
-        )
+        self.assertEqual(self.fake.calls, [("press", "a enter", False)])
 
-    def test_write_holds_shift_for_uppercase_and_symbol(self) -> None:
-        self.sender.write("A!", delay=0)
+    def test_write_delegates_shift_handling_to_pydirectinput(self) -> None:
+        self.sender.write("A!", interval=0)
 
-        self.assertEqual(
-            self.fake.calls,
-            [
-                ("down", "shiftleft", False),
-                ("down", "a", False),
-                ("up", "a", False),
-                ("up", "shiftleft", False),
-                ("down", "shiftleft", False),
-                ("down", "1", False),
-                ("up", "1", False),
-                ("up", "shiftleft", False),
-            ],
-        )
-
-    def test_write_releases_shift_when_shifted_key_fails(self) -> None:
-        self.fake.failed_calls = {("down", "a")}
-
-        with self.assertRaisesRegex(ValueError, "Could not press key down"):
-            self.sender.write("A", delay=0)
-
-        self.assertEqual(
-            self.fake.calls,
-            [
-                ("down", "shiftleft", False),
-                ("down", "a", False),
-                ("up", "shiftleft", False),
-            ],
-        )
-
-    def test_rejects_failed_key_events(self) -> None:
-        self.fake.failed_calls = {("down", "ctrlleft")}
-        with self.assertRaisesRegex(ValueError, "leftctrl"):
-            self.sender.keyDown("leftctrl")
-
-        self.fake.failed_calls = {("up", "ctrlleft")}
-        with self.assertRaisesRegex(ValueError, "leftctrl"):
-            self.sender.keyUp("leftctrl")
-
-    def test_rejects_unsupported_character(self) -> None:
-        with self.assertRaisesRegex(ValueError, "Unsupported character"):
-            self.sender.write("á", delay=0)
+        self.assertEqual(self.fake.calls, [("write", "A!", False)])
 
     def test_support_helpers_match_accepted_input(self) -> None:
         supported_keys = self.sender.supportedKeys()
         self.assertIn("leftctrl", supported_keys)
-        self.assertIn("kpenter", supported_keys)
-        self.assertNotIn("102nd", supported_keys)
+        self.assertNotIn("ctrlleft", supported_keys)
 
         characters = self.sender.supportedWriteCharacters()
         self.assertIn("a", characters)
         self.assertIn("A", characters)
-        self.assertIn("!", characters)
-        self.assertIn("\n", characters)
-        self.assertNotIn("á", characters)
 
 
 class WindowMouseTests(unittest.TestCase):
@@ -418,30 +402,32 @@ class WindowMouseTests(unittest.TestCase):
         sys.modules.pop("utils.input_controller.window.sendinput_mouse", None)
 
     def test_maps_buttons_and_disables_global_pause(self) -> None:
-        self.sender.click("back")
+        self.sender.click(button="back")
         self.sender.mouseDown("forward")
         self.sender.mouseUp("middle")
 
         self.assertEqual(
             self.fake.calls,
             [
-                ("click", "x1", False),
+                ("click", None, None, "x1", False),
                 ("down", "x2", False),
                 ("up", "middle", False),
             ],
         )
 
-    def test_rejects_invalid_button_for_every_button_api(self) -> None:
-        for action in (
-            self.sender.click,
-            self.sender.mouseDown,
-            self.sender.mouseUp,
-        ):
-            with self.subTest(action=action.__name__):
-                with self.assertRaisesRegex(ValueError, "Unsupported mouse button"):
-                    action("invalid")
+    def test_delegates_button_validation_to_pydirectinput(self) -> None:
+        self.sender.click(button="invalid")
+        self.sender.mouseDown("invalid")
+        self.sender.mouseUp("invalid")
 
-        self.assertEqual(self.fake.calls, [])
+        self.assertEqual(
+            self.fake.calls,
+            [
+                ("click", None, None, "invalid", False),
+                ("down", "invalid", False),
+                ("up", "invalid", False),
+            ],
+        )
 
     def test_scrolls_both_axes_without_global_pause(self) -> None:
         self.sender.scroll(-3)
@@ -457,52 +443,28 @@ class WindowMouseTests(unittest.TestCase):
         self.assertEqual(self.sender.position(take_new=True), (10, 20))
         self.assertEqual(self.fake.calls, [("position",), ("position",)])
 
-    def test_rejects_invalid_movement_arguments(self) -> None:
-        for steps in (0, -1):
-            with self.subTest(steps=steps):
-                with self.assertRaisesRegex(ValueError, "steps"):
-                    self.sender.moveTo(1, 2, steps=steps)
-        with self.assertRaisesRegex(ValueError, "duration"):
-            self.sender.moveRel(1, 2, duration=-0.1)
-
-        self.assertEqual(self.fake.calls, [])
-
-    def test_move_to_interpolates_exact_steps_and_duration(self) -> None:
-        self.sender.moveTo(15, 13, steps=3, duration=0.6)
+    def test_move_to_delegates_duration(self) -> None:
+        self.sender.moveTo(15, 13, duration=0.6)
 
         self.assertEqual(
             self.fake.calls,
-            [
-                ("position",),
-                ("moveTo", 12, 18, 0.19999999999999998, False),
-                ("moveTo", 13, 15, 0.19999999999999998, False),
-                ("moveTo", 15, 13, 0.19999999999999998, False),
-            ],
+            [("moveTo", 15, 13, 0.6, False)],
         )
 
-    def test_move_rel_uses_absolute_interpolation(self) -> None:
-        self.sender.moveRel(-4, 6, steps=2, duration=1)
+    def test_move_rel_delegates_duration(self) -> None:
+        self.sender.moveRel(-4, 6, duration=1)
 
         self.assertEqual(
             self.fake.calls,
-            [
-                ("position",),
-                ("moveTo", 8, 23, 0.5, False),
-                ("moveTo", 6, 26, 0.5, False),
-            ],
+            [("moveRel", -4, 6, 1, False)],
         )
 
-    def test_zero_delta_keeps_step_count_and_distributes_duration(self) -> None:
-        self.sender.moveRel(0, 0, steps=3, duration=0.9)
+    def test_move_rel_accepts_zero_delta(self) -> None:
+        self.sender.moveRel(0, 0, duration=0.9)
 
         self.assertEqual(
             self.fake.calls,
-            [
-                ("position",),
-                ("moveTo", 10, 20, 0.3, False),
-                ("moveTo", 10, 20, 0.3, False),
-                ("moveTo", 10, 20, 0.3, False),
-            ],
+            [("moveRel", 0, 0, 0.9, False)],
         )
 
     def test_import_is_lazy_until_api_call(self) -> None:

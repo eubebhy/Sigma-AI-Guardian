@@ -12,37 +12,29 @@
 - `tests/content_classifier/test_all_classifiers.py:330`: local AI backend co thong bao TODO khi backend khong kha dung.
 - `tests/content_classifier/test_all_classifiers.py:343`: cloud AI backend chua duoc noi vao test harness.
 
-# Nhung case mat classifier lam sai can fix
-(.pyvenv) eubebhy@SigmaDebian:/media/eubebhy/sigma/projects/Sigma-AI-Guardian$ python3 tests/content_classifier/test_all_classifiers.py -fn 100 --strict-level mid
 === main-classifier | strict=mid ===
-[FAIL][game] Steam - Black Myth: Wukong | got=Pornography
-[FAIL][game] EA SPORTS FC 25 | got=Pornography
-[FAIL][game] Path of Exile | got=Gore
-[FAIL][game] osu! | got=Pornography
-[FAIL][porn] Reddit - r/Rule34: Hot posts this week - Google Chrome | got=Unknown
-[FAIL][porn] Naughty America | got=Gore
-[FAIL][porn] Digital Playground | got=Unknown
-[FAIL][porn] pr0n | got=Unknown
-[FAIL][gore] "crime scene photos uncensored" | got=Pornography
-[FAIL][gore] "raw battlefield casualties" | got=Game
-[FAIL][gore] Crime Scene Photos (Graphic) | got=Unknown
-[FAIL][gore] Discord - | got=Unknown
-[FAIL][gore] LiveLeak Archive - Graphic Content | got=Unknown
-[FAIL][gore] Medical Trauma Archive | got=Unknown
-[FAIL][gore] Microsoft Edge - LiveLeak archive mirror | got=Unknown
-[FAIL][gore] Raw Battlefield Casualties | got=Game
-[FAIL][gore] Surgical Operation (Uncensored) | got=Pornography
-[FAIL][gore] bestg0re | got=Pornography
-[FAIL][unknown] chrome - anh anime | got=Pornography
-[FAIL][unknown] Pascal - BAI1.PAS | got=Pornography
-[FAIL][unknown] st | got=Pornography
-[FAIL][unknown] WSL | got=Pornography
-[FAIL][unknown] Gcc | got=Pornography
-[FAIL][unknown] tcc | got=Pornography
-[FAIL][unknown] a | got=Pornography
-[FAIL][unknown] e | got=Pornography
-[FAIL][unknown] c | got=Pornography
-[FAIL][unknown] d | got=Pornography
-[FAIL][unknown] g | got=Pornography
-
-
+Tests / chất lượng
+- pytest chưa được khai báo/cài trong .pyvenv, nên không chạy được pytest -q.
+- python -m unittest discover chạy 0 tests.
+- tests/web_blocker.py, browser_tab.py, process_killer.py, screen_locker.py không theo tên discover mặc định của pytest.
+- Pyright báo lỗi import/symbol thực tế ở keylogger và dependency thiếu; nhiều lỗi type ở screen capture/window tracker.
+- Workspace có nhiều thay đổi chưa commit; không chỉnh sửa chúng.
+SUCCESS
+Làm ngay
+- Khai báo đủ dependency trong requirements.txt.
+- Sửa import thiếu Final ở Linux listener.
+- Sửa contract keylogger và input_controller để import/chạy được.
+- Thêm smoke test import cho Linux và Windows facade.
+- Đồng bộ SAG-config.toml với config.py.
+Cần cân nhắc
+- Tạo main.py làm entry point duy nhất.
+- Chọn Windows/Linux backend một lần tại entry point.
+- Truyền backend vào feature thay vì feature tự check OS.
+- Bỏ khởi tạo MSS tại import; quản lý lifecycle ở entry point.
+- Chuẩn hóa unsupported OS: fail rõ ràng, không fallback Linux.
+Cần thận trọng
+- Thiết kế PlatformBackend tối thiểu, tránh abstraction quá lớn.
+- Đảm bảo screen lock thất bại thì không hiển thị trạng thái đã khóa.
+- Đồng bộ/lifecycle cho local AI model và monitor thread.
+- Bảo vệ file model trước joblib.load.
+- Tách test khỏi hosts, input device và desktop thật.

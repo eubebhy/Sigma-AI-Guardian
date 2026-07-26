@@ -1,3 +1,4 @@
+# pyright: reportMissingImports=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false
 """Wrapper chup man hinh bang MSS.
 
 File path: `src/device_controler/screen_capture/capture.py`
@@ -77,6 +78,21 @@ class ScreenCapture:
         if callable(close):
             close()
 
+    def get_monitors(self) -> list[ScreenRegion]:
+        """Trả các monitor vật lý theo tọa độ virtual desktop của MSS."""
+
+        with self._lock:
+            monitors = list(self._mss.monitors[1:])
+        return [
+            ScreenRegion(
+                top=int(monitor["top"]),
+                left=int(monitor["left"]),
+                width=int(monitor["width"]),
+                height=int(monitor["height"]),
+            )
+            for monitor in monitors
+        ]
+
 
 def capture(
     top: int,
@@ -108,6 +124,12 @@ def capture(
         )
 
 
+def get_monitors() -> list[ScreenRegion]:
+    """Trả vùng của từng monitor vật lý cho các feature đa màn hình."""
+
+    return _capture_instance.get_monitors()
+
+
 def _apply_sharpness(frame: Frame, sharpness: float) -> Frame:
     if sharpness == 1.0:
         return frame
@@ -123,4 +145,4 @@ def _create_capture_backend() -> ScreenCapture:
 
 _capture_instance: ScreenCapture = _create_capture_backend()
 
-__all__ = ["ScreenCapture", "ScreenRegion", "capture"]
+__all__ = ["ScreenCapture", "ScreenRegion", "capture", "get_monitors"]

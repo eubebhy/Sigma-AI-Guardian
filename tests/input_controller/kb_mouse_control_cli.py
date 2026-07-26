@@ -23,7 +23,7 @@ if str(SRC_ROOT) not in sys.path:
 # trong `_prepare_devices()` để tạo trước UInput object trước action đầu tiên.
 from utils.input_controller import linux
 from utils.input_controller.linux import sendinput_kb, sendinput_mouse
-from utils.input_controller.types import Keys, MouseButton
+from utils.input_controller.types import MouseButton
 
 # Mỗi command giữ nguyên flag và các giá trị đi kèm. Danh sách command giúp CLI
 # thực thi đúng thứ tự người dùng nhập, kể cả khi các loại flag xen kẽ nhau.
@@ -117,7 +117,7 @@ def _execute(command: Command, parser: argparse.ArgumentParser) -> None:
         if values[0] not in linux.supportedKeys():
             parser.error(f"unsupported key: {values[0]}")
 
-        key = cast(Keys, values[0])
+        key = values[0]
 
         if action == "--key-down":
             linux.keyDown(key)
@@ -140,7 +140,7 @@ def _execute(command: Command, parser: argparse.ArgumentParser) -> None:
                 parser.error("--spam-click COUNT must be greater than zero")
             started = time.perf_counter()
             for _ in range(count):
-                linux.click(button)
+                linux.click(button=button)
             elapsed = time.perf_counter() - started
             print(f"spam-click: {count / elapsed:.2f} CPS")
         elif action == "--mouse-down":
@@ -150,7 +150,7 @@ def _execute(command: Command, parser: argparse.ArgumentParser) -> None:
             linux.mouseUp(button)
 
         else:
-            linux.click(button)
+            linux.click(button=button)
 
     elif action == "--move-to":
         linux.moveTo(int(values[0]), int(values[1]))
