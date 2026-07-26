@@ -1,10 +1,14 @@
 rapidfuzz
 pyperclip
 scikit-learn
+joblib
+Pillow
+PyWinCtl
 
 numpy
 mss
 
 evdev; platform_system == "Linux"
+python-xlib; platform_system == "Linux"
 pydirectinput-rgx; platform_system == "Windows"
 pynput; platform_system == "Windows"
