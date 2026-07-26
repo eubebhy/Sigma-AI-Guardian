@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pyright: reportUnknownMemberType=false, reportUnknownVariableType=false
 # input_blocker.py
 """Backend Linux để chặn input bằng evdev grab.
 
@@ -30,13 +31,15 @@ def block() -> None:
         if path in _grabbed_devices:  # already grabbed
             continue
 
+        dev: InputDevice | None = None
         try:
             dev = InputDevice(path)  # open device
             dev.grab()  # take exclusive input
             _grabbed_devices[path] = dev  # keep handle for release
         except Exception:
             try:
-                dev.close()  # cleanup half-open device
+                if dev is not None:
+                    dev.close()  # cleanup half-open device
             except Exception:
                 pass
 

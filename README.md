@@ -8,7 +8,10 @@
 
 Thay vì chỉ giám sát và chặn nội dung, SAG có thể tự phân loại nội dung, phát hiện rủi ro, cảnh báo người dùng và thực hiện các tác vụ tự động thông qua AI.
 
-## Tính năng
+## Tầm nhìn sản phẩm
+
+Các chức năng sau là định hướng của Sigma AI Guardian hoàn chỉnh; chúng chưa phải
+capability của repository SAG Agent hiện tại.
 
 - Tu dong phat hien va chặn các noi dung khong phu hop voi AI (porn, gore, game)
 - Chan cac web site theo chu de va ho tro custom
@@ -22,6 +25,19 @@ Thay vì chỉ giám sát và chặn nội dung, SAG có thể tự phân loại
 
 * **Rule-based Engine**: phát hiện nhanh bằng từ khóa và luật.
 * **Local AI Classifier**: mô hình học máy chạy hoàn toàn trên máy người dùng.
+
+## SAG Agent hiện tại
+
+Repository hiện là SAG Agent chạy cục bộ trên máy học sinh. Entry point là
+`src/main.py`; hiện chỉ có command an toàn `status` để kiểm tra runtime:
+
+```bash
+./.pyvenv/bin/python src/main.py status
+```
+
+Agent chọn Windows hoặc Linux một lần khi khởi động, sau đó feature dùng adapter
+platform chung. Server, Teacher Console, mạng LAN và remote desktop streaming chưa
+thuộc repository hiện tại. Xem [tài liệu kiến trúc](docs/architecture.md).
 
 ## Cau truc input_controller
 
@@ -205,7 +221,13 @@ sudo npm install --global pyright
 
 ### Kiểm tra môi trường
 
-Dự án chưa có entry point hoàn chỉnh. Có thể kiểm tra classifier hiện có bằng:
+Entry point hiện tại của SAG Agent chỉ hỗ trợ command an toàn `status`:
+
+```bash
+./.pyvenv/bin/python src/main.py status
+```
+
+Có thể kiểm tra classifier hiện có bằng:
 
 ```bash
 ./.pyvenv/bin/python tests/content_classifier/test_all_classifiers.py --help

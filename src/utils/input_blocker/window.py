@@ -1,3 +1,4 @@
+# pyright: reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false, reportAttributeAccessIssue=false
 """Backend Windows để chặn input bằng Win32 `BlockInput`.
 
 File path: `src/utils/input_blocker/window.py`
