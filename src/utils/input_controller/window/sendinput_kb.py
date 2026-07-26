@@ -9,6 +9,7 @@ nhiệm xử lý key, Shift, delay và lỗi input.
 
 from __future__ import annotations
 
+import ctypes
 import importlib
 from collections.abc import Sequence
 from typing import Any, cast
@@ -62,6 +63,13 @@ def _input() -> Any:
     """Import dependency Windows tại thời điểm thực sự gửi input."""
 
     return cast(Any, importlib.import_module("pydirectinput"))
+
+
+def get_num_lock_state() -> bool:
+    """Trả trạng thái NumLock hiện tại từ Windows user32."""
+
+    windows_dll = getattr(ctypes, "windll")
+    return bool(windows_dll.user32.GetKeyState(0x90) & 1)
 
 
 def _key_name(key: Key) -> str:

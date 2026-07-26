@@ -8,6 +8,7 @@ trong từng API để package vẫn import được trên Linux.
 """
 
 from utils.input_controller.window.sendinput_kb import (
+    get_num_lock_state,
     keyDown,
     keyUp,
     press,
@@ -29,6 +30,7 @@ from utils.input_controller.window.listener import listen_keys, listen_mice
 
 __all__ = [
     "click",
+    "get_num_lock_state",
     "keyDown",
     "keyUp",
     "listen_keys",
