@@ -6,13 +6,18 @@ Input contract:
 - set_blacklist(values): bo sung exact process names can kill.
 - set_whitelist(values): exact process names khong duoc kill.
 - start()/stop(): bat/tat vong quet nen.
+- raise_if_failed(): nem loi quet nen da luu, neu co.
 Output contract:
 - Process trung blacklist va khong nam trong whitelist se bi kill.
-- Cac ham dieu khien khong tra ve gia tri.
+- Cac ham dieu khien khong tra ve gia tri; loi native duoc giu nguyen cho caller.
 Operating principle:
 - Lay process theo OS hien tai.
 - Chuan hoa process name ve lowercase.
-- Background thread lap theo interval, match rule thi kill pid.
+- Background thread lap theo interval, xac minh lai PID/name roi moi kill.
+- Xac minh nay giam race PID reuse, nhung khong chung minh duoc identity OS bat bien
+  khi process thay the van dung cung name.
+- Daemon bo qua ProcessLookupError; loi quet/kill khac dung daemon va duoc luu de
+  caller lay qua raise_if_failed().
 """
 
 from __future__ import annotations
@@ -34,6 +39,7 @@ class ProcessKiller:
         self._thread: threading.Thread | None = None
         self._stop_event: threading.Event | None = None
         self._lifecycle_lock = threading.Lock()
+        self._failure: Exception | None = None
         self._extra_exact: set[str] = set()
         self._process_operations = (
             process_operations or get_default_platform_services().processes
@@ -58,6 +64,7 @@ class ProcessKiller:
                 stop_event = self._stop_event
                 if not thread or not thread.is_alive():
                     self.running = True
+                    self._failure = None
                     self._stop_event = threading.Event()
                     self._thread = threading.Thread(
                         target=self._run,
@@ -88,19 +95,46 @@ class ProcessKiller:
                     self._stop_event = None
                     return
 
+    def raise_if_failed(self) -> None:
+        """Ném lỗi quét nền gần nhất để caller xử lý bằng try/except."""
+
+        with self._lifecycle_lock:
+            failure = self._failure
+        if failure is not None:
+            raise failure
+
     def _run(self, stop_event: threading.Event) -> None:
         while not stop_event.is_set():
-            self._scan_and_kill()
+            try:
+                self._scan_and_kill()
+            except ProcessLookupError:
+                pass
+            except Exception as error:
+                with self._lifecycle_lock:
+                    self._failure = error
+                return
             stop_event.wait(self.interval)
 
     def _scan_and_kill(self) -> None:
         for pid, name in self._process_operations.list_processes():
-            if self._should_kill(name):
-                try:
-                    self._process_operations.kill_process(pid)
-                except (PermissionError, ProcessLookupError):
-                    # PID co the da thoat hoac khong du quyen; van quet PID sau.
-                    continue
+            normalized_name = name.strip().lower()
+            if not self._should_kill(normalized_name):
+                continue
+            if not self._has_same_name(pid, normalized_name):
+                continue
+            try:
+                self._process_operations.kill_process(pid)
+            except ProcessLookupError:
+                # PID co the da thoat; van quet PID sau.
+                continue
+
+    def _has_same_name(self, pid: int, normalized_name: str) -> bool:
+        """Xác minh PID/name ngay trước kill, không chứng minh identity OS bất biến."""
+
+        return any(
+            current_pid == pid and name.strip().lower() == normalized_name
+            for current_pid, name in self._process_operations.list_processes()
+        )
 
     def _should_kill(self, name: str) -> bool:
         if self.whitelist and name in self.whitelist:

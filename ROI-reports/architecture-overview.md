@@ -29,7 +29,9 @@ adapter có thể tạo, không khẳng định quyền hoặc desktop session s
 | `src/agent/contracts.py` | Protocol process, browser, window, hosts | Feature và adapter |
 | `src/agent/platform/` | Factory, adapter native, `PlatformServices` | `device_controler`, `system_monitor` |
 | `src/device_controler/`, `src/system_monitor/` | Nghiệp vụ desktop/monitor | `agent.platform.linux` hoặc `.windows` |
-| `src/utils/` | Input dùng lại | Feature cấp cao |
+| `src/device_controler/input_controller/` | Gửi input, lifecycle UInput | Feature cấp cao |
+| `src/utils/key_listener/` | Lắng nghe input, NumLock | Feature cấp cao |
+| `src/utils/` khác | Helper dùng lại | Feature cấp cao |
 | `src/content_classifier/` | Chuẩn hóa text, rule và local model | Desktop/Agent runtime |
 
 `PlatformServices` là dataclass immutable gồm bốn protocol nhỏ. Đây là boundary
@@ -63,8 +65,11 @@ nhiều thread trong luồng Agent hiện tại.
 ### Desktop lifecycle
 
 - `ProcessKiller` chạy daemon thread, quét tên process exact-match theo `interval`.
+  Chỉ `ProcessLookupError` được tiếp tục; lỗi scan/kill khác dừng daemon, được caller
+  đọc lại bằng `raise_if_failed()`.
 - `screenlocker.lock()` tạo Tk overlay daemon thread, chờ UI ready rồi block input;
-  `unlock()` signal UI và unblock input.
+  UI dừng hoặc cleanup lỗi đều raise. `unlock()` signal UI, unblock input và xác nhận
+  UI đã thoát.
 - `LocalAI` tạo daemon idle monitor, lazy-load model; `close()` signal stop và bỏ
   instance reference, nhưng module-global `_model` vẫn có thể giữ model trong memory.
 - Linux input blocker giữ file descriptor evdev trong global registry; descriptor
@@ -76,8 +81,13 @@ feature sống lâu cho tới khi ownership/start/stop được thiết kế và
 ## Invariant quan trọng
 
 - Chỉ Linux và Windows được factory hỗ trợ; OS khác phải fail rõ, không fallback.
-- `open_tab()` chỉ chấp nhận URL bắt đầu `http://` hoặc `https://`.
-- `ProcessKiller` so khớp exact process name đã lowercase; whitelist ưu tiên blacklist.
+- `open_tab()` chỉ chấp nhận URL bắt đầu `http://` hoặc `https://`; URL sai raise
+  `ValueError`, mọi lần launch thất bại raise `RuntimeError`.
+- `ProcessKiller` so khớp exact process name đã lowercase; whitelist ưu tiên blacklist;
+   trước khi kill phải list lại để xác minh PID vẫn có cùng tên normalized. Kiểm tra này
+   không chứng minh identity OS bất biến nếu process thay thế dùng cùng tên.
+- `ProcessOperations` không được đổi lỗi native thành danh sách rỗng; caller xử lý lỗi
+  adapter trực tiếp hoặc gọi `ProcessKiller.raise_if_failed()` cho daemon.
 - Web blocker chỉ được thay nội dung giữa `START_MARKER`/`END_MARKER`; marker hỏng là
   lỗi `ValueError`, không được tự sửa file hosts.
 - `screen_capture.capture()` chỉ nhận `0.0 < sharpness <= 1.0`.

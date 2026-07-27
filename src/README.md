@@ -19,6 +19,7 @@ Nhom module dieu khien may hoc sinh hoac moi truong desktop.
 - `screen_capture`: chup man hinh bang MSS.
 - `screenlocker`: khoa man hinh va chan input.
 - `web_blocker`: them/xoa domain trong hosts file.
+- `input_controller`: gui input va quan ly virtual input device theo OS.
 
 Dau vao/dau ra chi tiet nam trong docstring dau tung module.
 
@@ -34,7 +35,7 @@ Cung cap API thu thap trang thai he thong.
 Chua chuc nang dung lai cho nhieu package, khong phu thuoc feature cap cao.
 
 - `input_blocker`: chan/mo chan input theo OS.
-- `input_controller`: gui va lang nghe input da nen tang.
+- `key_listener`: lang nghe input va doc NumLock da nen tang.
 
 Cac package trong thu muc nay duoc thiet ke de package khac import. Chung khong nen import package feature hoac phu thuoc thanh phan cap cao hon cua project.
 Dat chuc nang moi o day khi nhieu hon mot package can dung no.

@@ -1,5 +1,5 @@
 # pyright: reportPrivateUsage=false
-"""Kiểm tra keylogger nhận event chuẩn từ input controller.
+"""Kiểm tra keylogger nhận event chuẩn từ key listener.
 
 File path: `tests/test_keylogger.py`.
 Input: event `(KEY_*, state)` từ listener nền tảng.
@@ -56,17 +56,14 @@ def run_real(arguments: Sequence[str]) -> int:
         print("Listening for keyboard input. Press Ctrl+C to stop.", flush=True)
         previous_buffer = ""
         while True:
-            listener_error = KeyLogger.get_listener_error()
-            if listener_error is not None:
-                print(f"Keylogger listener failed: {listener_error}", file=sys.stderr)
-                return 1
-            current_buffer = KeyLogger.get_new_typed_words()
+            KeyLogger.raise_if_listener_failed()
+            current_buffer = KeyLogger.get_current_buffer()
             if current_buffer != previous_buffer:
                 print(f"Virtual buffer: {current_buffer}", flush=True)
                 previous_buffer = current_buffer
             time.sleep(0.1)
     except KeyboardInterrupt:
-        print(f"Final virtual buffer: {KeyLogger.get_new_typed_words()}", flush=True)
+        print(f"Final virtual buffer: {KeyLogger.get_current_buffer()}", flush=True)
         print("Listening stopped.", flush=True)
         return 0
     except Exception as error:
@@ -90,7 +87,7 @@ class KeyLoggerTests(unittest.TestCase):
         KeyLogger._keylogger(("KEY_B", "down"))
         KeyLogger._keylogger(("KEY_SPACE", "down"))
 
-        self.assertEqual(KeyLogger.get_new_typed_words(), "ab ")
+        self.assertEqual(KeyLogger.get_current_buffer(), "ab ")
 
     @test_modes("fake", "smoke")
     def test_repeats_printable_keys_for_hold_events(self) -> None:
@@ -99,7 +96,7 @@ class KeyLoggerTests(unittest.TestCase):
         KeyLogger._keylogger(("KEY_SPACE", "down"))
         KeyLogger._keylogger(("KEY_SPACE", "hold"))
 
-        self.assertEqual(KeyLogger.get_new_typed_words(), "aa  ")
+        self.assertEqual(KeyLogger.get_current_buffer(), "aa  ")
 
     @test_modes("fake", "smoke")
     def test_collects_punctuation_and_shifted_punctuation(self) -> None:
@@ -110,7 +107,7 @@ class KeyLoggerTests(unittest.TestCase):
         KeyLogger._keylogger(("KEY_SLASH", "down"))
         KeyLogger._keylogger(("KEY_LEFTSHIFT", "up"))
 
-        self.assertEqual(KeyLogger.get_new_typed_words(), ",/<?")
+        self.assertEqual(KeyLogger.get_current_buffer(), ",/<?")
 
     @test_modes("fake")
     def test_caps_lock_changes_letter_case_without_changing_digits(self) -> None:
@@ -123,7 +120,24 @@ class KeyLoggerTests(unittest.TestCase):
         KeyLogger._keylogger(("KEY_CAPSLOCK", "down"))
         KeyLogger._keylogger(("KEY_C", "down"))
 
-        self.assertEqual(KeyLogger.get_new_typed_words(), "A1bc")
+        self.assertEqual(KeyLogger.get_current_buffer(), "A1bc")
+
+    @test_modes("fake")
+    def test_current_buffer_returns_full_text_without_resetting(self) -> None:
+        KeyLogger._keylogger(("KEY_A", "down"))
+
+        self.assertEqual(KeyLogger.get_current_buffer(), "a")
+        self.assertEqual(KeyLogger.get_current_buffer(), "a")
+
+    @test_modes("fake")
+    def test_buffer_retains_newest_6767_characters_on_overflow(self) -> None:
+        KeyLogger._buffer.extend("a" * 6767)
+        KeyLogger._cursor = 1
+        KeyLogger._keylogger(("KEY_B", "down"))
+
+        self.assertEqual(KeyLogger.get_current_buffer(), "b" + "a" * 6766)
+        self.assertEqual(KeyLogger._cursor, 1)
+        self.assertLessEqual(KeyLogger._cursor, len(KeyLogger._buffer))
 
     @test_modes("mock", "smoke")
     def test_system_monitor_listener_forwards_events_to_keylogger(self) -> None:
@@ -140,7 +154,7 @@ class KeyLoggerTests(unittest.TestCase):
             KeyLogger._listening = True
             KeyLogger._listen()
 
-        self.assertEqual(KeyLogger.get_new_typed_words(), "Ab")
+        self.assertEqual(KeyLogger.get_current_buffer(), "Ab")
 
     @test_modes("mock")
     def test_listener_records_backend_error(self) -> None:
@@ -150,6 +164,16 @@ class KeyLoggerTests(unittest.TestCase):
 
         self.assertEqual(str(KeyLogger.get_listener_error()), "denied")
         self.assertFalse(KeyLogger._listening)
+
+    @test_modes("mock")
+    def test_raise_if_listener_failed_raises_stored_backend_error(self) -> None:
+        error = OSError("denied")
+        KeyLogger._listener_error = error
+
+        with self.assertRaises(OSError) as context:
+            KeyLogger.raise_if_listener_failed()
+
+        self.assertIs(context.exception, error)
 
 
 class RealKeyLoggerCommandTests(unittest.TestCase):
@@ -163,7 +187,7 @@ class RealKeyLoggerCommandTests(unittest.TestCase):
         output = io.StringIO()
 
         def update_buffer_then_interrupt(_: float) -> None:
-            if KeyLogger.get_new_typed_words():
+            if KeyLogger.get_current_buffer():
                 raise KeyboardInterrupt
             KeyLogger._buffer.extend("typed")
             KeyLogger._cursor = len(KeyLogger._buffer)
@@ -195,8 +219,8 @@ class RealKeyLoggerCommandTests(unittest.TestCase):
             patch.object(KeyLogger, "stop") as stop,
             patch.object(
                 KeyLogger,
-                "get_listener_error",
-                return_value=OSError("permission denied"),
+                "raise_if_listener_failed",
+                side_effect=OSError("permission denied"),
             ),
             contextlib.redirect_stderr(output),
             contextlib.redirect_stdout(io.StringIO()),

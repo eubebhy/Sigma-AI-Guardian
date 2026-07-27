@@ -1,10 +1,11 @@
-"""Lắng nghe sự kiện bàn phím Linux qua evdev.
+"""Lắng nghe input và đọc NumLock trên Linux qua evdev/X11.
 
-File path: `src/utils/input_controller/linux/listen_keys.py`
+File path: `src/utils/key_listener/linux.py`
 Input: các device `/dev/input/event*` có capability phím A-Z.
-Output: generator sinh `KeyEvent` dạng `(KEY_NAME, "down" | "up" | "hold")`.
+Output: generator event chuẩn hóa và trạng thái NumLock hiện tại.
 Nguyên lý: quét danh sách device một lần rồi cache lại để tránh IO lặp; vòng lặp
-chính dùng `select` để chỉ đọc device khi kernel báo có event sẵn.
+chính dùng `select` để chỉ đọc device khi kernel báo có event sẵn. NumLock dùng
+kết nối X11 ngắn hạn để không chia sẻ lifecycle với input injection.
 """
 
 from collections.abc import Callable, Iterator, Sequence
@@ -13,8 +14,9 @@ from typing import Final, Protocol, cast
 
 import evdev
 from evdev import InputDevice, ecodes
+from Xlib.display import Display
 
-from utils.input_controller.types import KeyEvent, KeyState, MouseEvent, MouseState
+from utils.key_listener.types import KeyEvent, KeyState, MouseEvent, MouseState
 
 # InputDevice truyen path vao duoi dang str thay vi Pat
 # It nhat quyet dinh tren chi la tam thoi
@@ -115,6 +117,16 @@ def _get_keyboards() -> list[_InputDevice]:
     _keyboards = keyboards
 
     return keyboards
+
+
+def get_num_lock_state() -> bool:
+    """Trả trạng thái NumLock hiện tại từ X11 keyboard control."""
+
+    display = Display()
+    try:
+        return bool(display.get_keyboard_control().led_mask & 2)
+    finally:
+        display.close()
 
 
 def listen_keys(timeout: float | None = None) -> Iterator[KeyEvent]:
@@ -231,4 +243,4 @@ def listen_mice(timeout: float | None = None) -> Iterator[MouseEvent]:
                     yield code, event.value
 
 
-__all__ = ["listen_keys", "listen_mice"]
+__all__ = ["get_num_lock_state", "listen_keys", "listen_mice"]

@@ -8,9 +8,9 @@ phải readiness check; không dùng nó để kết luận máy có thể lock,
 | Failure mode | Dấu hiệu | Recovery hiện tại | Cải thiện/kiểm chứng cần thiết |
 | --- | --- | --- | --- |
 | OS không hỗ trợ | `NotImplementedError` từ factory | Dừng rõ, không fallback | Unit test factory; giữ behavior. |
-| UI locker không ready 5s | `RuntimeError` từ `lock()` | Caller phải gọi `unlock()` nếu state chưa rõ | Test timeout/crash cleanup, unblock guaranteed. |
-| Evdev không grab | `block()` im lặng tiếp tục device khác | `unblock()` release registry đã grab | Structured result, manual check device coverage. |
-| PID đã thoát/quyền kill thiếu | `ProcessLookupError`/`PermissionError` | Audit đã bỏ qua PID lỗi và tiếp tục scan | Test PID lỗi + PID sau; thêm health/audit khi có lifecycle. |
+| UI locker không ready/cleanup lỗi | Exception từ `lock()`/`unlock()` | Lifecycle tự signal UI và thử unblock trước khi báo lỗi | Fake timeout/crash/cleanup failure. |
+| Evdev không grab/release | Exception từ `block()`/`unblock()` | `block()` rollback; `unblock()` thử release mọi registry entry | Fake grab/release lỗi và kiểm tra mọi cleanup được gọi. |
+| PID đã thoát/quyền kill thiếu | `ProcessLookupError`/`PermissionError` | Bỏ qua riêng PID đã thoát; lưu lỗi scan/kill khác để caller nhận qua `raise_if_failed()` | Test PID lỗi + PID sau; thêm health/audit khi có lifecycle. |
 | Hosts marker hỏng | `ValueError("Web blocker marker is broken")` | Không tự rewrite hosts | Backup/review file, test broken marker. |
 | Ghi hosts permission fail | OS exception | Không có command result chuẩn | Command layer tương lai map thành permission failure. |
 | Model file lỗi/không tin cậy | `joblib.load` exception hoặc risk deserialize | Không có manifest/recovery | Verify hash trước load, report actionable error. |

@@ -90,7 +90,8 @@ khác nhau; fake adapter cho test cũng đơn giản hơn.
 | Screen capture | `ScreenRegion`, downsample, lock | MSS backend đa nền tảng |
 
 Code native hiện chỉ được phép nằm tại `src/agent/platform/linux/`,
-`src/agent/platform/windows/` hoặc backend input hiện có dưới `src/utils/`.
+`src/agent/platform/windows/`, `src/device_controler/input_controller/` hoặc
+`src/utils/key_listener/`.
 Feature trong `device_controler/` và `system_monitor/` không gọi `ps`,
 `tasklist`, `taskkill`, `xdotool`, `os.name`, `sys.platform` hay đường dẫn hosts.
 
@@ -116,14 +117,16 @@ trước khi Agent shutdown.
 
 `status` mô tả adapter có thể chọn. Nó không khẳng định thao tác đặc quyền sẽ
 thành công: ghi hosts, grab `/dev/input`, `BlockInput` và desktop Xorg vẫn có thể
-thất bại do quyền hoặc session. `ProcessKiller` hiện vẫn suppress
-`PermissionError`/`ProcessLookupError` và không có result/health contract; caller
-không được suy ra kill thành công chỉ từ việc gọi feature.
+thất bại do quyền hoặc session. `ProcessLookupError` được bỏ qua khi process đã tự
+thoát. Lỗi scan/kill khác được ProcessKiller lưu lại và caller gọi
+`raise_if_failed()` để nhận exception; caller vẫn không được suy ra kill thành công
+chỉ từ việc gọi feature.
 
 ## Kiểm thử
 
 Test contract nằm trong các file phẳng `tests/test_agent.py`,
-`tests/test_process_guard.py`, `tests/test_input_controller.py` và các feature test
+`tests/test_process_guard.py`, `tests/test_input_controller.py`,
+`tests/test_key_listener.py` và các feature test
 `test_<feature>.py` khác. Safe mode dùng fake adapter, không đọc process thật, không
 gọi desktop và không sửa hosts. Xem `tests/README.md` trước khi chạy real mode vì nó
 có thể có tác động hệ thống.

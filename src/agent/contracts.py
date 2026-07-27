@@ -16,12 +16,12 @@ class ProcessOperations(Protocol):
     """Liệt kê và kết thúc process theo format Agent thống nhất."""
 
     def list_processes(self) -> list[tuple[int, str]]:
-        """Trả `(pid, process_name_lowercase)` của process hiện có."""
+        """Trả `(pid, process_name_lowercase)`; lỗi native được giữ nguyên."""
 
         ...
 
     def kill_process(self, pid: int) -> None:
-        """Yêu cầu hệ điều hành kết thúc process theo PID."""
+        """Yêu cầu hệ điều hành kết thúc process theo PID và giữ nguyên lỗi native."""
 
         ...
 

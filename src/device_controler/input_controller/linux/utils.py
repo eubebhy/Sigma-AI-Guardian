@@ -1,6 +1,6 @@
 """Tạo và quản lý lifecycle của virtual input device Linux.
 
-File path: `src/utils/input_controller/linux/utils.py`
+File path: `src/device_controler/input_controller/linux/utils.py`
 Input: tên gốc và capability cho một UInput device.
 Output: `UInputManager` tái sử dụng device khỏe, đóng và tạo lại device chết.
 Nguyên lý: health được cache 5 giây; mỗi lần tạo lại dùng generation mới để
@@ -14,7 +14,7 @@ from evdev import UInput
 from Xlib.display import Display
 from Xlib.ext import xinput
 
-from utils.input_controller.linux.types import (
+from device_controler.input_controller.linux.types import (
     Capabilities,
     UInputDevice,
     XInputDisplay,
@@ -78,16 +78,6 @@ def ui_alive(ui: UInputDevice) -> bool:
     return True
 
 
-def get_num_lock_state() -> bool:
-    """Trả trạng thái NumLock hiện tại từ X11 keyboard control."""
-
-    display = Display()
-    try:
-        return bool(display.get_keyboard_control().led_mask & 2)
-    finally:
-        display.close()
-
-
 class UInputManager:
     """Giữ, kiểm tra và tạo lại một virtual input device."""
 
@@ -129,4 +119,4 @@ class UInputManager:
         self._last_check = 0.0
 
 
-__all__ = ["UInputManager", "create_ui", "get_num_lock_state", "ui_alive"]
+__all__ = ["UInputManager", "create_ui", "ui_alive"]

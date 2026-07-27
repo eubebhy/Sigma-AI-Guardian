@@ -2,9 +2,10 @@
 
 File path: `src/system_monitor/keylogger/__init__.py`.
 Input: event `(KEY_*, "down" | "up" | "hold")` từ `listen_keys()`.
-Output: `get_new_typed_words()` trả toàn bộ text `str` trong virtual buffer.
-Nguyên lý: text là danh sách ký tự, cursor là offset; sửa và điều hướng chỉ thay
-đổi state process, không ghi xuống đĩa.
+Output: `get_current_buffer()` trả toàn bộ text `str` trong virtual buffer;
+`raise_if_listener_failed()` ném lại lỗi backend đã lưu nếu có.
+Nguyên lý: text là danh sách tối đa 6767 ký tự, cursor là offset; sửa và điều hướng
+chỉ thay đổi state process, không ghi xuống đĩa.
 
 EDUCATION PURPOSE ONLY: Module chỉ phục vụ bài tập mô phỏng editor với input tự
 nguyện trong môi trường học tập. Không lưu bền, truyền mạng hoặc dùng dữ liệu
@@ -15,10 +16,11 @@ from __future__ import annotations
 
 import threading
 
-from utils.input_controller import KeyEvent, get_num_lock_state, listen_keys
+from utils.key_listener import KeyEvent, get_num_lock_state, listen_keys
 
 
 _MODIFIERS = {"KEY_LEFTALT", "KEY_RIGHTALT", "KEY_LEFTSHIFT", "KEY_RIGHTSHIFT"}
+_MAX_BUFFER_CHARS = 6767
 _KEYPAD_SYMBOLS = {
     "KEY_KPSLASH": "/",
     "KEY_KPASTERISK": "*",
@@ -146,6 +148,13 @@ class KeyLogger:
         return cls._listener_error
 
     @classmethod
+    def raise_if_listener_failed(cls) -> None:
+        """Ném lại lỗi backend listener đã lưu để caller xử lý bằng try/except."""
+
+        if cls._listener_error is not None:
+            raise cls._listener_error
+
+    @classmethod
     def _keylogger(cls, event: KeyEvent) -> None:
         """Áp dụng một keyboard event vào virtual buffer."""
         key_name, state = event
@@ -210,6 +219,13 @@ class KeyLogger:
     def _insert(cls, text: str) -> None:
         cls._buffer[cls._cursor : cls._cursor] = list(text)
         cls._cursor += len(text)
+        overflow = len(cls._buffer) - _MAX_BUFFER_CHARS
+        if overflow > 0:
+            del cls._buffer[:overflow]
+            cls._cursor = min(
+                len(cls._buffer),
+                max(0, cls._cursor - overflow),
+            )
 
     @classmethod
     def _delete_before_cursor(cls) -> None:
@@ -268,7 +284,7 @@ class KeyLogger:
             del cls._buffer[cls._cursor]
 
     @classmethod
-    def get_new_typed_words(cls) -> str:
+    def get_current_buffer(cls) -> str:
         """Trả toàn bộ virtual buffer dưới dạng chuỗi, không xóa state."""
 
         return "".join(cls._buffer)

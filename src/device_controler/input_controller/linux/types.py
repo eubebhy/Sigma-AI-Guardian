@@ -1,6 +1,6 @@
 """Type nội bộ dùng chung cho Linux input controller.
 
-File path: `src/utils/input_controller/linux/types.py`
+File path: `src/device_controler/input_controller/linux/types.py`
 Input/Output: mô tả capability, UInput object và kết quả query XInput2.
 Module này chỉ khai báo contract; logic lifecycle nằm trong `linux/utils.py`.
 """

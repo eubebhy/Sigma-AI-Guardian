@@ -4,10 +4,10 @@
 File path: ``tests/test_screen_locker.py``.
 Input: safe mode dùng fake UI/input; mode real nhận ``lock DELAY SECONDS``.
 Output: mode real in countdown, trạng thái lock/unlock và cleanup cuối cùng. Chỉ in
-``State: unlocked`` khi overlay và input cleanup được xác nhận.
+``State: unlocked`` khi `unlock()` hoàn tất; exception cleanup được in ra stderr.
 Nguyên lý: chờ ``DELAY`` giây trước khi khóa, giữ khóa ``SECONDS`` giây rồi gọi
 ``unlock()``; ``finally`` luôn gọi lại unlock để dọn input và overlay nếu có lỗi.
-Nếu cleanup không được xác nhận trong thời hạn, command in lỗi và trả exit code 1.
+Nếu cleanup raise lỗi, command in lỗi và trả exit code 1.
 
 Real usage dùng bởi ``--info``:
 ``./.pyvenv/bin/python tests/test_screen_locker.py real lock DELAY SECONDS``
@@ -94,20 +94,19 @@ def run_real(arguments: Sequence[str]) -> int:
         print(f"State: locked for {command.seconds}s")
         _countdown("Countdown to unlock", command.seconds)
         print("State: timed unlock")
-        if screenlocker.unlock():
-            print("State: unlocked")
-        else:
-            print("State: unlock cleanup was not confirmed", file=sys.stderr)
-            result = 1
+        screenlocker.unlock()
+        print("State: unlocked")
     except Exception as error:
         print(f"Action failed: {error}", file=sys.stderr)
         result = 1
     finally:
-        if screenlocker.unlock():
-            print("Cleanup: completed")
-        else:
-            print("Cleanup: UI cleanup was not confirmed", file=sys.stderr)
+        try:
+            screenlocker.unlock()
+        except Exception as error:
+            print(f"Cleanup failed: {error}", file=sys.stderr)
             result = 1
+        else:
+            print("Cleanup: completed")
     return result
 
 
@@ -159,6 +158,31 @@ class _ImmediateThread:
         return False
 
 
+class _FakeInputDevice:
+    operations: list[str] = []
+    failed_grabs: set[str] = set()
+    failed_ungrabs: set[str] = set()
+    failed_closes: set[str] = set()
+
+    def __init__(self, path: str) -> None:
+        self.path = path
+
+    def grab(self) -> None:
+        _FakeInputDevice.operations.append(f"grab:{self.path}")
+        if self.path in _FakeInputDevice.failed_grabs:
+            raise RuntimeError(f"grab failed: {self.path}")
+
+    def ungrab(self) -> None:
+        _FakeInputDevice.operations.append(f"ungrab:{self.path}")
+        if self.path in _FakeInputDevice.failed_ungrabs:
+            raise RuntimeError(f"ungrab failed: {self.path}")
+
+    def close(self) -> None:
+        _FakeInputDevice.operations.append(f"close:{self.path}")
+        if self.path in _FakeInputDevice.failed_closes:
+            raise RuntimeError(f"close failed: {self.path}")
+
+
 class ScreenLockerTests(unittest.TestCase):
     """Screen locker phải tạo overlay cho từng monitor được cung cấp."""
 
@@ -172,6 +196,8 @@ class ScreenLockerTests(unittest.TestCase):
         ]
         ready_event = threading.Event()
         failed_event = threading.Event()
+        stop_event = threading.Event()
+        stop_event.set()
 
         with (
             patch.object(screenlocker.tk, "Tk", return_value=first_root) as tk_root,
@@ -188,7 +214,7 @@ class ScreenLockerTests(unittest.TestCase):
                 regions,
                 ready_event,
                 failed_event,
-                threading.Event(),
+                stop_event,
                 threading.Event(),
             )
 
@@ -219,6 +245,7 @@ class ScreenLockerTests(unittest.TestCase):
         ui_exited_event = unittest.mock.MagicMock()
         ui_exited_event.wait.return_value = True
         screenlocker._ui_exited_event = ui_exited_event
+        screenlocker._ui_failed_event = threading.Event()
 
         with patch.object(screenlocker.input_blocker, "unblock") as unblock:
             completed = screenlocker.unlock()
@@ -253,13 +280,17 @@ class ScreenLockerTests(unittest.TestCase):
         unblock.assert_called_once()
 
     @test_modes("fake")
-    def test_run_real_reports_failed_overlay_cleanup(self) -> None:
+    def test_run_real_reports_unlock_exception(self) -> None:
         output = StringIO()
         errors = StringIO()
 
         with (
             patch.object(screenlocker, "lock"),
-            patch.object(screenlocker, "unlock", side_effect=(False, True)),
+            patch.object(
+                screenlocker,
+                "unlock",
+                side_effect=(RuntimeError("UI cleanup failed"), None),
+            ),
             patch(__name__ + "._countdown"),
             redirect_stdout(output),
             redirect_stderr(errors),
@@ -268,7 +299,7 @@ class ScreenLockerTests(unittest.TestCase):
 
         self.assertEqual(result, 1)
         self.assertNotIn("State: unlocked", output.getvalue())
-        self.assertIn("State: unlock cleanup was not confirmed", errors.getvalue())
+        self.assertIn("Action failed: UI cleanup failed", errors.getvalue())
 
     @test_modes("fake")
     def test_lock_image_uses_full_screen_brand_layout(self) -> None:
@@ -349,6 +380,143 @@ class ScreenLockerTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(RuntimeError, "UI"):
                 screenlocker.lock()
+
+    @test_modes("fake")
+    def test_lock_raises_when_ready_ui_exits_before_input_blocks(self) -> None:
+        region = ScreenRegion(top=0, left=0, width=100, height=100)
+        ready_event = threading.Event()
+        ready_event.set()
+        failed_event = threading.Event()
+        exited_event = threading.Event()
+        exited_event.set()
+        stop_event = threading.Event()
+
+        def start_ui(
+            _: list[ScreenRegion],
+        ) -> tuple[threading.Event, threading.Event, threading.Event, threading.Event]:
+            screenlocker._stop_event = stop_event
+            screenlocker._ui_exited_event = exited_event
+            screenlocker._ui_failed_event = failed_event
+            screenlocker._thread = None
+            return ready_event, failed_event, stop_event, exited_event
+
+        with (
+            patch.object(screenlocker.screen_capture, "get_monitors", return_value=[region]),
+            patch.object(screenlocker, "_start_ui", side_effect=start_ui),
+            patch.object(screenlocker.input_blocker, "block") as block,
+            patch.object(screenlocker.input_blocker, "unblock") as unblock,
+        ):
+            with self.assertRaisesRegex(RuntimeError, "UI"):
+                screenlocker.lock()
+
+        block.assert_not_called()
+        unblock.assert_called_once()
+
+    @test_modes("fake")
+    def test_unlock_raises_when_input_cleanup_fails(self) -> None:
+        stop_event = threading.Event()
+        exited_event = threading.Event()
+        exited_event.set()
+        screenlocker._stop_event = stop_event
+        screenlocker._ui_exited_event = exited_event
+        screenlocker._ui_failed_event = threading.Event()
+        screenlocker._thread = None
+
+        with patch.object(
+            screenlocker.input_blocker,
+            "unblock",
+            side_effect=RuntimeError("input cleanup failed"),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "input cleanup failed"):
+                screenlocker.unlock()
+
+        self.assertTrue(stop_event.is_set())
+
+    @test_modes("fake")
+    def test_unlock_raises_when_ui_cleanup_is_not_confirmed(self) -> None:
+        stop_event = threading.Event()
+        exited_event = unittest.mock.MagicMock()
+        exited_event.wait.return_value = False
+        screenlocker._stop_event = stop_event
+        screenlocker._ui_exited_event = exited_event
+        screenlocker._ui_failed_event = threading.Event()
+        screenlocker._thread = None
+
+        with patch.object(screenlocker.input_blocker, "unblock"):
+            with self.assertRaisesRegex(RuntimeError, "UI cleanup"):
+                screenlocker.unlock()
+
+        self.assertTrue(stop_event.is_set())
+        exited_event.wait.assert_called_once_with(timeout=5.0)
+
+    @test_modes("fake")
+    def test_linux_block_rolls_back_when_one_device_grab_fails(self) -> None:
+        from utils.input_blocker import linux as linux_input_blocker
+
+        _FakeInputDevice.operations = []
+        _FakeInputDevice.failed_grabs = {"/dev/input/event1"}
+        _FakeInputDevice.failed_ungrabs = set()
+        _FakeInputDevice.failed_closes = set()
+
+        with (
+            patch.object(linux_input_blocker, "_grabbed_devices", {}),
+            patch.object(
+                linux_input_blocker,
+                "list_devices",
+                return_value=["/dev/input/event0", "/dev/input/event1"],
+            ),
+            patch.object(linux_input_blocker, "InputDevice", _FakeInputDevice),
+        ):
+            with self.assertRaisesRegex(RuntimeError, "grab failed"):
+                linux_input_blocker.block()
+
+            self.assertEqual(linux_input_blocker._grabbed_devices, {})
+
+        self.assertEqual(
+            _FakeInputDevice.operations,
+            [
+                "grab:/dev/input/event0",
+                "grab:/dev/input/event1",
+                "ungrab:/dev/input/event0",
+                "close:/dev/input/event0",
+                "ungrab:/dev/input/event1",
+                "close:/dev/input/event1",
+            ],
+        )
+
+    @test_modes("fake")
+    def test_linux_unblock_attempts_every_release_before_raising(self) -> None:
+        from utils.input_blocker import linux as linux_input_blocker
+
+        _FakeInputDevice.operations = []
+        _FakeInputDevice.failed_grabs = set()
+        _FakeInputDevice.failed_ungrabs = {"/dev/input/event0"}
+        _FakeInputDevice.failed_closes = {"/dev/input/event1"}
+        first = _FakeInputDevice("/dev/input/event0")
+        second = _FakeInputDevice("/dev/input/event1")
+
+        with patch.object(
+            linux_input_blocker,
+            "_grabbed_devices",
+            {first.path: first, second.path: second},
+        ):
+            with self.assertRaises(ExceptionGroup):
+                linux_input_blocker.unblock()
+
+            self.assertEqual(
+                linux_input_blocker._grabbed_devices,
+                {second.path: second},
+            )
+
+        self.assertEqual(
+            _FakeInputDevice.operations,
+            [
+                "ungrab:/dev/input/event0",
+                "close:/dev/input/event0",
+                "ungrab:/dev/input/event1",
+                "close:/dev/input/event1",
+            ],
+        )
 
     @test_modes("fake")
     def test_lock_cleans_up_ui_when_input_blocking_fails(self) -> None:

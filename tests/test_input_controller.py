@@ -3,8 +3,10 @@
 
 File path: `tests/test_input_controller.py`.
 Input: mode `fake`, `mock`, `smoke` hoặc `real`; real nhận `control` hay `logger`.
-Output: unittest xác nhận contract Linux/Windows; real in chuẩn bị, action và result.
-Nguyên lý: fake thay thế UInput, pydirectinput và pynput; real chỉ dùng Linux facade.
+Output: unittest xác nhận contract control Linux/Windows; real in chuẩn bị, action
+và result. Lệnh `logger` được chuyển tiếp đến `test_key_listener.py` để giữ command
+manual cũ.
+Nguyên lý: fake thay thế UInput và pydirectinput; real chỉ dùng Linux control facade.
 
 Lệnh control: `./.pyvenv/bin/python tests/test_input_controller.py real control
 --move-to 500 300 --click left --write Hello --press enter`. Các flag legacy theo
@@ -23,7 +25,6 @@ thật, nên không chạy hai lệnh này trong automated test.
 from __future__ import annotations
 
 import argparse
-import builtins
 import contextlib
 import io
 import importlib
@@ -33,11 +34,9 @@ import shutil
 import sys
 import time
 import unittest
-from collections.abc import Callable, Iterator, Mapping, Sequence
-from threading import Thread
+from collections.abc import Callable, Sequence
 from types import ModuleType
 from typing import Any, ClassVar, TypeAlias, cast
-from unittest import mock
 from unittest.mock import patch
 
 from test_support import add_source_path, run_module, test_modes
@@ -46,30 +45,27 @@ add_source_path()
 
 try:
     from evdev import ecodes
-    from utils.input_controller import linux as linux_api
-    from utils.input_controller.linux import listener
-    from utils.input_controller.linux import sendinput_kb, sendinput_mouse
-    from utils.input_controller.linux import utils as linux_utils
-    from utils.input_controller.types import MouseButton
+    from device_controler.input_controller import linux as linux_api
+    from device_controler.input_controller.linux import sendinput_kb, sendinput_mouse
+    from device_controler.input_controller.linux import utils as linux_utils
+    from device_controler.input_controller.types import MouseButton
+    from utils import key_listener
 except ModuleNotFoundError:
     _linux_fake_tests_available = False
     ecodes = cast(Any, None)
     linux_api = cast(Any, None)
-    listener = cast(Any, None)
     sendinput_kb = cast(Any, None)
     sendinput_mouse = cast(Any, None)
     linux_utils = cast(Any, None)
     MouseButton = cast(Any, None)
+    key_listener = cast(Any, None)
 else:
     _linux_fake_tests_available = True
 
 _BACKEND_API = (
     "click",
-    "get_num_lock_state",
     "keyDown",
     "keyUp",
-    "listen_keys",
-    "listen_mice",
     "mouseDown",
     "mouseUp",
     "moveRel",
@@ -196,24 +192,9 @@ def _preflight_control() -> None:
     if shutil.which("xinput") is None:
         raise _PrerequisiteError("missing required binary: xinput")
     try:
-        linux_utils.get_num_lock_state()
+        key_listener.get_num_lock_state()
     except Exception as error:
         raise _PrerequisiteError("cannot connect to the X11 display") from error
-
-
-def _preflight_logger() -> None:
-    _require_linux()
-    if not os.path.isdir("/dev/input"):
-        raise _PrerequisiteError("missing /dev/input")
-    devices = [
-        os.path.join("/dev/input", name)
-        for name in os.listdir("/dev/input")
-        if name.startswith("event")
-    ]
-    if not devices:
-        raise _PrerequisiteError("no /dev/input/event* device found")
-    if not any(os.access(device, os.R_OK) for device in devices):
-        raise _PrerequisiteError("read permission required for /dev/input/event*")
 
 
 def _require_linux() -> None:
@@ -269,37 +250,6 @@ def _spam_click(button: MouseButton, count: int) -> None:
     print(f"spam-click: {count / elapsed:.2f} CPS", flush=True)
 
 
-def _parse_logger_arguments(arguments: Sequence[str]) -> tuple[bool, bool]:
-    keyboard = "--kb" in arguments
-    mouse = "--mouse" in arguments
-    invalid = set(arguments).difference({"--kb", "--mouse"})
-    if invalid:
-        raise _InvalidCommandError(f"unknown logger option: {sorted(invalid)[0]}")
-    if not keyboard and not mouse:
-        raise _InvalidCommandError("logger requires --kb and/or --mouse")
-    return keyboard, mouse
-
-
-def _log_events(keyboard: bool, mouse: bool) -> None:
-    if keyboard and mouse:
-        Thread(target=_log_keyboard, daemon=True).start()
-        _log_mouse()
-    elif keyboard:
-        _log_keyboard()
-    else:
-        _log_mouse()
-
-
-def _log_keyboard() -> None:
-    for event in linux_api.listen_keys():
-        print("kb:", event, flush=True)
-
-
-def _log_mouse() -> None:
-    for event in linux_api.listen_mice():
-        print("mouse:", event, flush=True)
-
-
 def run_real(arguments: Sequence[str]) -> int:
     """Chạy control/logger Linux manual; 2 invalid/prerequisite, 1 action error."""
 
@@ -320,11 +270,9 @@ def run_real(arguments: Sequence[str]) -> int:
                 _execute_control(command)
             return 0
         if values[0] == "logger":
-            keyboard, mouse = _parse_logger_arguments(values[1:])
-            _preflight_logger()
-            print("Logging events. Press Ctrl+C to stop.", flush=True)
-            _log_events(keyboard, mouse)
-            return 0
+            from test_key_listener import run_real as run_listener_real
+
+            return run_listener_real(values, error_prefix="input_controller")
         raise _InvalidCommandError(f"unknown real command: {values[0]}")
     except _InvalidCommandError as error:
         print(f"[input_controller][real][invalid] {error}", file=sys.stderr)
@@ -411,20 +359,15 @@ class RealCommandFakeTests(unittest.TestCase):
         self.assertEqual(result, 2)
         self.assertIn("no X11", output.getvalue())
 
-    def test_logger_stops_cleanly_after_keyboard_interrupt(self) -> None:
-        output = io.StringIO()
-        with (
-            patch(__name__ + "._preflight_logger"),
-            patch(__name__ + "._log_events", side_effect=KeyboardInterrupt),
-            contextlib.redirect_stdout(output),
-        ):
+    def test_legacy_logger_command_delegates_to_key_listener(self) -> None:
+        with patch("test_key_listener.run_real", return_value=0) as logger:
             result = run_real(("logger", "--kb"))
 
         self.assertEqual(result, 0)
-        self.assertEqual(output.getvalue().splitlines(), [
-            "Logging events. Press Ctrl+C to stop.", "Logging stopped.",
-        ])
-
+        logger.assert_called_once_with(
+            ("logger", "--kb"),
+            error_prefix="input_controller",
+        )
 
 class _FakeUInput:
     last_instance: ClassVar[_FakeUInput | None] = None
@@ -449,39 +392,13 @@ class _FakeUInput:
         self.closed = True
 
 
-class _FakeEvent:
-    def __init__(self, event_type: int, code: int, value: int) -> None:
-        self.type = event_type
-        self.code = code
-        self.value = value
-
-
-class _FakeInputDevice:
-    def __init__(
-        self,
-        events: list[_FakeEvent],
-        capabilities: dict[int, list[int]] | None = None,
-    ) -> None:
-        self._events = events
-        self._capabilities = capabilities or {}
-
-    def fileno(self) -> int:
-        return 0
-
-    def capabilities(self, verbose: bool = False, absinfo: bool = True) -> object:
-        return self._capabilities
-
-    def read(self) -> Iterator[_FakeEvent]:
-        return iter(self._events)
-
-
 def _load_linux_sender(module_name: str) -> tuple[ModuleType, _FakeUInput]:
     sys.modules.pop(module_name, None)
     _FakeUInput.last_instance = None
     with (
         patch.object(linux_utils, "UInput", _FakeUInput),
         patch.object(linux_utils, "_wait_for_xinput_device") as wait,
-        patch("utils.input_controller.linux.sendinput_mouse.subprocess.run"),
+        patch("device_controler.input_controller.linux.sendinput_mouse.subprocess.run"),
     ):
         module = importlib.import_module(module_name)
         assert _FakeUInput.last_instance is None
@@ -498,15 +415,16 @@ def _load_linux_sender(module_name: str) -> tuple[ModuleType, _FakeUInput]:
 )
 class LinuxFakeTests(unittest.TestCase):
     @test_modes("smoke")
-    def test_facades_export_listeners(self) -> None:
-        from utils.input_controller import linux, window
+    def test_control_facades_export_control_operations(self) -> None:
+        from device_controler.input_controller import linux, window
 
-        self.assertTrue(callable(linux.listen_keys))
-        self.assertTrue(callable(window.listen_keys))
+        for name in _BACKEND_API:
+            self.assertTrue(callable(getattr(linux, name)))
+            self.assertTrue(callable(getattr(window, name)))
 
     def test_keyboard_capabilities_and_events(self) -> None:
         module, fake = _load_linux_sender(
-            "utils.input_controller.linux.sendinput_kb"
+            "device_controler.input_controller.linux.sendinput_kb"
         )
         self.assertTrue(fake.name.startswith("Sigma Virtual Keyboard "))
         self.assertEqual(fake.capabilities[ecodes.EV_REP], [])
@@ -547,7 +465,7 @@ class LinuxFakeTests(unittest.TestCase):
 
     def test_mouse_capabilities_motion_and_scrolling(self) -> None:
         module, fake = _load_linux_sender(
-            "utils.input_controller.linux.sendinput_mouse"
+            "device_controler.input_controller.linux.sendinput_mouse"
         )
         self.assertEqual(
             fake.capabilities[ecodes.EV_KEY],
@@ -570,7 +488,7 @@ class LinuxFakeTests(unittest.TestCase):
 
     def test_mouse_relative_duration_and_none_axis(self) -> None:
         module, fake = _load_linux_sender(
-            "utils.input_controller.linux.sendinput_mouse"
+            "device_controler.input_controller.linux.sendinput_mouse"
         )
         with patch.object(module.time, "sleep") as sleep:
             module.moveRel(10, 0, duration=0.2)
@@ -582,92 +500,6 @@ class LinuxFakeTests(unittest.TestCase):
             (ecodes.EV_REL, ecodes.REL_Y, 0),
         ])
         self.assertEqual(sleep.call_args_list, [((0.1,),), ((0.1,),)])
-
-    def test_listener_normalizes_and_validates_devices(self) -> None:
-        keyboard = _FakeInputDevice([_FakeEvent(ecodes.EV_KEY, ecodes.KEY_A, 1)])
-        listener._keyboards = [keyboard]
-        with patch.object(listener.select, "select", return_value=([keyboard], [], [])):
-            self.assertEqual(next(listener.listen_keys()), ("KEY_A", "down"))
-        mouse = _FakeInputDevice([
-            _FakeEvent(ecodes.EV_KEY, ecodes.BTN_LEFT, 0),
-            _FakeEvent(ecodes.EV_REL, ecodes.REL_X, 12),
-        ])
-        listener._mice = [mouse]
-        with patch.object(listener.select, "select", return_value=([mouse], [], [])):
-            events = listener.listen_mice()
-            self.assertEqual(next(events), ("BTN_LEFT", "up"))
-            self.assertEqual(next(events), ("REL_X", 12))
-        self.assertTrue(_is_keyboard(_FakeInputDevice([], {ecodes.EV_KEY: list(listener._LETTER_CODES)})))
-        with patch.object(listener, "_get_keyboards", return_value=[]):
-            with self.assertRaisesRegex(RuntimeError, "No Linux keyboard"):
-                next(listener.listen_keys())
-
-def _is_keyboard(device: _FakeInputDevice) -> bool:
-    return listener._is_keyboard(device)
-
-
-class _FakeKey:
-    def __init__(self, char: str | None = None, name: str | None = None, vk: int | None = None) -> None:
-        self.char = char
-        self.name = name
-        self.vk = vk
-
-    def __str__(self) -> str:
-        return "unknown"
-
-
-class _FakeButton:
-    def __init__(self, name: str) -> None:
-        self.name = name
-
-
-class _FakePynputListener:
-    def __init__(self, callbacks: dict[str, object]) -> None:
-        self.callbacks = callbacks
-        self.running = False
-        self.thread_alive = False
-        self.started = False
-        self.stop_calls = 0
-        self.join_calls = 0
-        self.on_start: Callable[[_FakePynputListener], None] | None = None
-        self.join_error: BaseException | None = None
-
-    def start(self) -> None:
-        self.started = True
-
-    def wait(self) -> None:
-        self.running = True
-        self.thread_alive = True
-        if self.on_start is not None:
-            self.on_start(self)
-
-    def is_alive(self) -> bool:
-        return self.thread_alive
-
-    def stop(self) -> None:
-        self.stop_calls += 1
-        self.running = False
-        self.thread_alive = False
-
-    def join(self, timeout: float | None = None) -> None:
-        del timeout
-        self.join_calls += 1
-        if self.join_error is not None:
-            raise self.join_error
-
-    def emit(self, name: str, *arguments: object) -> None:
-        cast(Callable[..., None], self.callbacks[name])(*arguments)
-
-
-class _FakePynputModule(ModuleType):
-    def __init__(self, name: str) -> None:
-        super().__init__(name)
-        self.listener: _FakePynputListener | None = None
-
-    def Listener(self, **callbacks: object) -> _FakePynputListener:
-        self.listener = _FakePynputListener(callbacks)
-        return self.listener
-
 
 class _FakeDirectInput(ModuleType):
     def __init__(self) -> None:
@@ -721,9 +553,9 @@ class WindowFakeTests(unittest.TestCase):
         self.fake = _FakeDirectInput()
         sys.modules["pydirectinput"] = self.fake
         for name in (
-            "utils.input_controller.window",
-            "utils.input_controller.window.sendinput_kb",
-            "utils.input_controller.window.sendinput_mouse",
+            "device_controler.input_controller.window",
+            "device_controler.input_controller.window.sendinput_kb",
+            "device_controler.input_controller.window.sendinput_mouse",
         ):
             sys.modules.pop(name, None)
 
@@ -731,24 +563,10 @@ class WindowFakeTests(unittest.TestCase):
         sys.modules.pop("pydirectinput", None)
 
     def test_exports_match_linux_and_are_lazy(self) -> None:
-        package_name = "utils.input_controller.window"
-        for name in ("pydirectinput", "pynput", "pynput.keyboard", "pynput.mouse"):
+        package_name = "device_controler.input_controller.window"
+        for name in ("pydirectinput",):
             sys.modules.pop(name, None)
-        real_import = builtins.__import__
-
-        def guarded_import(
-            name: str,
-            globals: Mapping[str, object] | None = None,
-            locals: Mapping[str, object] | None = None,
-            fromlist: Sequence[str] = (),
-            level: int = 0,
-        ) -> object:
-            if name == "pydirectinput" or name.startswith("pynput"):
-                raise AssertionError(f"Eager platform dependency import: {name}")
-            return real_import(name, globals, locals, fromlist, level)
-
-        with mock.patch.object(builtins, "__import__", side_effect=guarded_import):
-            window = importlib.import_module(package_name)
+        window = importlib.import_module(package_name)
         self.assertEqual(window.__all__, list(_BACKEND_API))
         for name in _BACKEND_API:
             self.assertTrue(hasattr(window, name))
@@ -759,7 +577,9 @@ class WindowFakeTests(unittest.TestCase):
                 )
 
     def test_keyboard_delegates_and_normalizes_names(self) -> None:
-        keyboard = importlib.import_module("utils.input_controller.window.sendinput_kb")
+        keyboard = importlib.import_module(
+            "device_controler.input_controller.window.sendinput_kb"
+        )
         keyboard.keyDown("leftctrl")
         keyboard.keyUp("leftctrl")
         keyboard.press(["a", "enter"])
@@ -772,7 +592,9 @@ class WindowFakeTests(unittest.TestCase):
         self.assertIn("A", keyboard.supportedWriteCharacters())
 
     def test_mouse_delegates_all_operations(self) -> None:
-        mouse = importlib.import_module("utils.input_controller.window.sendinput_mouse")
+        mouse = importlib.import_module(
+            "device_controler.input_controller.window.sendinput_mouse"
+        )
         mouse.click(button="back")
         mouse.mouseDown("forward")
         mouse.mouseUp("middle")
@@ -788,85 +610,6 @@ class WindowFakeTests(unittest.TestCase):
             ("scroll", -3, False), ("hscroll", 2, False),
         ])
 
-
-class WindowListenerFakeTests(unittest.TestCase):
-    def setUp(self) -> None:
-        self.keyboard = _FakePynputModule("pynput.keyboard")
-        self.mouse = _FakePynputModule("pynput.mouse")
-        sys.modules.pop("utils.input_controller.window.listener", None)
-        actual = importlib.import_module
-
-        def import_fake(name: str, package: str | None = None) -> ModuleType:
-            if name == "pynput.keyboard":
-                return self.keyboard
-            if name == "pynput.mouse":
-                return self.mouse
-            return actual(name, package)
-
-        self.patch = mock.patch.object(importlib, "import_module", side_effect=import_fake)
-        self.patch.start()
-        self.listener = importlib.import_module("utils.input_controller.window.listener")
-
-    def tearDown(self) -> None:
-        self.patch.stop()
-        sys.modules.pop("utils.input_controller.window.listener", None)
-
-    def test_normalizes_keyboard_events_and_cleanup(self) -> None:
-        original = self.keyboard.Listener
-
-        def with_events(**callbacks: object) -> _FakePynputListener:
-            fake = original(**callbacks)
-            def emit(active: _FakePynputListener) -> None:
-                active.emit("on_press", _FakeKey(char="a"))
-                active.emit("on_press", _FakeKey(char="a"))
-                active.emit("on_release", _FakeKey(char="a"))
-                active.emit("on_press", _FakeKey(name="ctrl_l"))
-                active.emit("on_release", _FakeKey(name="ctrl_l"))
-            fake.on_start = emit
-            return fake
-
-        self.keyboard.Listener = with_events  # pyright: ignore[reportAttributeAccessIssue]
-        events = self.listener.listen_keys(timeout=0.001)
-        self.assertEqual([next(events) for _ in range(5)], [
-            ("KEY_A", "down"), ("KEY_A", "hold"), ("KEY_A", "up"),
-            ("KEY_LEFTCTRL", "down"), ("KEY_LEFTCTRL", "up"),
-        ])
-        events.close()
-        fake = self.keyboard.listener
-        assert fake is not None
-        self.assertEqual((fake.stop_calls, fake.join_calls), (1, 1))
-
-    def test_normalizes_mouse_buttons_motion_and_scroll(self) -> None:
-        original = self.mouse.Listener
-
-        def with_events(**callbacks: object) -> _FakePynputListener:
-            fake = original(**callbacks)
-            def emit(active: _FakePynputListener) -> None:
-                active.emit("on_move", 10, 20)
-                active.emit("on_move", 13, 18)
-                active.emit("on_scroll", 13, 18, 2, -1)
-                for name in ("left", "right", "middle", "x1", "x2", "unknown"):
-                    active.emit("on_click", 13, 18, _FakeButton(name), True)
-            fake.on_start = emit
-            return fake
-
-        self.mouse.Listener = with_events  # pyright: ignore[reportAttributeAccessIssue]
-        events = self.listener.listen_mice(timeout=0.001)
-        self.assertEqual([next(events) for _ in range(9)], [
-            ("REL_X", 3), ("REL_Y", -2), ("REL_HWHEEL", 2),
-            ("REL_WHEEL", -1), ("BTN_LEFT", "down"), ("BTN_RIGHT", "down"),
-            ("BTN_MIDDLE", "down"), ("BTN_BACK", "down"),
-            ("BTN_FORWARD", "down"),
-        ])
-        events.close()
-
-
-class LinuxRealUtilities(unittest.TestCase):
-    @test_modes("real")
-    def test_real_facade_reads_num_lock_state(self) -> None:
-        from utils import input_controller
-
-        self.assertIsInstance(input_controller.get_num_lock_state(), bool)
 
 if __name__ == "__main__":
     raise SystemExit(run_module(sys.modules[__name__]))

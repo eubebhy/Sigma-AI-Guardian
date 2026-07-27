@@ -37,7 +37,7 @@ tool calling mới, UI mới và protocol mạng đều ngoài phạm vi hiện 
 - Di chuyển `ps`/`os.kill` và `tasklist`/`taskkill` ra adapter process.
 - Di chuyển khác biệt `subprocess.Popen` mở browser ra adapter browser.
 - Di chuyển đường dẫn hosts và fallback window tracker (`xdotool`) ra adapter.
-- Giữ `utils/input_controller` và `utils/input_blocker` là facade compatibility;
+- Giữ `utils/input_blocker` là facade compatibility;
   chỉ sửa để runtime có thể dùng chúng rõ ràng hơn nếu thật sự cần.
 
 ### 3. Feature Agent

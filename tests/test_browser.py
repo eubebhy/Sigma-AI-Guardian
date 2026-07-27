@@ -3,7 +3,8 @@
 
 File path: ``tests/test_browser.py``. Input: safe suite dùng adapter fake/mock;
 manual command nhận URL HTTP hoặc HTTPS. Output: in kết quả ``opened`` hoặc
-``failed``. Nguyên lý: chỉ ``real open`` gọi browser adapter của platform.
+thông báo lỗi. Nguyên lý: chỉ ``real open`` gọi browser adapter của platform và bắt
+exception của ``open_tab()``.
 
 Lệnh manual chính xác: ``./.pyvenv/bin/python tests/test_browser.py real open
 https://example.com``. Preflight/prerequisites: có desktop session và browser mặc
@@ -15,6 +16,7 @@ có thể tạo process/tab. Ctrl+C trước khi browser nhận lệnh dừng ru
 from __future__ import annotations
 
 import argparse
+from io import StringIO
 from pathlib import Path
 import sys
 import unittest
@@ -59,15 +61,15 @@ def run_real(arguments: Sequence[str]) -> int:
         print("Usage: real open URL", file=sys.stderr)
         return 2
     try:
-        opened = browser_tab.open_tab(command.url)
+        browser_tab.open_tab(command.url)
     except KeyboardInterrupt:
         print("Open interrupted")
         return 130
     except Exception as error:
         print(f"Open failed: {error}", file=sys.stderr)
         return 1
-    print("opened" if opened else "failed")
-    return 0 if opened else 1
+    print("opened")
+    return 0
 
 
 class _FakeProcessOperations:
@@ -92,9 +94,10 @@ class _FakeHostsPathOperations:
 
 
 class _FakeBrowserOperations:
-    def __init__(self) -> None:
+    def __init__(self, default_open_result: bool = True) -> None:
         self.default_urls: list[str] = []
         self.executable_lookups: list[tuple[str, ...]] = []
+        self.default_open_result = default_open_result
 
     def launch(self, command: list[str]) -> bool:
         del command
@@ -102,7 +105,7 @@ class _FakeBrowserOperations:
 
     def open_default_url(self, url: str) -> bool:
         self.default_urls.append(url)
-        return True
+        return self.default_open_result
 
     def find_executable(self, executables: tuple[str, ...]) -> str | None:
         self.executable_lookups.append(executables)
@@ -112,7 +115,32 @@ class _FakeBrowserOperations:
 class BrowserTests(unittest.TestCase):
     @test_modes("fake")
     def test_open_tab_rejects_invalid_url(self) -> None:
-        self.assertFalse(browser_tab.open_tab("file:///tmp/a.html"))
+        with self.assertRaisesRegex(ValueError, "HTTP or HTTPS"):
+            browser_tab.open_tab("file:///tmp/a.html")
+
+    @test_modes("fake")
+    def test_open_tab_raises_when_all_launches_fail(self) -> None:
+        browser_operations = _FakeBrowserOperations(default_open_result=False)
+        services = PlatformServices(
+            name="Test",
+            capabilities=PlatformCapabilities(platform_name="Test", items=()),
+            processes=_FakeProcessOperations(),
+            browser=browser_operations,
+            windows=_FakeWindowOperations(),
+            hosts=_FakeHostsPathOperations(),
+        )
+        browser = {
+            "spec": browser_tab.BROWSERS[0],
+            "executable": "/bin/browser",
+            "pid": None,
+            "score": 10,
+        }
+
+        with patch.object(browser_tab, "_pick_browser", side_effect=([], [browser])):
+            with self.assertRaisesRegex(RuntimeError, "https://example.com"):
+                browser_tab.open_tab("https://example.com", services)
+
+        self.assertEqual(browser_operations.default_urls, ["https://example.com"])
 
     @test_modes("mock", "smoke")
     def test_open_tab_uses_running_browser(self) -> None:
@@ -174,6 +202,20 @@ class RealBrowserCommandTests(unittest.TestCase):
 
     def test_parse_real_open_rejects_non_http_url(self) -> None:
         self.assertIsNone(_parse_real_arguments(("open", "file:///tmp/a.html")))
+
+    def test_run_real_reports_browser_error(self) -> None:
+        with (
+            patch.object(
+                browser_tab,
+                "open_tab",
+                side_effect=RuntimeError("No browser could open the URL"),
+            ),
+            patch("sys.stderr", new_callable=StringIO) as standard_error,
+        ):
+            result = run_real(("open", "https://example.com"))
+
+        self.assertEqual(result, 1)
+        self.assertIn("Open failed: No browser could open the URL", standard_error.getvalue())
 
 
 if __name__ == "__main__":

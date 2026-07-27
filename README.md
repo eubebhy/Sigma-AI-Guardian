@@ -39,17 +39,16 @@ Agent chọn Windows hoặc Linux một lần khi khởi động, sau đó featu
 platform chung. Server, Teacher Console, mạng LAN và remote desktop streaming chưa
 thuộc repository hiện tại. Xem [tài liệu kiến trúc](docs/architecture.md).
 
-## Cau truc input_controller
+## Cau truc input
 
-Thu muc `src/utils/input_controller/` cung cap facade input chung:
+Input duoc tach theo trach nhiem:
 
-* `__init__.py`: facade theo platform cua process hien tai.
-* `types.py`: event type va protocol input dung chung.
-* `linux/`: backend evdev/UInput/Xlib.
-* `window/`: backend pydirectinput-rgx/pynput.
+* `src/device_controler/input_controller/`: gui input va lifecycle virtual device.
+* `src/utils/key_listener/`: lang nghe event va doc NumLock.
 
 Chi tiet API, dieu kien platform va gioi han co tai
-[`src/utils/input_controller/README.md`](src/utils/input_controller/README.md).
+[`src/device_controler/input_controller/README.md`](src/device_controler/input_controller/README.md)
+va [`src/utils/key_listener/README.md`](src/utils/key_listener/README.md).
 
 ## Tai lieu bao tri
 
@@ -147,9 +146,10 @@ npm install --global pyright
 
 Chạy PowerShell bằng **Run as administrator** khi dùng tính năng chặn input hoặc
 sửa file `C:\Windows\System32\drivers\etc\hosts`. `taskkill` cũng có thể bị từ
-chối quyền khi process thuộc user hoặc privilege cao hơn. API `ProcessKiller` hiện
-không có result, health state hoặc logging để báo lỗi này cho caller; xem backlog
-trong [`ROI-reports/technical-debt.md`](ROI-reports/technical-debt.md) trước khi dùng
+chối quyền khi process thuộc user hoặc privilege cao hơn. `ProcessKiller` lưu lỗi
+scan/kill nền và caller gọi `raise_if_failed()` để nhận exception; nó vẫn không có
+per-process result/history, nên xem backlog trong
+[`ROI-reports/technical-debt.md`](ROI-reports/technical-debt.md) trước khi dùng
 process guard như enforcement đáng tin cậy.
 
 ### Ubuntu minimal

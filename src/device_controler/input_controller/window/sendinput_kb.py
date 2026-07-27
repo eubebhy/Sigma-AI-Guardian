@@ -1,6 +1,6 @@
 """Wrapper tối thiểu cho keyboard API của `pydirectinput-rgx` trên Windows.
 
-File path: `src/utils/input_controller/window/sendinput_kb.py`.
+File path: `src/device_controler/input_controller/window/sendinput_kb.py`.
 Input: key name hoặc text theo key name/layout US của `pydirectinput-rgx`.
 Output: gửi keyboard event bằng WinAPI SendInput.
 Nguyên lý: mỗi hàm chỉ chuyển tiếp tham số tới thư viện; thư viện chịu trách
@@ -9,12 +9,11 @@ nhiệm xử lý key, Shift, delay và lỗi input.
 
 from __future__ import annotations
 
-import ctypes
 import importlib
 from collections.abc import Sequence
 from typing import Any, cast
 
-from utils.input_controller.types import Key
+from device_controler.input_controller.types import Key
 
 
 _KEY_NAMES = {
@@ -63,13 +62,6 @@ def _input() -> Any:
     """Import dependency Windows tại thời điểm thực sự gửi input."""
 
     return cast(Any, importlib.import_module("pydirectinput"))
-
-
-def get_num_lock_state() -> bool:
-    """Trả trạng thái NumLock hiện tại từ Windows user32."""
-
-    windows_dll = getattr(ctypes, "windll")
-    return bool(windows_dll.user32.GetKeyState(0x90) & 1)
 
 
 def _key_name(key: Key) -> str:

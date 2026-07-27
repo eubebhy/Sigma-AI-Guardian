@@ -5,7 +5,8 @@ Input contract:
 - open_tab(url): nhan url bat dau bang http:// hoac https://.
 Output contract:
 - Tra ve True neu goi duoc browser hop le.
-- Tra ve False neu url sai, khong co browser hop le hoac mo browser that bai.
+- Raise ValueError neu url khong bat dau bang http:// hoac https://.
+- Raise RuntimeError neu tat ca lan mo browser deu that bai.
 Operating principle:
 - Lay process browser dang chay va executable co trong PATH.
 - Uu tien browser dang chay, roi fallback sang browser co executable.
@@ -158,11 +159,12 @@ def open_tab(url: str, platform_services: PlatformServices | None = None) -> boo
 
     URL phải bắt đầu bằng `http://` hoặc `https://`. Hàm ưu tiên browser đang chạy
     để tab mới xuất hiện đúng phiên người dùng, sau đó mới fallback sang browser
-    có executable trong PATH và cuối cùng là default browser của OS.
+    có executable trong PATH và cuối cùng là default browser của OS. Raise
+    `ValueError` khi URL không hợp lệ và `RuntimeError` khi không mở được URL.
     """
 
     if not url.startswith(("http://", "https://")):
-        return False
+        raise ValueError(f"Invalid URL {url!r}: must start with HTTP or HTTPS")
     if platform_services is None:
         for browser in _pick_browser(require_running=True):
             if browser["executable"] and _run_open_command([browser["executable"], url]):
@@ -170,27 +172,31 @@ def open_tab(url: str, platform_services: PlatformServices | None = None) -> boo
         for browser in _pick_browser(require_running=False):
             if browser["executable"] and _run_open_command([browser["executable"], url]):
                 return True
-        return get_default_platform_services().browser.open_default_url(url)
+        if get_default_platform_services().browser.open_default_url(url):
+            return True
+    else:
+        for browser in _pick_browser(
+            True,
+            platform_services.processes,
+            platform_services.browser,
+        ):
+            if browser["executable"] and _run_open_command(
+                [browser["executable"], url], platform_services.browser
+            ):
+                return True
+        for browser in _pick_browser(
+            False,
+            platform_services.processes,
+            platform_services.browser,
+        ):
+            if browser["executable"] and _run_open_command(
+                [browser["executable"], url], platform_services.browser
+            ):
+                return True
+        if platform_services.browser.open_default_url(url):
+            return True
 
-    for browser in _pick_browser(
-        True,
-        platform_services.processes,
-        platform_services.browser,
-    ):
-        if browser["executable"] and _run_open_command(
-            [browser["executable"], url], platform_services.browser
-        ):
-            return True
-    for browser in _pick_browser(
-        False,
-        platform_services.processes,
-        platform_services.browser,
-    ):
-        if browser["executable"] and _run_open_command(
-            [browser["executable"], url], platform_services.browser
-        ):
-            return True
-    return platform_services.browser.open_default_url(url)
+    raise RuntimeError(f"Could not open URL after all browser launch attempts: {url}")
 
 
 __all__ = ["open_tab"]

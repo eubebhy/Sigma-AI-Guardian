@@ -5,11 +5,12 @@
 
 File path: `src/utils/input_blocker/linux.py`
 Input: `block()` và `unblock()` không nhận tham số.
-Output: các `/dev/input/event*` hiện có bị grab độc quyền hoặc được release.
+Output: `block()`/`unblock()` trả `None` khi hoàn tất; lỗi grab/release được raise.
 
 Nguyên lý hoạt động: `block()` mở từng thiết bị input và giữ file descriptor trong
-`_grabbed_devices`; Linux chỉ giữ trạng thái grab khi descriptor còn mở. `unblock()`
-ungrab, đóng descriptor và xoá khỏi registry nội bộ.
+`_grabbed_devices`; Linux chỉ giữ trạng thái grab khi descriptor còn mở. `block()`
+rollback mọi descriptor đã mở nếu một grab lỗi. `unblock()` luôn thử ungrab và đóng
+mọi descriptor trước khi báo các lỗi release bằng `ExceptionGroup`.
 
 Yêu cầu: process cần quyền đọc/grab các thiết bị trong `/dev/input`.
 """
@@ -25,39 +26,45 @@ def block() -> None:
 
     global _grabbed_devices
 
-    for dev_path in list_devices():
-        path = str(Path(dev_path))  # normalize path key
+    try:
+        for dev_path in list_devices():
+            path = str(Path(dev_path))
+            if path in _grabbed_devices:
+                continue
+            dev = InputDevice(path)
+            _grabbed_devices[path] = dev
+            dev.grab()
+    except Exception as error:
+        cleanup_errors = _release_grabbed_devices()
+        if cleanup_errors:
+            raise ExceptionGroup(
+                "Input blocking failed and rollback was incomplete",
+                [error, *cleanup_errors],
+            )
+        raise
 
-        if path in _grabbed_devices:  # already grabbed
-            continue
 
-        dev: InputDevice | None = None
+def _release_grabbed_devices() -> list[Exception]:
+    """Thử ungrab và đóng mọi descriptor, rồi trả toàn bộ lỗi gặp phải."""
+
+    errors: list[Exception] = []
+    for path, dev in list(_grabbed_devices.items()):
         try:
-            dev = InputDevice(path)  # open device
-            dev.grab()  # take exclusive input
-            _grabbed_devices[path] = dev  # keep handle for release
-        except Exception:
-            try:
-                if dev is not None:
-                    dev.close()  # cleanup half-open device
-            except Exception:
-                pass
+            dev.ungrab()
+        except Exception as error:
+            errors.append(error)
+        try:
+            dev.close()
+        except Exception as error:
+            errors.append(error)
+            continue
+        _grabbed_devices.pop(path, None)
+    return errors
 
 
 def unblock() -> None:
     """Release tất cả thiết bị đã bị `block()` grab trong process này."""
 
-    global _grabbed_devices
-
-    for path, dev in list(_grabbed_devices.items()):
-        try:
-            dev.ungrab()  # release input
-        except Exception:
-            pass
-
-        try:
-            dev.close()  # close handle
-        except Exception:
-            pass
-
-        _grabbed_devices.pop(path, None)  # forget released device
+    errors = _release_grabbed_devices()
+    if errors:
+        raise ExceptionGroup("Input unblock failed", errors)

@@ -14,12 +14,9 @@ class LinuxProcessOperations:
     """Thao tác process qua procps và POSIX signal."""
 
     def list_processes(self) -> list[tuple[int, str]]:
-        """Đọc PID/name process từ `ps`; lỗi command trả danh sách rỗng."""
+        """Đọc PID/name process từ `ps`; lỗi command được giữ nguyên cho caller."""
 
-        try:
-            output = subprocess.check_output(["ps", "-eo", "pid=,comm="], text=True)
-        except (OSError, subprocess.SubprocessError):
-            return []
+        output = subprocess.check_output(["ps", "-eo", "pid=,comm="], text=True)
         processes: list[tuple[int, str]] = []
         for line in output.splitlines():
             parts = line.strip().split(maxsplit=1)

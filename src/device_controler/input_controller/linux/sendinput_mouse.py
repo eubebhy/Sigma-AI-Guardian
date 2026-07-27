@@ -1,5 +1,10 @@
 """Gửi mouse event qua virtual device Linux bằng `evdev.UInput`.
 
+File path: `src/device_controler/input_controller/linux/sendinput_mouse.py`.
+Input: nút chuột, tọa độ, thời lượng và lượng cuộn theo public API chung.
+Output: event điều khiển mouse qua UInput và X11.
+Nguyên lý: giữ virtual device sống trong suốt phiên để Xorg/libinput nhận diện.
+
 UInput device phải được tạo trước và giữ sống trong suốt phiên điều khiển để
 Xorg/libinput có thời gian nhận diện. Nếu tạo device, gửi event rồi hủy ngay,
 event đầu tiên có thể bị mất vì Xorg chưa attach xong.
@@ -14,9 +19,9 @@ import subprocess
 from evdev import ecodes
 from Xlib.display import Display
 
-from utils.input_controller.linux.types import UInputDevice
-from utils.input_controller.linux.utils import UInputManager
-from utils.input_controller.types import MouseButton
+from device_controler.input_controller.linux.types import UInputDevice
+from device_controler.input_controller.linux.utils import UInputManager
+from device_controler.input_controller.types import MouseButton
 
 # Đổi tên nút public sang BTN_* code mà Linux input subsystem sử dụng.
 _BUTTON_CODES: Final[dict[MouseButton, int]] = {

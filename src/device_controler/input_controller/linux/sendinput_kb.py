@@ -1,6 +1,6 @@
 """Tạo và phát event qua virtual keyboard Linux bằng `evdev`.
 
-File path: `src/utils/input_controller/linux/sendinput_kb.py`
+File path: `src/device_controler/input_controller/linux/sendinput_kb.py`
 Input: tên phím dạng chuỗi như `a`, `enter`, `leftctrl`; `press` nhận nhiều
 chuỗi liên tiếp.
 Output: phát event `EV_KEY` qua một `UInput` ảo.
@@ -15,9 +15,9 @@ from typing import Final
 
 from evdev import ecodes
 
-from utils.input_controller.linux.types import UInputDevice
-from utils.input_controller.linux.utils import UInputManager
-from utils.input_controller.types import Key
+from device_controler.input_controller.linux.types import UInputDevice
+from device_controler.input_controller.linux.utils import UInputManager
+from device_controler.input_controller.types import Key
 
 
 # Ký tự có thể gõ trực tiếp trên layout US/ANSI bằng một phím vật lý.

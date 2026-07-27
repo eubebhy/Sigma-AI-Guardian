@@ -1,8 +1,8 @@
-"""Lắng nghe và chuẩn hóa sự kiện input Windows qua ``pynput``.
+"""Lắng nghe input và đọc NumLock Windows qua ``pynput``/Win32.
 
-File path: `src/utils/input_controller/window/listener.py`
+File path: `src/utils/key_listener/window.py`
 Input: raw callback từ `pynput.keyboard` hoặc `pynput.mouse` và timeout chờ.
-Output: iterator `KeyEvent` hoặc `MouseEvent` theo contract chung của dự án.
+Output: iterator `KeyEvent` hoặc `MouseEvent` và trạng thái NumLock.
 Nguyên lý: callback hook chỉ đưa raw event vào queue; generator xử lý tuần tự,
 theo dõi trạng thái listener và luôn dừng/join hook trong khối ``finally``.
 """
@@ -10,11 +10,12 @@ theo dõi trạng thái listener và luôn dừng/join hook trong khối ``final
 from __future__ import annotations
 
 from collections.abc import Callable, Iterator
+import ctypes
 import importlib
 from queue import Empty, Queue
 from typing import Final, Protocol, cast
 
-from utils.input_controller.types import KeyEvent, KeyState, MouseEvent, MouseState
+from utils.key_listener.types import KeyEvent, KeyState, MouseEvent, MouseState
 
 
 class _PynputListener(Protocol):
@@ -161,6 +162,13 @@ def _wait_timeout(timeout: float | None) -> float:
     return 0.1 if timeout is None else max(0.0, min(timeout, 0.1))
 
 
+def get_num_lock_state() -> bool:
+    """Trả trạng thái NumLock hiện tại từ Windows user32."""
+
+    windows_dll = getattr(ctypes, "windll")
+    return bool(windows_dll.user32.GetKeyState(0x90) & 1)
+
+
 def listen_keys(timeout: float | None = None) -> Iterator[KeyEvent]:
     """Sinh keyboard event `KEY_*`; timeout chỉ giới hạn từng lần chờ queue."""
 
@@ -270,4 +278,4 @@ def listen_mice(timeout: float | None = None) -> Iterator[MouseEvent]:
             listener.join()
 
 
-__all__ = ["listen_keys", "listen_mice"]
+__all__ = ["get_num_lock_state", "listen_keys", "listen_mice"]

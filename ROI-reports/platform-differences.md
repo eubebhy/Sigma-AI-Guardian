@@ -7,7 +7,7 @@ tĩnh không phải readiness; feature phải phản ánh lỗi permission/sessi
 
 | Khả năng | Linux | Windows | Điều chưa xác minh |
 | --- | --- | --- | --- |
-| Process | `ps -eo pid=,comm=`, `os.kill(pid, 9)` | `tasklist` CSV, `taskkill /F` | Quyền kill process khác owner. |
+| Process | `ps -eo pid=,comm=`, `os.kill(pid, 9)` | `tasklist` CSV, `taskkill /F` | Lỗi list và exit code `taskkill` khác 0 được propagate; quyền kill process khác owner. |
 | Browser | `subprocess.Popen`, `webbrowser` | `Popen` với creation flag, `webbrowser` | Browser/executable có sẵn. |
 | Hosts | `/etc/hosts` | `C:\Windows\System32\drivers\etc\hosts` | Quyền ghi/admin và antivirus policy. |
 | Window | PyWinCtl, fallback `xdotool` | PyWinCtl | Desktop session, PyWinCtl exception, title trùng. |
@@ -19,13 +19,13 @@ tĩnh không phải readiness; feature phải phản ánh lỗi permission/sessi
 
 Theo [`README.md`](../README.md), cần GNOME on Xorg, `ps`, `xdotool`, `xclip`,
 Tk/X11, `evdev` và `/dev/uinput`. Source virtual mouse còn gọi
-`xinput` tại `src/utils/input_controller/linux/sendinput_mouse.py`; hướng dẫn cài
+`xinput` tại `src/device_controler/input_controller/linux/sendinput_mouse.py`; hướng dẫn cài
 đặt phải có binary này trước khi coi sender Linux là ready. Wayland không được quảng
 bá là hỗ trợ hoàn chỉnh.
 
-`input_blocker.linux.block()` cố grab từng `/dev/input/event*`; exception hiện bị
-nuốt để tiếp tục device khác. Vì API không trả result, caller không biết lock đã grab
-đủ keyboard/mouse hay chưa. Không suy ra “locked” chỉ từ overlay hiển thị.
+`input_blocker.linux.block()` cố grab từng `/dev/input/event*`; một lỗi sẽ rollback
+các descriptor đã mở và raise. `unblock()` thử release mọi descriptor trước khi raise
+toàn bộ lỗi release. Không suy ra “locked” chỉ từ overlay hiển thị.
 
 ## Điều kiện Windows
 

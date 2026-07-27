@@ -30,7 +30,7 @@ lập. Không có bằng chứng cần rewrite kiến trúc.
 - `src/README.md` bỏ clipboard tracker không tồn tại.
 - `scripts/README.md` bỏ script dedupe không tồn tại.
 - `tests/README.md` mô tả đúng side effect manual thay vì flag/hosts dev không tồn tại.
-- Input docs nêu 17 API chung, bao gồm `get_num_lock_state`.
+- Input docs tách 14 API control khỏi listener/NumLock và nêu rõ đường dẫn import.
 
 ## Workflow tối thiểu cho maintainer
 

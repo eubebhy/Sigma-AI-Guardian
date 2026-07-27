@@ -14,17 +14,14 @@ class WindowsProcessOperations:
     """Thao tác process qua tasklist và taskkill."""
 
     def list_processes(self) -> list[tuple[int, str]]:
-        """Đọc PID/name process từ `tasklist`; lỗi command trả danh sách rỗng."""
+        """Đọc PID/name process từ `tasklist`; lỗi command được giữ nguyên cho caller."""
 
-        try:
-            output = subprocess.check_output(
-                ["tasklist", "/fo", "csv", "/nh"],
-                text=True,
-                encoding="utf-8",
-                errors="ignore",
-            )
-        except (OSError, subprocess.SubprocessError):
-            return []
+        output = subprocess.check_output(
+            ["tasklist", "/fo", "csv", "/nh"],
+            text=True,
+            encoding="utf-8",
+            errors="ignore",
+        )
         processes: list[tuple[int, str]] = []
         for row in csv.reader(output.splitlines()):
             if len(row) >= 2 and row[1].strip().isdigit():
@@ -32,6 +29,6 @@ class WindowsProcessOperations:
         return processes
 
     def kill_process(self, pid: int) -> None:
-        """Yêu cầu Windows kết thúc PID như hành vi ProcessKiller cũ."""
+        """Yêu cầu Windows kết thúc PID; exit code khác 0 được giữ nguyên cho caller."""
 
-        subprocess.run(["taskkill", "/PID", str(pid), "/F"], check=False)
+        subprocess.run(["taskkill", "/PID", str(pid), "/F"], check=True)

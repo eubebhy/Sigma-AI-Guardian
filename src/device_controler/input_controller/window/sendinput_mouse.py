@@ -1,6 +1,6 @@
 """Wrapper tối thiểu cho mouse API của `pydirectinput-rgx` trên Windows.
 
-File path: `src/utils/input_controller/window/sendinput_mouse.py`.
+File path: `src/device_controler/input_controller/window/sendinput_mouse.py`.
 Input: nút chuột, tọa độ, thời lượng và lượng cuộn theo public API chung.
 Output: gửi mouse event bằng WinAPI SendInput.
 Nguyên lý: thư viện đã hỗ trợ di chuyển theo `duration`, vì wrapper chỉ chuyển
@@ -12,7 +12,7 @@ from __future__ import annotations
 import importlib
 from typing import Any, cast
 
-from utils.input_controller.types import MouseButton
+from device_controler.input_controller.types import MouseButton
 
 
 _BUTTON_NAMES = {

@@ -1,8 +1,8 @@
-"""Hợp đồng API chung cho backend input Linux và Windows.
+"""Kiểu chung cho API điều khiển input Linux và Windows.
 
-File path: `src/utils/input_controller/types.py`.
+File path: `src/device_controler/input_controller/types.py`.
 Input: tên phím, nút chuột và tọa độ theo tập con tương thích PyAutoGUI.
-Output: `InputBackend` để facade hệ điều hành và `__init__.py` kiểm tra tĩnh.
+Output: `InputBackend` để facade điều khiển và `__init__.py` kiểm tra tĩnh.
 Nguyên lý: backend nhận chuỗi phím, chuẩn hóa nút chuột rồi phát event nền tảng.
 """
 
@@ -11,8 +11,6 @@ from typing import Literal, Protocol, TypeAlias
 
 Key: TypeAlias = str
 Keys: TypeAlias = Key
-KeyState: TypeAlias = Literal["down", "up", "hold"]
-KeyEvent: TypeAlias = tuple[str, KeyState]
 MouseButton: TypeAlias = Literal[
     "primary",
     "secondary",
@@ -22,10 +20,6 @@ MouseButton: TypeAlias = Literal[
     "forward",
     "back",
 ]
-MouseState: TypeAlias = Literal["down", "up"]
-MouseButtonEvent: TypeAlias = tuple[str, MouseState]
-MouseMoveEvent: TypeAlias = tuple[str, int]
-MouseEvent: TypeAlias = MouseButtonEvent | MouseMoveEvent
 
 
 class InputBackend(Protocol):
@@ -78,12 +72,6 @@ class InputBackend(Protocol):
 __all__ = [
     "InputBackend",
     "Key",
-    "KeyEvent",
-    "KeyState",
     "Keys",
     "MouseButton",
-    "MouseButtonEvent",
-    "MouseEvent",
-    "MouseMoveEvent",
-    "MouseState",
 ]

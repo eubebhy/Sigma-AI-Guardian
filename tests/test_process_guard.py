@@ -24,6 +24,7 @@ import argparse
 import os
 import subprocess
 import sys
+import threading
 import unittest
 from collections.abc import Sequence
 from contextlib import redirect_stderr, redirect_stdout
@@ -37,6 +38,8 @@ from test_support import add_source_path, run_module, test_modes
 add_source_path()
 
 from agent.contracts import ProcessOperations
+from agent.platform.linux.processes import LinuxProcessOperations
+from agent.platform.windows.processes import WindowsProcessOperations
 from device_controler.process_killer import ProcessKiller
 
 
@@ -49,8 +52,10 @@ class _FakeProcessOperations:
     def __init__(self, processes: list[tuple[int, str]]) -> None:
         self.processes = processes
         self.killed_processes: list[int] = []
+        self.list_calls = 0
 
     def list_processes(self) -> list[tuple[int, str]]:
+        self.list_calls += 1
         return self.processes
 
     def kill_process(self, pid: int) -> None:
@@ -70,6 +75,19 @@ class _FailingProcessOperations(_FakeProcessOperations):
         raise RuntimeError(f"cannot kill {pid}")
 
 
+class _PermissionDeniedProcessOperations(_FakeProcessOperations):
+    def kill_process(self, pid: int) -> None:
+        raise PermissionError(f"cannot kill {pid}")
+
+
+class _TransientLookupProcessOperations(_FakeProcessOperations):
+    def list_processes(self) -> list[tuple[int, str]]:
+        self.list_calls += 1
+        if self.list_calls == 1:
+            raise ProcessLookupError(101)
+        return self.processes
+
+
 class _SpawningProcessOperations(_FakeProcessOperations):
     def kill_process(self, pid: int) -> None:
         super().kill_process(pid)
@@ -79,17 +97,28 @@ class _SpawningProcessOperations(_FakeProcessOperations):
 class _PidReuseProcessOperations(_FakeProcessOperations):
     def __init__(self) -> None:
         super().__init__([(101, "game.exe")])
-        self._list_calls = 0
 
     def list_processes(self) -> list[tuple[int, str]]:
-        self._list_calls += 1
-        if self._list_calls == 1:
-            return super().list_processes()
+        self.list_calls += 1
+        if self.list_calls == 1:
+            return self.processes
         return [(101, "other.exe")]
 
 
-class _FakeStopEvent:
+class _MissingPidProcessOperations(_FakeProcessOperations):
     def __init__(self) -> None:
+        super().__init__([(101, "game.exe")])
+
+    def list_processes(self) -> list[tuple[int, str]]:
+        self.list_calls += 1
+        if self.list_calls == 1:
+            return self.processes
+        return []
+
+
+class _FakeStopEvent(threading.Event):
+    def __init__(self) -> None:
+        super().__init__()
         self.was_set = False
 
     def is_set(self) -> bool:
@@ -98,8 +127,22 @@ class _FakeStopEvent:
     def set(self) -> None:
         self.was_set = True
 
-    def wait(self, timeout: float) -> bool:
+    def wait(self, timeout: float | None = None) -> bool:
         del timeout
+        return self.was_set
+
+
+class _ScanStopEvent(_FakeStopEvent):
+    def __init__(self, stop_after_waits: int) -> None:
+        super().__init__()
+        self._stop_after_waits = stop_after_waits
+        self.wait_calls = 0
+
+    def wait(self, timeout: float | None = None) -> bool:
+        del timeout
+        self.wait_calls += 1
+        if self.wait_calls == self._stop_after_waits:
+            self.set()
         return self.was_set
 
 
@@ -394,6 +437,27 @@ class ProcessGuardTests(unittest.TestCase):
         killer._scan_and_kill()
 
         self.assertEqual(operations.killed_processes, [101])
+        self.assertEqual(operations.list_calls, 2)
+
+    @test_modes("fake")
+    def test_scan_skips_pid_when_its_name_changes_before_kill(self) -> None:
+        operations = _PidReuseProcessOperations()
+        killer = ProcessKiller(operations)
+        killer.set_blacklist(["game.exe"])
+
+        killer._scan_and_kill()
+
+        self.assertEqual(operations.killed_processes, [])
+
+    @test_modes("fake")
+    def test_scan_skips_pid_when_it_disappears_before_kill(self) -> None:
+        operations = _MissingPidProcessOperations()
+        killer = ProcessKiller(operations)
+        killer.set_blacklist(["game.exe"])
+
+        killer._scan_and_kill()
+
+        self.assertEqual(operations.killed_processes, [])
 
     @test_modes("fake")
     def test_scan_continues_when_a_process_exits_before_kill(self) -> None:
@@ -404,6 +468,75 @@ class ProcessGuardTests(unittest.TestCase):
         killer._scan_and_kill()
 
         self.assertEqual(operations.killed_processes, [102])
+
+    @test_modes("fake")
+    def test_daemon_continues_after_process_lookup_error(self) -> None:
+        operations = _TransientLookupProcessOperations([(101, "game.exe")])
+        killer = ProcessKiller(operations)
+        killer.set_blacklist(["game.exe"])
+        stop_event = _ScanStopEvent(stop_after_waits=2)
+
+        killer._run(stop_event)
+
+        self.assertEqual(operations.killed_processes, [101])
+        self.assertEqual(stop_event.wait_calls, 2)
+        killer.raise_if_failed()
+
+    @test_modes("fake")
+    def test_daemon_records_kill_failure_for_agent_caller(self) -> None:
+        killer = ProcessKiller(_FailingProcessOperations([(101, "game.exe")]))
+        killer.set_blacklist(["game.exe"])
+
+        killer._run(_FakeStopEvent())
+
+        with self.assertRaisesRegex(RuntimeError, "cannot kill 101"):
+            killer.raise_if_failed()
+
+    @test_modes("fake")
+    def test_daemon_records_permission_error(self) -> None:
+        killer = ProcessKiller(
+            _PermissionDeniedProcessOperations([(101, "game.exe")])
+        )
+        killer.set_blacklist(["game.exe"])
+        stop_event = _ScanStopEvent(stop_after_waits=1)
+
+        killer._run(stop_event)
+
+        with self.assertRaisesRegex(PermissionError, "cannot kill 101"):
+            killer.raise_if_failed()
+
+    @test_modes("fake")
+    def test_linux_list_processes_propagates_command_failure(self) -> None:
+        error = subprocess.CalledProcessError(1, ["ps"])
+
+        with patch(
+            "agent.platform.linux.processes.subprocess.check_output",
+            side_effect=error,
+        ):
+            with self.assertRaises(subprocess.CalledProcessError):
+                LinuxProcessOperations().list_processes()
+
+    @test_modes("fake")
+    def test_windows_list_processes_propagates_command_failure(self) -> None:
+        with patch(
+            "agent.platform.windows.processes.subprocess.check_output",
+            side_effect=OSError("tasklist unavailable"),
+        ):
+            with self.assertRaisesRegex(OSError, "tasklist unavailable"):
+                WindowsProcessOperations().list_processes()
+
+    @test_modes("fake")
+    def test_windows_kill_process_propagates_nonzero_exit(self) -> None:
+        error = subprocess.CalledProcessError(1, ["taskkill"])
+
+        with patch(
+            "agent.platform.windows.processes.subprocess.run",
+            side_effect=error,
+        ) as run:
+            with self.assertRaises(subprocess.CalledProcessError):
+                WindowsProcessOperations().kill_process(101)
+
+        run.assert_called_once_with(["taskkill", "/PID", "101", "/F"], check=True)
 
     @test_modes("fake")
     def test_stop_then_start_signals_and_replaces_alive_daemon(self) -> None:

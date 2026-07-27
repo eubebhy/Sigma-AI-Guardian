@@ -51,6 +51,7 @@ Trước khi chạy real mode, luôn đọc hướng dẫn của đúng feature:
 ```bash
 ./.pyvenv/bin/python tests/test_classifier.py --info
 ./.pyvenv/bin/python tests/test_input_controller.py --info
+./.pyvenv/bin/python tests/test_key_listener.py --info
 ```
 
 `--info` mô tả command, quyền cần có, side effect, cách dừng và cleanup. Các real
@@ -73,6 +74,8 @@ sudo ./.pyvenv/bin/python tests/test_keylogger.py real listen
 
 # Input Linux/Xorg: phát input hoặc ghi event đến khi Ctrl+C.
 sudo ./.pyvenv/bin/python tests/test_input_controller.py real control --move-to 500 300 --click left
+sudo ./.pyvenv/bin/python tests/test_key_listener.py real logger --kb --mouse
+# Lệnh logger cũ vẫn được chuyển tiếp để tương thích command manual đã công bố.
 sudo ./.pyvenv/bin/python tests/test_input_controller.py real logger --kb --mouse
 
 # Hosts: automatic luôn cleanup; block persistent cần xác nhận rõ.
