@@ -3,9 +3,9 @@
 ## Phạm vi
 
 Repository hiện tại là **SAG Agent**: ứng dụng cục bộ chạy trên một máy học sinh.
-Agent phát hiện platform, cung cấp capability và thực thi các feature desktop có
-sẵn. Repository chưa có Server, Teacher Console, mạng LAN, protocol từ xa hoặc
-remote desktop streaming.
+Agent phát hiện platform và cung cấp adapter/capability cho feature desktop có sẵn;
+CLI hiện chỉ chạy `status`, chưa dispatch feature desktop. Repository chưa có Server,
+Teacher Console, mạng LAN, protocol từ xa hoặc remote desktop streaming.
 
 ## Chạy Agent
 
@@ -125,7 +125,14 @@ xem `tests/README.md` trước khi chạy vì một số test có tác động h
 Sau khi sửa Python, chạy:
 
 ```bash
-scripts/clean_pyright_check.sh src tests
+scripts/clean_pyright_check.sh src
+scripts/clean_pyright_check.sh tests
+```
+
+Khi sửa script Python, chạy thêm:
+
+```bash
+scripts/clean_pyright_check.sh scripts
 ```
 
 ## Hướng phát triển sau SAG Agent

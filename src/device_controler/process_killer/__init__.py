@@ -70,7 +70,11 @@ class ProcessKiller:
     def _scan_and_kill(self) -> None:
         for pid, name in self._process_operations.list_processes():
             if self._should_kill(name):
-                self._process_operations.kill_process(pid)
+                try:
+                    self._process_operations.kill_process(pid)
+                except (PermissionError, ProcessLookupError):
+                    # PID co the da thoat hoac khong du quyen; van quet PID sau.
+                    continue
 
     def _should_kill(self, name: str) -> bool:
         if self.whitelist and name in self.whitelist:

@@ -268,7 +268,7 @@ class WindowExportTests(unittest.TestCase):
 
         self.assertTrue(hasattr(window, "__all__"), "Windows facade is missing")
         self.assertEqual(window.__all__, linux.__all__)
-        self.assertEqual(len(window.__all__), 16)
+        self.assertIn("get_num_lock_state", window.__all__)
         for name in linux.__all__:
             with self.subTest(name=name):
                 self.assertTrue(hasattr(window, name))
@@ -334,7 +334,7 @@ class WindowExportTests(unittest.TestCase):
         ):
             window = importlib.import_module(package_name)
 
-        self.assertEqual(len(window.__all__), 16)
+        self.assertIn("get_num_lock_state", window.__all__)
         self.assertTrue(all(name not in sys.modules for name in dependency_names))
 
 

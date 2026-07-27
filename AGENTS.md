@@ -2,6 +2,12 @@
 ## Mission
 Phần mềm quản lý phòng tin học dành cho giáo viên, tích hợp AI Agent để phân tích và thực thi tool calling trong ứng dụng.
 
+## Đọc trước khi sửa
+* Đọc [`ROI-reports/index.md`](ROI-reports/index.md), module docstring, test liên quan
+  và ADR phù hợp trước khi thay đổi behavior, lifecycle, platform hoặc public API.
+* Repository hiện là **SAG Agent cục bộ**. Server, Teacher Console, LAN, remote
+  desktop, remote input và remote shell không thuộc scope hiện tại.
+
 ## Scope Rules
 * **Đúng yêu cầu:** Chỉ thực hiện chính xác những gì được giao. Không tự ý mở rộng phạm vi công việc.
 * **Giới hạn biên:** Phát hiện vấn đề ngoài phạm vi task phải dừng lại và báo cáo, tuyệt đối không tự sửa.
@@ -20,6 +26,9 @@ Phần mềm quản lý phòng tin học dành cho giáo viên, tích hợp AI A
 * **Tài liệu hóa (Bằng tiếng Việt):** 
   * Tại mỗi package/module phức tạp, phải ghi chú rõ: Đường dẫn file (`file path`), chuẩn `input`, chuẩn `output` và nguyên lý hoạt động đi kèm với các chuẩn đó.
 * **Tính di động (Portable):** Mã nguồn phải đảm bảo tính độc lập, sao chép sang thư mục khác vẫn hoạt động bình thường.
+* **Side effect:** Test tự động không được ghi hosts thật, kill process thật, mở
+  browser, đọc/phát input thật, khóa desktop hoặc đọc dữ liệu người dùng. Dùng fake,
+  mock hoặc temporary path; manual test phải được gọi có chủ đích.
 
 ### Python
 * Follow PEP 8 extreme strictly.
@@ -75,5 +84,9 @@ Sau dung workflow mac dinh cua m, sau khi lam xong thi buoc cuoi la chay lenh be
    ```bash
    scripts/clean_pyright_check.sh <path_to_python_file_or_directory>
    ```
+
+Script trên nhận một target mỗi lần. Chạy riêng `src`, `tests` và `scripts` khi phạm
+vi thay đổi liên quan. Xem `ROI-reports/testing-strategy.md` trước khi chạy test ngoài
+unit test an toàn.
 
 Virtual environment của dự án: `./.pyvenv`.

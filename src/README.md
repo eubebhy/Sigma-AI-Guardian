@@ -26,7 +26,6 @@ Dau vao/dau ra chi tiet nam trong docstring dau tung module.
 
 Cung cap API thu thap trang thai he thong.
 
-- `clipboard_tracker`: doc clipboard hien tai.
 - `keylogger`: gom phim thanh chuoi text tam thoi.
 - `windows_tracker`: doc tieu de cua so active va cac cua so dang mo.
 

@@ -1,9 +1,10 @@
 # Mục tiêu hiện tại: SAG Agent đa nền tảng
 
 Repository này hiện chỉ xây dựng **SAG Agent** chạy trên máy học sinh. Agent là
-tiến trình cục bộ có entry point, phát hiện Windows/Linux một lần, kiểm tra khả
-năng môi trường và gọi các feature đang có. Server, Teacher Console, mạng LAN,
-AI tool calling mới, UI mới và protocol mạng đều ngoài phạm vi hiện tại.
+tiến trình cục bộ có entry point, phát hiện Windows/Linux một lần và tạo adapter
+platform. CLI hiện chỉ có `status` an toàn; các feature desktop là public API độc
+lập, chưa có command dispatcher gọi chúng. Server, Teacher Console, mạng LAN, AI
+tool calling mới, UI mới và protocol mạng đều ngoài phạm vi hiện tại.
 
 ## Output xác định cuối cùng
 
@@ -206,3 +207,32 @@ nào trước khi gửi command.
 4. Audit log/policy lớp học.
 5. Screen capture theo snapshot thấp tần suất; remote desktop realtime là dự án
    sau cùng.
+
+---
+
+# Backlog bảo trì từ ROI audit
+
+Chi tiết bằng chứng, phạm vi và cách kiểm chứng nằm trong
+[`ROI-reports/technical-debt.md`](ROI-reports/technical-debt.md) và
+[`ROI-reports/roadmap.md`](ROI-reports/roadmap.md). Không làm các mục này bằng
+refactor hàng loạt.
+
+## P1
+
+1. Đảm bảo `screenlocker` luôn cleanup input/overlay khi UI hoặc input blocker lỗi;
+   thêm lifecycle test fake.
+
+## P2
+
+1. Làm `ProcessKiller` stop/start deterministic và định nghĩa health state.
+2. Không để hosts update mất dữ liệu khi có nhiều writer; chọn lock liên-process phù hợp.
+3. Chuẩn hóa collection/gate test, đặc biệt classifier runner phải fail khi quality
+   expectation fail.
+4. Tách capability tĩnh và readiness runtime trước command đặc quyền.
+5. Đặt budget input/token cho classifier bằng benchmark và corpus cố định.
+
+## P3
+
+1. Model training deterministic, artifact manifest/hash và atomic write.
+2. Bounded queue Windows input, lock state UInput Linux, và xử lý window fallback/title collision.
+3. Chốt strategy dependency pin/lock và CI sau khi test gate xanh trên môi trường sạch.
