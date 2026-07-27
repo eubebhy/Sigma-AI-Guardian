@@ -1,0 +1,19 @@
+[
+  {"target": "clean_text", "input": "h-e-n-t-a-i", "expected": "hentai"},
+  {"target": "clean_text", "input": "h e n t a i", "expected": "hentai"},
+  {"target": "clean_text", "input": "w4r", "expected": "war"},
+  {"target": "clean_text", "input": "w@r", "expected": "war"},
+  {"target": "clean_text", "input": "hent@i", "expected": "hentai"},
+  {"target": "clean_text", "input": "bestg0re", "expected": "bestgore"},
+  {"target": "clean_text", "input": "breaking news w4r and hent@i", "expected": "breaking news war and hentai"},
+  {"target": "clean_text", "input": "raw battlefiel footage", "expected": "raw battlefield footage"},
+  {"target": "clean_text", "input": "graphic violnce report", "expected": "graphic violence report"},
+  {"target": "clean_text", "input": "h\u200bentai", "expected": "hentai"},
+  {"target": "clean_text", "input": "Hello!", "expected": "hello!"},
+  {"target": "clean_text", "input": "A | B", "expected": "a | b"},
+  {"target": "clean_text", "input": "hent@i!", "expected": "hentai!"},
+  {"target": "clean_text", "input": "rule 34", "expected": "rule 34"},
+  {"target": "clean_text", "input": "g0r3", "expected": "gore"},
+  {"target": "clean_text", "input": "g4m3", "expected": "game"},
+  {"target": "rule_based_classifier", "input": "rule 34", "expected": "Pornography", "strict_level": "mid"}
+]

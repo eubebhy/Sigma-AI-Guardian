@@ -1,5 +1,8 @@
 # Kiến trúc SAG Agent
 
+> Đây là kiến trúc **code hiện tại**. Blueprint Agent–Server tương lai nằm tại
+> [`index.md`](index.md); không nhầm tài liệu đích với feature đã tồn tại.
+
 ## Phạm vi
 
 Repository hiện tại là **SAG Agent**: ứng dụng cục bộ chạy trên một máy học sinh.
@@ -117,10 +120,11 @@ thất bại do quyền hoặc session. Feature phải trả lỗi thực tế �
 
 ## Kiểm thử
 
-Test contract nằm trong `tests/test_agent_runtime.py` và
-`tests/test_agent_platform.py`. Chúng dùng fake adapter, không đọc process thật,
-không gọi desktop và không sửa hosts. Test integration/manual cũ vẫn ở `tests/`;
-xem `tests/README.md` trước khi chạy vì một số test có tác động hệ thống.
+Test contract nằm trong các file phẳng `tests/test_agent.py`,
+`tests/test_process_guard.py`, `tests/test_input_controller.py` và các feature test
+`test_<feature>.py` khác. Safe mode dùng fake adapter, không đọc process thật, không
+gọi desktop và không sửa hosts. Xem `tests/README.md` trước khi chạy real mode vì nó
+có thể có tác động hệ thống.
 
 Sau khi sửa Python, chạy:
 

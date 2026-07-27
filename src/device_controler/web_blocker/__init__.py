@@ -5,14 +5,17 @@ Input contract:
 - block(file_path) va unblock(file_path) nhan path toi file domain/url, moi dong mot gia tri.
 Output contract:
 - Them/xoa domain trong khoi hosts nam giua marker cua ung dung.
+- block() tra ve cac domain no da them moi, de cleanup chi xoa phan no so huu.
 - Ghi lai hosts bang atomic write va bo qua ghi file neu noi dung khong doi.
 Operating principle:
-- Doc file domain va hosts mot lan, tinh thay doi trong bo nho, sau do atomic replace hosts.
+- Khoa sidecar theo hosts trong suot read-modify-write, sau do atomic replace hosts.
 """
 
 import os
+from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
+from typing import Generator
 
 from agent.contracts import HostsPathOperations
 from agent.platform import get_default_platform_services
@@ -110,33 +113,67 @@ def _atomic_write(path: Path, content: str) -> None:
         temp_path.unlink(missing_ok=True)
 
 
+@contextmanager
+def _hosts_lock(hosts_path: Path) -> Generator[None, None, None]:
+    """Khoa sidecar de cac process SAG cung serialize hosts transaction."""
+
+    lock_path = hosts_path.with_name(f".{hosts_path.name}.sag.lock")
+    with lock_path.open("a+", encoding="utf-8") as lock_file:
+        if os.name == "nt":
+            import msvcrt
+
+            lock_file.seek(0)
+            lock_file.write("0")
+            lock_file.flush()
+            lock_file.seek(0)
+            msvcrt.locking(lock_file.fileno(), msvcrt.LK_LOCK, 1)
+        else:
+            import fcntl
+
+            fcntl.flock(lock_file.fileno(), fcntl.LOCK_EX)
+        try:
+            yield
+        finally:
+            if os.name == "nt":
+                import msvcrt
+
+                msvcrt.locking(lock_file.fileno(), msvcrt.LK_UNLCK, 1)
+            else:
+                import fcntl
+
+                fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
+
+
 def _update_hosts(
     file_path: str | Path,
     is_blocking: bool,
     hosts_operations: HostsPathOperations | None = None,
-) -> None:
+) -> set[str]:
     hosts_path = (
         hosts_operations.get_hosts_path()
         if hosts_operations is not None
         else Path(default_hoster)
     )
-    # vao ram het truoc, IO toi thieu
     domains = set(_load_domains(file_path))
-    hosts_text = hosts_path.read_text(encoding="utf-8")
-    before, current_domains, after = _split_hosts(hosts_text)
-    blocked_domains = set(current_domains)
-    blocked_domains.update(
-        domains
-    ) if is_blocking else blocked_domains.difference_update(domains)
-    new_hosts_text = _render_hosts(before, sorted(blocked_domains), after)
-    if new_hosts_text != hosts_text:
-        # co doi moi cham hosts
-        _atomic_write(hosts_path, new_hosts_text)
+    with _hosts_lock(hosts_path):
+        hosts_text = hosts_path.read_text(encoding="utf-8")
+        before, current_domains, after = _split_hosts(hosts_text)
+        blocked_domains = set(current_domains)
+        added_domains: set[str] = set()
+        if is_blocking:
+            added_domains = domains.difference(blocked_domains)
+            blocked_domains.update(domains)
+        else:
+            blocked_domains.difference_update(domains)
+        new_hosts_text = _render_hosts(before, sorted(blocked_domains), after)
+        if new_hosts_text != hosts_text:
+            _atomic_write(hosts_path, new_hosts_text)
+    return added_domains
 
 
-def block(file_path: str | Path) -> None:
+def block(file_path: str | Path) -> set[str]:
     # them list vao block state
-    _update_hosts(file_path, is_blocking=True)
+    return _update_hosts(file_path, is_blocking=True)
 
 
 def unblock(file_path: str | Path) -> None:

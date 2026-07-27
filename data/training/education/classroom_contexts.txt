@@ -2807,8 +2807,10 @@ By then, I knew all the stories by heart. The professional football player who g
 Most days, I drew imaginary places and then spent the rest of the time whipped up creatures to live there. They’d have horns where horns don’t go, fur where scales should be, and all the wings. They were odd. And they each had a story that I wanted to tell. But, on that day, I never even got to the first pair of wings. I had barely gotten started when it appeared, and changed Stagwood, and me, forever.
 
 If it had chosen to press its little green face against any other window, I might not have seen it. And if I hadn’t been trying to decide whether my dragon should have four legs or two, I might not have looked out window at that exact moment, dropping my pencil on the page. 
-
+Tsar Bomba - 50 megatons
 It was a frog. And it was staring right at me.
+"Fat Man" (also known as Mark III) was the design of the nuclear weapon the United States used for seven of the first eight nuclear weapons ever detonated in history. It is also the most powerful design to ever be used in warfare.
+fat man walking through the door
 
 I couldn’t stop looking at the frog and it couldn’t stop looking back. We were locked in a staring contest. Maybe some frogs blinked, but with its eyes smushed against the glass, this one didn’t. Stagwood Forest was just beyond the schoolyard and it was riddled with frogs, but they always avoided people. I knew right away, in a way that I could think better than I could say, that this frog was different.
 live stream trên mạng, ông vẫn rất minh mẫn khi nói về các chủ đề về công nghệ, lập trình tuy nhiên giao tiếp và tính khí của ông bộc lộ những ảnh hưởng bởi bệnh tật.+ Davis bị cấm tham gia nhiều diễn đàn Reddit hay Hackernews bởi chứngtâm thần phân liệt và nỗi ám ảnh về tôn giáo của ông. Thậm chí vào năm 2017, sau nhiều lần cãi cọ với người xem, tài khoản livestream của Davis trên YouTube để giới thiệu về TempleOS cũng bị cấm. Cuộc sống của ông với bố mẹ cũng gặp nhiều khó khăn, cuối cùng ông bị đuổi khỏi nhà và phải sống trên một chiếc xe van vào cuối năm 2017.Cơ duyên nào đã khiến Terry Davis sáng lập nên hệ điều hành TempleOS? [ Chỗ này có thể thiết kế câu hỏi vì lí do ông này tạo nên TempleOS khá độc lạ, khác với lí do của các nhà sáng lập hệ điều hành khác ( để tạo nên phần mềm quản trị phần cứng máy tính )]+ Ban đầu ông là người vô thần. Trong lúc bị bệnh, ông bị chứng hoang tưởngvà tưởng mình được kết nối với Chúa và Chúa đã ra lệnh cho ông phải xây dựng một ngôi đền thứ hai (Second Temple). Từ đó ông viết nên hệ điều hành có tên là TempleOS.+ Theo phần mô tả của hệ điều hành, TempleOS chính làj"Ngôi đền chính thức của Chúa, nơi cộng đồng có thể đưa ra những lời cầu khẩn và lới phán truyền củaChúa được trao xuống.
@@ -2900,10 +2902,10 @@ Program output reports a short execution time during a supervised classroom acti
 Program output reports a short execution time for a student assignment without sensitive content.
 Program output reports a short execution time on a school computer during regular instruction.
 Program output reports a short execution time as part of a safe educational workflow.
-Browser switches from search results to an online lesson during a supervised classroom activity.
-Browser switches from search results to an online lesson for a student assignment without sensitive content.
-Browser switches from search results to an online lesson on a school computer during regular instruction.
-Browser switches from search results to an online lesson as part of a safe educational workflow.
+lesson during a supervised classroom activity.
+lesson for a student assignment without sensitive content.
+lesson on a school computer during regular instruction.
+lesson as part of a safe educational workflow.
 Game theory worksheet explains probability without gameplay during a supervised classroom activity.
 Game theory worksheet explains probability without gameplay for a student assignment without sensitive content.
 Game theory worksheet explains probability without gameplay on a school computer during regular instruction.
@@ -2912,3 +2914,16 @@ Biology lesson labels blood circulation on a safe diagram during a supervised cl
 Biology lesson labels blood circulation on a safe diagram for a student assignment without sensitive content.
 Biology lesson labels blood circulation on a safe diagram on a school computer during regular instruction.
 Biology lesson labels blood circulation on a safe diagram as part of a safe educational workflow.
+woman run over the road
+a
+Language swap English to Vietnamese
+Video paused at 00:04:18
+Video seek from 00:04:18 to 00:06:02
+DeepL Vietnamese to English translation
+what is this dog doing
+my name is joe goldberg
+i am patrick bateman
+"thragg" is my name.
+Vietnam beat news headline
+Cheese webcam photo booth
+Gallery recently deleted photos

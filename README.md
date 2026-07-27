@@ -235,7 +235,7 @@ Entry point hiện tại của SAG Agent chỉ hỗ trợ command an toàn `stat
 Có thể kiểm tra classifier hiện có bằng:
 
 ```bash
-./.pyvenv/bin/python tests/content_classifier/test_all_classifiers.py --help
+./.pyvenv/bin/python tests/test_classifier.py --info
 ```
 
 Trên Windows, thay `./.pyvenv/bin/python` bằng

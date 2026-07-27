@@ -80,14 +80,14 @@ def train_model(
                             "char",
                             TfidfVectorizer(
                                 analyzer="char_wb",
-                                ngram_range=(3, 5),
+                                ngram_range=(4, 7),
                             ),
                         ),
                         (
                             "word",
                             TfidfVectorizer(
                                 analyzer="word",
-                                ngram_range=(1, 2),
+                                ngram_range=(1, 3),
                             ),
                         ),
                     ]

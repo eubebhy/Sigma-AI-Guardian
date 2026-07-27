@@ -78,6 +78,10 @@ tool calling mới, UI mới và protocol mạng đều ngoài phạm vi hiện 
 
 # Hướng phát triển tiếp: SAG Agent vận hành được
 
+Blueprint kiến trúc đích để build dần Server nằm tại
+[`docs/index.md`](docs/index.md). Các tài liệu này mô tả boundary và data flow, không
+chọn framework, library hoặc kỹ thuật networking cụ thể.
+
 ## SAG Agent thực sự là gì?
 
 SAG Agent là tiến trình cài trên **mỗi máy học sinh**. Nó là lớp duy nhất được

@@ -54,7 +54,6 @@ def content_classifier(
         return cached_result
 
     letter_count = len(text.replace(" ", ""))
-    word_count = len(text.split())
 
     # Neu qua ngan
     if letter_count <= 2:
@@ -62,10 +61,6 @@ def content_classifier(
 
     # Neu co 3 ki tu thi de rule eng
     if letter_count == 3:
-        result = rule_based_classifier(text, strict_level)
-
-    # Neu strict_level = xlow thi chap nhan bo qua cac cum tu ngan
-    elif strict_level == "xlow" and (word_count <= 3 and letter_count <= 25):
         result = rule_based_classifier(text, strict_level)
 
     else:

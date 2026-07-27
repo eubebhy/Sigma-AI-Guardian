@@ -26,60 +26,140 @@ _KEYPAD_SYMBOLS = {
     "KEY_KPPLUS": "+",
 }
 _NAVIGATION = {
-    "KEY_LEFT": "left", "KEY_RIGHT": "right", "KEY_UP": "up", "KEY_DOWN": "down",
-    "KEY_HOME": "home", "KEY_END": "end", "KEY_PAGEUP": "pageup",
-    "KEY_PAGEDOWN": "pagedown", "KEY_INSERT": "insert", "KEY_DELETE": "delete",
+    "KEY_LEFT": "left",
+    "KEY_RIGHT": "right",
+    "KEY_UP": "up",
+    "KEY_DOWN": "down",
+    "KEY_HOME": "home",
+    "KEY_END": "end",
+    "KEY_PAGEUP": "pageup",
+    "KEY_PAGEDOWN": "pagedown",
+    "KEY_INSERT": "insert",
+    "KEY_DELETE": "delete",
 }
 _KEYPAD_NAVIGATION = {
-    "KEY_KP0": "insert", "KEY_KP1": "end", "KEY_KP2": "down",
-    "KEY_KP3": "pagedown", "KEY_KP4": "left", "KEY_KP6": "right",
-    "KEY_KP7": "home", "KEY_KP8": "up", "KEY_KP9": "pageup",
-    "KEY_KPDOT": "delete", "KEY_KPHOME": "home", "KEY_KPEND": "end",
-    "KEY_KPUP": "up", "KEY_KPDOWN": "down", "KEY_KPLEFT": "left",
-    "KEY_KPRIGHT": "right", "KEY_KPPAGEUP": "pageup",
-    "KEY_KPPAGEDOWN": "pagedown", "KEY_KPINSERT": "insert",
+    "KEY_KP0": "insert",
+    "KEY_KP1": "end",
+    "KEY_KP2": "down",
+    "KEY_KP3": "pagedown",
+    "KEY_KP4": "left",
+    "KEY_KP6": "right",
+    "KEY_KP7": "home",
+    "KEY_KP8": "up",
+    "KEY_KP9": "pageup",
+    "KEY_KPDOT": "delete",
+    "KEY_KPHOME": "home",
+    "KEY_KPEND": "end",
+    "KEY_KPUP": "up",
+    "KEY_KPDOWN": "down",
+    "KEY_KPLEFT": "left",
+    "KEY_KPRIGHT": "right",
+    "KEY_KPPAGEUP": "pageup",
+    "KEY_KPPAGEDOWN": "pagedown",
+    "KEY_KPINSERT": "insert",
     "KEY_KPDELETE": "delete",
 }
-_SHIFTED_DIGITS = {"0": ")", "1": "!", "2": "@", "3": "#", "4": "$", "5": "%", "6": "^", "7": "&", "8": "*", "9": "("}
+_SHIFTED_DIGITS = {
+    "0": ")",
+    "1": "!",
+    "2": "@",
+    "3": "#",
+    "4": "$",
+    "5": "%",
+    "6": "^",
+    "7": "&",
+    "8": "*",
+    "9": "(",
+}
+_KEY_SYMBOLS = {
+    "KEY_SPACE": " ",
+    "KEY_MINUS": "-",
+    "KEY_EQUAL": "=",
+    "KEY_LEFTBRACE": "[",
+    "KEY_RIGHTBRACE": "]",
+    "KEY_BACKSLASH": "\\",
+    "KEY_SEMICOLON": ";",
+    "KEY_APOSTROPHE": "'",
+    "KEY_GRAVE": "`",
+    "KEY_COMMA": ",",
+    "KEY_DOT": ".",
+    "KEY_SLASH": "/",
+}
+_SHIFTED_KEY_SYMBOLS = {
+    "KEY_MINUS": "_",
+    "KEY_EQUAL": "+",
+    "KEY_LEFTBRACE": "{",
+    "KEY_RIGHTBRACE": "}",
+    "KEY_BACKSLASH": "|",
+    "KEY_SEMICOLON": ":",
+    "KEY_APOSTROPHE": '"',
+    "KEY_GRAVE": "~",
+    "KEY_COMMA": "<",
+    "KEY_DOT": ">",
+    "KEY_SLASH": "?",
+}
 
 
 class KeyLogger:
     """Giữ virtual text buffer và cursor cho bài tập mô phỏng editor."""
 
     _listener: threading.Thread | None = None
+    _listening = False
+    _listener_error: Exception | None = None
     _buffer: list[str] = []
     _cursor = 0
     _modifiers: set[str] = set()
+    _caps_lock = False
 
     @classmethod
     def start(cls) -> None:
-        if cls._listener is None:
-            cls._listener = threading.Thread(target=cls._listen, daemon=True)
-            cls._listener.start()
+        if cls._listener is not None and cls._listener.is_alive():
+            return
+        cls._listener_error = None
+        cls._listening = True
+        cls._listener = threading.Thread(target=cls._listen, daemon=True)
+        cls._listener.start()
 
     @classmethod
     def stop(cls) -> None:
-        """Bỏ tham chiếu listener; backend listener tự kết thúc khi process dừng."""
+        """Yêu cầu listener dừng ở event kế tiếp từ backend."""
 
-        cls._listener = None
+        cls._listening = False
 
     @classmethod
     def _listen(cls) -> None:
-        for event in listen_keys():
-            cls._keylogger(event)
+        try:
+            for event in listen_keys():
+                if not cls._listening:
+                    break
+                cls._keylogger(event)
+        except Exception as error:
+            cls._listener_error = error
+        finally:
+            cls._listening = False
+            cls._listener = None
+
+    @classmethod
+    def get_listener_error(cls) -> Exception | None:
+        """Trả lỗi backend listener để caller manual có thể báo rõ."""
+
+        return cls._listener_error
 
     @classmethod
     def _keylogger(cls, event: KeyEvent) -> None:
         """Áp dụng một keyboard event vào virtual buffer."""
-
         key_name, state = event
         if key_name in _MODIFIERS:
-            if state == "down":
+            if state in ["down", "hold"]:
                 cls._modifiers.add(key_name)
             elif state == "up":
                 cls._modifiers.discard(key_name)
             return
-        if state != "down":
+        if key_name == "KEY_CAPSLOCK":
+            if state == "down":
+                cls._caps_lock = not cls._caps_lock
+            return
+        if state not in {"down", "hold"}:
             return
         if cls._handle_navigation(key_name):
             return
@@ -104,6 +184,11 @@ class KeyLogger:
 
     @classmethod
     def _character(cls, key_name: str) -> str | None:
+        shifted = bool({"KEY_LEFTSHIFT", "KEY_RIGHTSHIFT"} & cls._modifiers)
+        if key_name in _KEY_SYMBOLS:
+            if shifted:
+                return _SHIFTED_KEY_SYMBOLS.get(key_name, _KEY_SYMBOLS[key_name])
+            return _KEY_SYMBOLS[key_name]
         if key_name in _KEYPAD_SYMBOLS:
             return _KEYPAD_SYMBOLS[key_name]
         if key_name.startswith("KEY_KP") and get_num_lock_state():
@@ -115,13 +200,15 @@ class KeyLogger:
         if not key_name.startswith("KEY_") or len(key_name) != 5:
             return None
         character = key_name[-1].lower()
-        if {"KEY_LEFTSHIFT", "KEY_RIGHTSHIFT"} & cls._modifiers:
-            return _SHIFTED_DIGITS.get(character, character.upper())
+        if character.isalpha():
+            return character.upper() if shifted != cls._caps_lock else character
+        if shifted:
+            return _SHIFTED_DIGITS.get(character, character)
         return character
 
     @classmethod
     def _insert(cls, text: str) -> None:
-        cls._buffer[cls._cursor:cls._cursor] = list(text)
+        cls._buffer[cls._cursor : cls._cursor] = list(text)
         cls._cursor += len(text)
 
     @classmethod

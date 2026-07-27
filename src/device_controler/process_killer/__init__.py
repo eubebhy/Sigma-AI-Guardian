@@ -18,7 +18,6 @@ Operating principle:
 from __future__ import annotations
 
 import threading
-import time
 
 from agent.contracts import ProcessOperations
 from agent.platform import get_default_platform_services
@@ -33,6 +32,8 @@ class ProcessKiller:
         self.running: bool = False
         self.interval: float = 0.67
         self._thread: threading.Thread | None = None
+        self._stop_event: threading.Event | None = None
+        self._lifecycle_lock = threading.Lock()
         self._extra_exact: set[str] = set()
         self._process_operations = (
             process_operations or get_default_platform_services().processes
@@ -51,21 +52,46 @@ class ProcessKiller:
     def start(self) -> None:
         """Bắt đầu daemon thread quét process nếu chưa chạy."""
 
-        if self._thread and self._thread.is_alive():
-            return
-        self.running = True
-        self._thread = threading.Thread(target=self._run, daemon=True)
-        self._thread.start()
+        while True:
+            with self._lifecycle_lock:
+                thread = self._thread
+                stop_event = self._stop_event
+                if not thread or not thread.is_alive():
+                    self.running = True
+                    self._stop_event = threading.Event()
+                    self._thread = threading.Thread(
+                        target=self._run,
+                        args=(self._stop_event,),
+                        daemon=True,
+                    )
+                    self._thread.start()
+                    return
+                if stop_event and not stop_event.is_set():
+                    return
+            thread.join()
 
     def stop(self) -> None:
         """Dừng vòng quét nền ở lần lặp kế tiếp."""
 
-        self.running = False
+        while True:
+            with self._lifecycle_lock:
+                self.running = False
+                thread = self._thread
+                if not thread:
+                    return
+                if self._stop_event:
+                    self._stop_event.set()
+            thread.join()
+            with self._lifecycle_lock:
+                if self._thread is thread:
+                    self._thread = None
+                    self._stop_event = None
+                    return
 
-    def _run(self) -> None:
-        while self.running:
+    def _run(self, stop_event: threading.Event) -> None:
+        while not stop_event.is_set():
             self._scan_and_kill()
-            time.sleep(self.interval)
+            stop_event.wait(self.interval)
 
     def _scan_and_kill(self) -> None:
         for pid, name in self._process_operations.list_processes():

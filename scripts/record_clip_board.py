@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# pyright: reportMissingImports=false, reportMissingModuleSource=false
 """Ghi các giá trị clipboard mới vào một file text.
 
 File path: `scripts/record_clip_board.py`

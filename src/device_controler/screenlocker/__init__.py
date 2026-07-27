@@ -3,10 +3,11 @@
 
 File path: `src/device_controler/screenlocker/__init__.py`.
 Input: `lock()` và `unlock()` không nhận tham số.
-Output: `lock()` phủ mọi monitor bằng thông báo khóa rồi chặn input. `unlock()` mở
-input và yêu cầu UI thread đóng các overlay.
+Output: `lock()` phủ mọi monitor bằng thông báo khóa rồi chặn input. `unlock()` trả
+`True` khi input đã được yêu cầu mở và UI overlay đã thoát trong thời hạn chờ.
 Nguyên lý: Pillow dựng một ảnh khóa theo đúng độ phân giải từng monitor; Tkinter
-chỉ hiển thị ảnh toàn màn hình. `unlock()` chỉ set event để UI thread tự đóng cửa sổ.
+chỉ hiển thị ảnh toàn màn hình. `unlock()` signal UI thread, mở input ngay và chờ UI
+thread tự đóng cửa sổ; không chờ nếu được gọi ngay trên UI thread.
 """
 
 from __future__ import annotations
@@ -48,6 +49,8 @@ UNINTENDED CONSEQUENCES.
 _lock = threading.Lock()
 _thread: threading.Thread | None = None
 _stop_event: threading.Event | None = None
+_ui_exited_event: threading.Event | None = None
+_UI_EXIT_TIMEOUT_SECONDS = 5.0
 
 
 class App:
@@ -196,6 +199,7 @@ def _run_ui(
     ready_event: threading.Event,
     failed_event: threading.Event,
     stop_event: threading.Event,
+    exited_event: threading.Event,
 ) -> None:
     """Tạo overlay và chạy Tk event loop trên UI thread."""
 
@@ -207,24 +211,30 @@ def _run_ui(
     except Exception:
         failed_event.set()
         ready_event.set()
+    finally:
+        try:
+            input_blocker.unblock()
+        finally:
+            exited_event.set()
 
 
 def _start_ui(
     regions: list[screen_capture.ScreenRegion],
-) -> tuple[threading.Event, threading.Event, threading.Event]:
+) -> tuple[threading.Event, threading.Event, threading.Event, threading.Event]:
     """Khởi động UI thread và trả event báo trạng thái khởi tạo."""
 
-    global _stop_event, _thread
+    global _stop_event, _thread, _ui_exited_event
     ready_event = threading.Event()
     failed_event = threading.Event()
     _stop_event = threading.Event()
+    _ui_exited_event = threading.Event()
     _thread = threading.Thread(
         target=_run_ui,
-        args=(regions, ready_event, failed_event, _stop_event),
+        args=(regions, ready_event, failed_event, _stop_event, _ui_exited_event),
         daemon=True,
     )
     _thread.start()
-    return ready_event, failed_event, _stop_event
+    return ready_event, failed_event, _stop_event, _ui_exited_event
 
 
 def lock() -> None:
@@ -237,27 +247,47 @@ def lock() -> None:
         regions = screen_capture.get_monitors()
         if not regions:
             raise RuntimeError("No monitors were found")
-        ready_event, failed_event, stop_event = _start_ui(regions)
+        ready_event, failed_event, stop_event, exited_event = _start_ui(regions)
 
     if not ready_event.wait(timeout=5.0):
+        stop_event.set()
+        unlock()
         raise RuntimeError("Screen locker UI did not start within 5 seconds")
     if failed_event.is_set():
+        unlock()
         raise RuntimeError("Screen locker UI failed to start")
-    if stop_event.is_set():
+    if stop_event.is_set() or exited_event.is_set():
         return
-    input_blocker.block()
-    if stop_event.is_set():
+    try:
+        input_blocker.block()
+    except Exception:
+        unlock()
+        raise
+    if stop_event.is_set() or exited_event.is_set():
         input_blocker.unblock()
 
 
-def unlock() -> None:
-    """Mở input và yêu cầu UI thread đóng overlay an toàn."""
+def unlock() -> bool:
+    """Mở input, chờ UI thoát có giới hạn và trả trạng thái cleanup."""
 
     with _lock:
         stop_event = _stop_event
+        exited_event = _ui_exited_event
+        ui_thread = _thread
     if stop_event is not None:
         stop_event.set()
-    input_blocker.unblock()
+    try:
+        input_blocker.unblock()
+    except Exception:
+        input_released = False
+    else:
+        input_released = True
+    if exited_event is None:
+        return input_released
+    if ui_thread is threading.current_thread():
+        return False
+    ui_exited = exited_event.wait(timeout=_UI_EXIT_TIMEOUT_SECONDS)
+    return input_released and ui_exited
 
 
 __all__ = ["lock", "unlock"]

@@ -25,8 +25,8 @@ _BUTTON_CODES: Final[dict[MouseButton, int]] = {
     "left": ecodes.BTN_LEFT,
     "right": ecodes.BTN_RIGHT,
     "middle": ecodes.BTN_MIDDLE,
-    "forward": ecodes.BTN_FORWARD,
-    "back": ecodes.BTN_BACK,
+    "forward": ecodes.BTN_EXTRA,  # No khong phai BTN_FORWARD
+    "back": ecodes.BTN_SIDE,  # Not BTN_BACK
 }
 
 
@@ -125,6 +125,7 @@ def click(
     if x is not None or y is not None:
         moveTo(x, y)
     mouseDown(button)
+    time.sleep(0.02467)
     mouseUp(button)
 
 

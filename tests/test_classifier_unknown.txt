@@ -1,4 +1,10 @@
 # Unknown themed cases
+neovim
+lazyvim
+sigmavim
+woman cross the road
+car run over by woman
+
 python IDE
 vscode
 chrome - anh anime
@@ -349,28 +355,6 @@ Google Search - cách sao chép ảnh từ điện thoại
 Google Search - kho học liệu Tin học lớp 10
 Google Search - cách tải tài liệu lên Google Drive
 Google Search - phần mềm thiết kế đồ họa vector
-Inkscape - Welcome Screen
-Inkscape - New from Template
-Inkscape - A4 Landscape document
-Inkscape - Page Resize
-Inkscape - Rectangle and Square tool
-Inkscape - Circle Ellipse and Arc tool
-Inkscape - Stars and Polygons tool
-Inkscape - Draw Bezier Curves
-Inkscape - Draw Freehand Lines
-Inkscape - Create and Edit Text
-Inkscape - Select and Transform Objects
-Inkscape - Edit Paths by Nodes
-Inkscape - Pick Colors from Image
-Inkscape - Fill bounded areas
-Inkscape - Create Gradients
-Inkscape - Mesh Gradient tool
-Inkscape - Spray Objects
-Inkscape - Eraser tool
-Inkscape - Connector tool
-Inkscape - Measure tool
-Inkscape - Fill and Stroke dialog
-Inkscape - Object Properties
 Inkscape - Layers and Objects
 Inkscape - Align and Distribute dialog
 Inkscape - Transform dialog
@@ -450,3 +434,26 @@ tk $2
 """"""
 ~~@#!''
 ][]['''''''''''''''']
+fat man walking -> earth quake
+what is this dog doing?
+my name is thragg
+the word! time stoped.
+sub 3, sub 5, chad, true adam
+true eve
+Vietnam beat
+5 điều Bác Hồ dạy - Wikipedia tiếng Việt
+Plan 9 from UNIX
+TempleOS
+FreeBSD
+OpenBSD
+Debian craeted by Ian Murdock
+Language selector English to Vietnamese
+Translate this sentence from Vietnamese to English
+Video playback paused at 00:12:45
+Move video timeline from 00:03:10 to 00:05:30
+Webcam photo booth preview window
+Recently deleted images folder
+DeepL translation result panel
+What is this animal doing in the garden
+My username is thraxx
+Vietnam news headline today

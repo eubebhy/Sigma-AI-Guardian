@@ -1,9 +1,0 @@
-=== main-classifier | strict=xstrict ===
-
-Summary
-Total: 400 | Passed: 276 | Failed: 124
- game: 47/100 passed, 53 failed
- porn: 54/100 passed, 46 failed
- gore: 79/100 passed, 21 failed
-unknown: 96/100 passed, 4 failed
-DONE 47.623862504959106
