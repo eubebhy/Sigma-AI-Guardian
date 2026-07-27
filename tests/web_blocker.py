@@ -1,4 +1,4 @@
-"""Test web blocker bang hosts dev that, khong dung hosts fake."""
+"""Manual test web blocker bang system hosts mac dinh, khong dung hosts fake."""
 
 import argparse
 import socket
@@ -14,9 +14,9 @@ from device_controler import web_blocker
 
 
 def _blocked_domains() -> set[str]:
-    """Lay cac domain dang bi SAG block trong hosts dev."""
+    """Lay cac domain dang bi SAG block trong system hosts mac dinh."""
 
-    # hosts dev -> block state hien tai
+    # system hosts -> block state hien tai
     hosts = Path(web_blocker.default_hoster).read_text(encoding="utf-8")
     _, marker, rest = hosts.partition(web_blocker.START_MARKER)
     if not marker:
@@ -35,7 +35,7 @@ def _blocked_domains() -> set[str]:
 def _resolved_ips(domain: str) -> set[str]:
     """Resolve domain bang resolver he thong de check hosts co tac dung."""
 
-    # resolver he thong doc hosts dev
+    # resolver he thong doc system hosts
     return {
         address
         for *_, sockaddr in socket.getaddrinfo(domain, None)
@@ -73,7 +73,7 @@ def _assert_blocked(domain: str) -> None:
 
 
 def test_blocker_edits_dev_hosts(domain: str = "pornhub.com") -> None:
-    """Automatic: block default list, verify domain, roi cleanup."""
+    """Manual: block default list, verify domain, roi cleanup."""
 
     blocked = False
     try:
@@ -102,9 +102,10 @@ def _build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> None:
-    """Chon flow CLI va chay tren hosts dev."""
+    """Chon flow CLI va chay tren system hosts mac dinh."""
 
     args = _build_parser().parse_args()
+    print("WARNING: This manual script modifies the default system hosts file.")
     domain = _domain_from_url(str(args.url))
     if args.block:
         _block_default_lists()

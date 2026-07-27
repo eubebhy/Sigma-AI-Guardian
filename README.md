@@ -8,7 +8,10 @@
 
 Thay vì chỉ giám sát và chặn nội dung, SAG có thể tự phân loại nội dung, phát hiện rủi ro, cảnh báo người dùng và thực hiện các tác vụ tự động thông qua AI.
 
-## Tính năng
+## Tầm nhìn sản phẩm
+
+Các chức năng sau là định hướng của Sigma AI Guardian hoàn chỉnh; chúng chưa phải
+capability của repository SAG Agent hiện tại.
 
 - Tu dong phat hien va chặn các noi dung khong phu hop voi AI (porn, gore, game)
 - Chan cac web site theo chu de va ho tro custom
@@ -23,24 +26,42 @@ Thay vì chỉ giám sát và chặn nội dung, SAG có thể tự phân loại
 * **Rule-based Engine**: phát hiện nhanh bằng từ khóa và luật.
 * **Local AI Classifier**: mô hình học máy chạy hoàn toàn trên máy người dùng.
 
+## SAG Agent hiện tại
+
+Repository hiện là SAG Agent chạy cục bộ trên máy học sinh. Entry point là
+`src/main.py`; hiện chỉ có command an toàn `status` để kiểm tra runtime:
+
+```bash
+./.pyvenv/bin/python src/main.py status
+```
+
+Agent chọn Windows hoặc Linux một lần khi khởi động, sau đó feature dùng adapter
+platform chung. Server, Teacher Console, mạng LAN và remote desktop streaming chưa
+thuộc repository hiện tại. Xem [tài liệu kiến trúc](docs/architecture.md).
+
 ## Cau truc input_controller
 
-Thu muc `src/utils/input_controller/` gom cac phan chinh:
+Thu muc `src/utils/input_controller/` cung cap facade input chung:
 
-* `__init__.py`: API public, tu chon backend theo he dieu hanh.
-* `controller.py`: logic chung, timing, thu tu su kien va xu ly loi.
-* `contracts.py`: hop dong cho backend control va kha nang runtime.
-* `mapping.py`: chuan hoa phim, nut chuot va cac bang mapping.
-* `linux_backend.py` va `windows_backend.py`: adapter phat su kien thap cap cho tung he dieu hanh.
-* `linux_listener.py` va `windows_listener.py`: listener ban phim da chuan hoa.
-* `keys.py` va `types.py`: hang so va kieu du lieu dung chung.
+* `__init__.py`: facade theo platform cua process hien tai.
+* `types.py`: event type va protocol input dung chung.
+* `linux/`: backend evdev/UInput/Xlib.
+* `window/`: backend pydirectinput-rgx/pynput.
 
-Luong dung thuong la `__init__.py` goi `controller.py`, con `controller.py` lam viec voi backend qua `contracts.py` va `mapping.py`.
+Chi tiet API, dieu kien platform va gioi han co tai
+[`src/utils/input_controller/README.md`](src/utils/input_controller/README.md).
+
+## Tai lieu bao tri
+
+Bao cao kien truc, rui ro, test strategy, ADR va backlog bao tri nam tai
+[`ROI-reports/index.md`](ROI-reports/index.md). Tai lieu nay phan biet capability
+hien tai cua SAG Agent voi dinh huong san pham trong tuong lai.
 
 ## Mục tiêu
 * Tu dong hoa trong viec chan hanh vi khong phu hop.
 * Cung cap phan mem ma nguon mo minh bach.
-* Hoat dong doc lap qua LAN trong phong may.
+* Hoat dong doc lap qua LAN trong phong may sau khi co Server va transport; chua la
+  capability cua SAG Agent hien tai.
 
 ## Yêu cầu
 
@@ -54,7 +75,7 @@ Luong dung thuong la `__init__.py` goi `controller.py`, con `controller.py` lam 
 ### Dùng chung
 
 * **Python, pip và venv**: chạy mã nguồn và tạo môi trường `.pyvenv` độc lập.
-* **Trình duyệt**: mở URL từ xa. Không cần WebDriver; SAG dùng trình duyệt mặc
+* **Trình duyệt**: mở URL cục bộ trên máy đang chạy Agent. Không cần WebDriver; SAG dùng trình duyệt mặc
   định hoặc Chrome, Edge, Firefox, Brave, Opera, Chromium, Vivaldi, Cốc Cốc,
   Tor Browser, Yandex hay Waterfox nếu binary tương ứng có trong `PATH`.
 
@@ -75,8 +96,7 @@ Luong dung thuong la `__init__.py` goi `controller.py`, con `controller.py` lam 
 * **`xdotool`**: đọc cửa sổ active và danh sách cửa sổ đang mở.
 * **`procps` (`ps`)**: liệt kê process.
 * **`xclip`**: backend clipboard X11 cho `pyperclip`.
-* **Tk, X11/XCB và `gnome-screenshot`**: hiển thị khóa màn hình và hỗ trợ chụp
-  màn hình.
+* **Tk và X11/XCB**: hiển thị khóa màn hình và hỗ trợ chụp màn hình.
 * **`evdev`, kernel `uinput` và các device `/dev/input/event*`, `/dev/uinput`**:
   nghe, chặn và giả lập input.
 * **`build-essential`, header Python và Linux**: biên dịch `evdev` nếu pip không
@@ -107,7 +127,6 @@ Mở lại PowerShell để cập nhật `PATH`, sau đó tạo môi trường v
 py -3.13 -m venv .pyvenv
 .\.pyvenv\Scripts\python.exe -m pip install --upgrade pip
 .\.pyvenv\Scripts\python.exe -m pip install -r requirements.txt
-.\.pyvenv\Scripts\python.exe -m pip install Pillow PyWinCtl joblib
 ```
 
 Nếu máy không có trình duyệt, cài Edge:
@@ -127,8 +146,11 @@ npm install --global pyright
 ```
 
 Chạy PowerShell bằng **Run as administrator** khi dùng tính năng chặn input hoặc
-sửa file `C:\Windows\System32\drivers\etc\hosts`. Các tính năng còn lại không
-cần quyền Administrator.
+sửa file `C:\Windows\System32\drivers\etc\hosts`. `taskkill` cũng có thể bị từ
+chối quyền khi process thuộc user hoặc privilege cao hơn. API `ProcessKiller` hiện
+không có result, health state hoặc logging để báo lỗi này cho caller; xem backlog
+trong [`ROI-reports/technical-debt.md`](ROI-reports/technical-debt.md) trước khi dùng
+process guard như enforcement đáng tin cậy.
 
 ### Ubuntu minimal
 
@@ -137,7 +159,7 @@ sudo apt update
 sudo apt install -y \
   ubuntu-desktop-minimal gdm3 xorg gnome-session-xsession \
   python3 python3-venv python3-pip python3-tk python3-dev \
-  build-essential linux-libc-dev procps xdotool xclip gnome-screenshot \
+   build-essential linux-libc-dev procps xdotool xinput xclip \
   libx11-6 libxfixes3 libxrandr2 \
   libxcb1 libxcb-randr0 libxcb-render0 libxcb-shm0 libxcb-xfixes0 \
   firefox
@@ -151,7 +173,7 @@ sudo apt update
 sudo apt install -y \
   gnome-core gdm3 xorg gnome-session-xsession \
   python3 python3-venv python3-pip python3-tk python3-dev \
-  build-essential linux-libc-dev procps xdotool xclip gnome-screenshot \
+   build-essential linux-libc-dev procps xdotool xinput xclip \
   libx11-6 libxfixes3 libxrandr2 \
   libxcb1 libxcb-randr0 libxcb-render0 libxcb-shm0 libxcb-xfixes0 \
   firefox-esr
@@ -165,7 +187,6 @@ và Debian, tạo môi trường Python từ thư mục gốc của dự án:
 python3 -m venv .pyvenv
 ./.pyvenv/bin/python -m pip install --upgrade pip
 ./.pyvenv/bin/python -m pip install -r requirements.txt
-./.pyvenv/bin/python -m pip install Pillow PyWinCtl joblib
 ```
 
 #### Cấp quyền input trên Linux
@@ -205,7 +226,13 @@ sudo npm install --global pyright
 
 ### Kiểm tra môi trường
 
-Dự án chưa có entry point hoàn chỉnh. Có thể kiểm tra classifier hiện có bằng:
+Entry point hiện tại của SAG Agent chỉ hỗ trợ command an toàn `status`:
+
+```bash
+./.pyvenv/bin/python src/main.py status
+```
+
+Có thể kiểm tra classifier hiện có bằng:
 
 ```bash
 ./.pyvenv/bin/python tests/content_classifier/test_all_classifiers.py --help

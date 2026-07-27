@@ -9,7 +9,7 @@ chính dùng `select` để chỉ đọc device khi kernel báo có event sẵn.
 
 from collections.abc import Callable, Iterator, Sequence
 import select
-from typing import Protocol, cast
+from typing import Final, Protocol, cast
 
 import evdev
 from evdev import InputDevice, ecodes

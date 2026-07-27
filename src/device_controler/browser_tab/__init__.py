@@ -14,13 +14,10 @@ Operating principle:
 
 from __future__ import annotations
 
-import csv
-import os
-import shutil
-import subprocess
-import webbrowser
 from typing import TypedDict
 
+from agent.contracts import BrowserOperations, ProcessOperations
+from agent.platform import PlatformServices, get_default_platform_services
 
 class BrowserSpec(TypedDict):
     name: str
@@ -94,48 +91,10 @@ BROWSERS: tuple[BrowserSpec, ...] = (
 )
 
 
-def _linux_processes() -> dict[str, int]:
-    try:
-        output = subprocess.check_output(["ps", "-eo", "pid=,comm="], text=True)
-    except (OSError, subprocess.SubprocessError):
-        return {}
-    processes: dict[str, int] = {}
-    for line in output.splitlines():
-        pid_text, name = line.strip().split(maxsplit=1)
-        processes[name.lower()] = int(pid_text)
-    return processes
-
-
-def _windows_processes() -> dict[str, int]:
-    try:
-        output = subprocess.check_output(
-            ["tasklist", "/fo", "csv", "/nh"],
-            text=True,
-            encoding="utf-8",
-            errors="ignore",
-        )
-    except (OSError, subprocess.SubprocessError):
-        return {}
-    processes: dict[str, int] = {}
-    for row in csv.reader(output.splitlines()):
-        if len(row) < 2:
-            continue
-        processes[row[0].strip().lower()] = int(row[1])
-    return processes
-
-
 def _find_pid(spec: BrowserSpec, processes: dict[str, int]) -> int | None:
     for process_name in spec["processes"]:
         if process_name.lower() in processes:
             return processes[process_name.lower()]
-    return None
-
-
-def _find_executable(spec: BrowserSpec) -> str | None:
-    for executable in spec["executables"]:
-        resolved = shutil.which(executable)
-        if resolved:
-            return resolved
     return None
 
 
@@ -146,12 +105,24 @@ def _score_browser(pid: int | None, index: int) -> int:
     return score
 
 
-def _browser_states() -> list[BrowserState]:
-    processes = _windows_processes() if os.name == "nt" else _linux_processes()
+def _browser_states(
+    process_operations: ProcessOperations | None = None,
+    browser_operations: BrowserOperations | None = None,
+) -> list[BrowserState]:
+    if process_operations is None or browser_operations is None:
+        default_services = get_default_platform_services()
+        if process_operations is None:
+            process_operations = default_services.processes
+        if browser_operations is None:
+            browser_operations = default_services.browser
+    processes = {
+        name: pid
+        for pid, name in process_operations.list_processes()
+    }
     states: list[BrowserState] = []
     for index, spec in enumerate(BROWSERS):
         pid = _find_pid(spec, processes)
-        executable = _find_executable(spec)
+        executable = browser_operations.find_executable(spec["executables"])
         score = _score_browser(pid, index)
         states.append(
             {"spec": spec, "executable": executable, "pid": pid, "score": score}
@@ -159,8 +130,12 @@ def _browser_states() -> list[BrowserState]:
     return states
 
 
-def _pick_browser(require_running: bool) -> list[BrowserState]:
-    states = _browser_states()
+def _pick_browser(
+    require_running: bool,
+    process_operations: ProcessOperations | None = None,
+    browser_operations: BrowserOperations | None = None,
+) -> list[BrowserState]:
+    states = _browser_states(process_operations, browser_operations)
     if require_running:
         states = [state for state in states if state["pid"] is not None]
     states = [state for state in states if state["executable"] is not None]
@@ -168,25 +143,17 @@ def _pick_browser(require_running: bool) -> list[BrowserState]:
     return states
 
 
-def _run_open_command(command: list[str]) -> bool:
-    try:
-        # tach process browser, open_tab khong day loi ra ngoai
-        if os.name == "nt":
-            subprocess.Popen(command, creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
-            return True
-        with open(os.devnull, "wb") as devnull:
-            subprocess.Popen(
-                command,
-                stdout=devnull,
-                stderr=devnull,
-                start_new_session=True,
-            )
-        return True
-    except OSError:
-        return False
+def _run_open_command(
+    command: list[str],
+    browser_operations: BrowserOperations | None = None,
+) -> bool:
+    """Khởi chạy command qua adapter browser của platform hiện tại."""
+
+    operations = browser_operations or get_default_platform_services().browser
+    return operations.launch(command)
 
 
-def open_tab(url: str) -> bool:
+def open_tab(url: str, platform_services: PlatformServices | None = None) -> bool:
     """Mở URL bằng browser phù hợp nhất trên máy hiện tại.
 
     URL phải bắt đầu bằng `http://` hoặc `https://`. Hàm ưu tiên browser đang chạy
@@ -196,13 +163,34 @@ def open_tab(url: str) -> bool:
 
     if not url.startswith(("http://", "https://")):
         return False
-    for browser in _pick_browser(require_running=True):
-        if browser["executable"] and _run_open_command([browser["executable"], url]):
+    if platform_services is None:
+        for browser in _pick_browser(require_running=True):
+            if browser["executable"] and _run_open_command([browser["executable"], url]):
+                return True
+        for browser in _pick_browser(require_running=False):
+            if browser["executable"] and _run_open_command([browser["executable"], url]):
+                return True
+        return get_default_platform_services().browser.open_default_url(url)
+
+    for browser in _pick_browser(
+        True,
+        platform_services.processes,
+        platform_services.browser,
+    ):
+        if browser["executable"] and _run_open_command(
+            [browser["executable"], url], platform_services.browser
+        ):
             return True
-    for browser in _pick_browser(require_running=False):
-        if browser["executable"] and _run_open_command([browser["executable"], url]):
+    for browser in _pick_browser(
+        False,
+        platform_services.processes,
+        platform_services.browser,
+    ):
+        if browser["executable"] and _run_open_command(
+            [browser["executable"], url], platform_services.browser
+        ):
             return True
-    return webbrowser.open(url, new=2)
+    return platform_services.browser.open_default_url(url)
 
 
 __all__ = ["open_tab"]

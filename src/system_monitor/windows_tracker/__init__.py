@@ -1,96 +1,33 @@
-"""Đọc thông tin cửa sổ đang mở trên desktop.
+"""API theo dõi cửa sổ desktop cho SAG Agent.
 
-File path: `src/system_monitor/windows_tracker/__init__.py`
-Input: không nhận tham số; đọc state cửa sổ hiện tại qua `pywinctl`.
-Output: tiêu đề cửa sổ active hoặc danh sách tiêu đề cửa sổ đang mở.
-
-Nguyên lý hoạt động: module này bọc `pywinctl` để code giám sát không gọi trực
-tiếp thư viện ngoài. Trên Linux, nếu `pywinctl` không trả về dữ liệu và hệ thống
-có `xdotool`, module dùng `xdotool` để đọc tiêu đề và tên lớp của cửa sổ.
+File path: `src/system_monitor/windows_tracker/__init__.py`.
+Input: không nhận tham số; caller có thể truyền adapter `WindowOperations` khi test.
+Output: tiêu đề active hoặc mapping tiêu đề sang process name của cửa sổ đang mở.
+Nguyên lý: feature chỉ gọi contract Agent; PyWinCtl và fallback xdotool nằm trong
+adapter Windows/Linux tương ứng.
 """
 
-import shutil
-import subprocess as subp
-import sys
-
-import pywinctl as pwc
+from agent.contracts import WindowOperations
+from agent.platform import get_default_platform_services
 
 
-def _run_xdotool(*arguments: str) -> str:
-    """Chạy một lệnh xdotool trên Linux và trả về stdout đã loại khoảng trắng."""
-
-    if not sys.platform.startswith("linux"):
-        return ""
-
-    executable = shutil.which("xdotool")
-    if executable is None:
-        return ""
-
-    try:
-        result = subp.run(
-            [executable, *arguments],
-            capture_output=True,
-            check=False,
-            text=True,
-        )
-    except OSError:
-        return ""
-
-    return result.stdout.strip() if result.returncode == 0 else ""
+def _get_operations(operations: WindowOperations | None) -> WindowOperations:
+    if operations is not None:
+        return operations
+    return get_default_platform_services().windows
 
 
-def _get_active_window_with_xdotool() -> tuple[str, str]:
-    """Đọc tiêu đề và tên lớp của cửa sổ active bằng xdotool."""
+def get_active_window_name(
+    operations: WindowOperations | None = None,
+) -> tuple[str, str]:
+    """Trả title/process active, hoặc hai chuỗi rỗng khi desktop không có cửa sổ."""
 
-    window_id = _run_xdotool("getactivewindow")
-    if not window_id:
-        return "", ""
-
-    title = _run_xdotool("getwindowname", window_id)
-    process_name = _run_xdotool("getwindowclassname", window_id)
-    return title, process_name
+    return _get_operations(operations).get_active_window()
 
 
-def _get_all_windows_with_xdotool() -> dict[str, str]:
-    """Đọc các cửa sổ visible và tên lớp tương ứng bằng xdotool."""
+def get_all_opening_windows(
+    operations: WindowOperations | None = None,
+) -> dict[str, str]:
+    """Trả mapping title sang process name của cửa sổ đang mở."""
 
-    window_ids = _run_xdotool("search", "--onlyvisible", "--name", ".")
-    windows: dict[str, str] = {}
-
-    for window_id in window_ids.splitlines():
-        title = _run_xdotool("getwindowname", window_id)
-        process_name = _run_xdotool("getwindowclassname", window_id)
-        if title or process_name:
-            windows[title] = process_name
-
-    return windows
-
-
-def get_active_window_name() -> tuple[str, str]:
-    """Trả về tiêu đề cửa sổ đang active, hoặc chuỗi rỗng nếu không có."""
-
-    win = pwc.getActiveWindow()
-    if win:
-        active_window = win.title, win.getAppName()
-        if any(active_window):
-            return active_window
-
-    return _get_active_window_with_xdotool()
-
-
-def get_all_opening_windows() -> dict[str, str]:
-    """Return all opening window with thier process name"""
-
-    windows = pwc.getAllWindows()
-    process_names: list[str] = []
-    window_titles: list[str] = []
-
-    for window in windows:
-        window_titles.append(window.title)
-        process_names.append(window.getAppName())
-
-    opening_windows = dict(zip(window_titles, process_names))
-    if any(title or process_name for title, process_name in opening_windows.items()):
-        return opening_windows
-
-    return _get_all_windows_with_xdotool()
+    return _get_operations(operations).get_open_windows()

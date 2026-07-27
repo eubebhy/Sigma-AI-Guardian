@@ -3,6 +3,13 @@
 `src/` chua cac package runtime cua Sigma AI Guardian. Code trong thu muc nay
 duoc import boi ung dung, script ho tro va test.
 
+## Entry point va runtime Agent
+
+`main.py` là entry point duy nhất của SAG Agent. Package `agent/` sở hữu runtime,
+contract và chọn adapter Windows/Linux một lần; `agent/platform/` là nơi duy nhất
+giữ lệnh/API riêng OS. Feature chỉ import contract chung hoặc nhận adapter từ
+runtime. Chi tiết tại `docs/architecture.md`.
+
 ## `device_controler`
 
 Nhom module dieu khien may hoc sinh hoac moi truong desktop.
@@ -19,7 +26,6 @@ Dau vao/dau ra chi tiet nam trong docstring dau tung module.
 
 Cung cap API thu thap trang thai he thong.
 
-- `clipboard_tracker`: doc clipboard hien tai.
 - `keylogger`: gom phim thanh chuoi text tam thoi.
 - `windows_tracker`: doc tieu de cua so active va cac cua so dang mo.
 

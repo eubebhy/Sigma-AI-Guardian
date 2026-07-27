@@ -25,9 +25,11 @@ from utils.input_controller.linux.sendinput_mouse import (
     sideScroll,
 )
 from utils.input_controller.linux.listener import listen_keys, listen_mice
+from utils.input_controller.linux.utils import get_num_lock_state
 
 __all__ = [
     "click",
+    "get_num_lock_state",
     "keyDown",
     "keyUp",
     "listen_keys",

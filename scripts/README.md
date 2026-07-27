@@ -3,9 +3,8 @@
 Cac script trong thu muc nay phuc vu phat trien, huan luyen model va kiem tra cuc bo.
 Chung khong phai API runtime cong khai cua ung dung.
 
-## Tao du lieu huan luyen
+## Tao du lieu va huan luyen
 
-- `dedupe_similar_lines.py`: xoa cac dong giong nhau theo nguong.
 - `record_clip_board.py`: ghi noi dung clipboard vao file.
 - `train_model.py`: huan luyen model tu du lieu huan luyen hien co.
 

@@ -14,16 +14,12 @@ import os
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-Linux_host = "/etc/hosts"
-Window_host = r"C:\Windows\System32\drivers\etc\hosts"
-redirect = "127.0.0.1"
+from agent.contracts import HostsPathOperations
+from agent.platform import get_default_platform_services
 
-if os.name == "posix":
-    default_hoster = Linux_host
-elif os.name == "nt":
-    default_hoster = Window_host
-else:
-    raise OSError("OS Unknown")
+
+redirect = "127.0.0.1"
+default_hoster = str(get_default_platform_services().hosts.get_hosts_path())
 
 MODULE_PATH = Path(__file__).resolve().parent
 PORN_SITES_FILE_PATH = MODULE_PATH / "porn-sites.txt"
@@ -114,8 +110,16 @@ def _atomic_write(path: Path, content: str) -> None:
         temp_path.unlink(missing_ok=True)
 
 
-def _update_hosts(file_path: str | Path, is_blocking: bool) -> None:
-    hosts_path = Path(default_hoster)
+def _update_hosts(
+    file_path: str | Path,
+    is_blocking: bool,
+    hosts_operations: HostsPathOperations | None = None,
+) -> None:
+    hosts_path = (
+        hosts_operations.get_hosts_path()
+        if hosts_operations is not None
+        else Path(default_hoster)
+    )
     # vao ram het truoc, IO toi thieu
     domains = set(_load_domains(file_path))
     hosts_text = hosts_path.read_text(encoding="utf-8")

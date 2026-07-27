@@ -29,46 +29,39 @@ from utils.input_controller.window import moveTo, press
 Import facade Windows không import `pydirectinput` hoặc `pynput` ngay. Dependency
 chỉ được nạp khi API sender được gọi hoặc listener bắt đầu được duyệt.
 
-## Contract 16 API
+## Contract 17 API
 
 Các chữ ký dưới đây là chữ ký thật và giống nhau giữa hai facade:
 
 ```python
-from collections.abc import Iterator
+from collections.abc import Iterator, Sequence
+from typing import Literal
 
-from utils.input_controller.types import (
-    KeyEvent,
-    Keys,
-    MouseButton,
-    MouseEvent,
-)
+KeyEvent = tuple[str, Literal["down", "up", "hold"]]
+MouseEvent = tuple[str, Literal["down", "up"]] | tuple[str, int]
+MouseButton = Literal["primary", "secondary", "left", "right", "middle", "forward", "back"]
 
-def click(button: MouseButton) -> None: ...
-def keyDown(key: Keys) -> None: ...
-def keyUp(key: Keys) -> None: ...
+def click(
+    x: int | None = None,
+    y: int | None = None,
+    button: MouseButton = "primary",
+) -> None: ...
+def get_num_lock_state() -> bool: ...
+def keyDown(key: str) -> None: ...
+def keyUp(key: str) -> None: ...
 def listen_keys(timeout: float | None = None) -> Iterator[KeyEvent]: ...
 def listen_mice(timeout: float | None = None) -> Iterator[MouseEvent]: ...
 def mouseDown(button: MouseButton) -> None: ...
 def mouseUp(button: MouseButton) -> None: ...
-def moveRel(
-    x: int,
-    y: int,
-    steps: int = 1,
-    duration: int | float = 0,
-) -> None: ...
-def moveTo(
-    x: int,
-    y: int,
-    steps: int = 1,
-    duration: int | float = 0,
-) -> None: ...
+def moveRel(x: int | None, y: int | None, duration: float = 0.0) -> None: ...
+def moveTo(x: int | None, y: int | None, duration: float = 0.0) -> None: ...
 def position(take_new: bool = False) -> tuple[int, int]: ...
-def press(*keys: Keys, delay: float = 0.067) -> None: ...
+def press(keys: str | Sequence[str]) -> None: ...
 def scroll(amount: int) -> None: ...
 def sideScroll(amount: int) -> None: ...
 def supportedKeys() -> tuple[str, ...]: ...
 def supportedWriteCharacters() -> str: ...
-def write(text: str, delay: float = 0.067) -> None: ...
+def write(message: str, interval: float = 0.0) -> None: ...
 ```
 
 `click`, `mouseDown` và `mouseUp` nhận `"left"`, `"right"`, `"middle"`,
@@ -76,17 +69,18 @@ def write(text: str, delay: float = 0.067) -> None: ...
 gọi `keyUp`/`mouseUp`. `supportedKeys()` và `supportedWriteCharacters()` cho biết
 input sender thực sự hỗ trợ trên backend hiện tại. `write()` dùng layout US/ANSI.
 
-`press()` chờ `delay` sau event down và sau event up của từng phím. `write()`
-dùng cùng delay khi gọi `press`; ký tự cần Shift còn có delay sau lúc nhấn và
-thả Shift. Đặt `delay=0` để không chờ.
+`press()` nhận một tên phím hoặc sequence tên phím. `write()` nhận text và khoảng
+`interval` giữa các ký tự; đặt `interval=0` để không chờ.
+
+`get_num_lock_state()` là API thứ 17 chung giữa hai facade; nó trả trạng thái NumLock
+hiện tại khi backend có thể đọc được trạng thái này.
 
 ## Tọa độ và cuộn
 
 Tọa độ màn hình là số nguyên `(x, y)`: `x` tăng sang phải, `y` tăng xuống dưới.
 `moveTo` dùng tọa độ tuyệt đối; `moveRel` dùng độ lệch từ vị trí hiện tại.
-`steps` là số bước chuyển động và `duration` là tổng thời gian tính bằng giây.
-`position(take_new=False)` giữ cùng chữ ký trên hai backend; Windows bỏ qua
-`take_new`.
+`duration` là tổng thời gian tính bằng giây. `position(take_new=False)` giữ cùng chữ
+ký trên hai backend; Windows bỏ qua `take_new`.
 
 `scroll(amount)` cuộn dọc, số dương lên và số âm xuống. `sideScroll(amount)`
 cuộn ngang, số dương sang phải và số âm sang trái. Giá trị `0` không tạo độ dịch.

@@ -78,6 +78,16 @@ def ui_alive(ui: UInputDevice) -> bool:
     return True
 
 
+def get_num_lock_state() -> bool:
+    """Trả trạng thái NumLock hiện tại từ X11 keyboard control."""
+
+    display = Display()
+    try:
+        return bool(display.get_keyboard_control().led_mask & 2)
+    finally:
+        display.close()
+
+
 class UInputManager:
     """Giữ, kiểm tra và tạo lại một virtual input device."""
 
@@ -119,4 +129,4 @@ class UInputManager:
         self._last_check = 0.0
 
 
-__all__ = ["UInputManager", "create_ui", "ui_alive"]
+__all__ = ["UInputManager", "create_ui", "get_num_lock_state", "ui_alive"]
