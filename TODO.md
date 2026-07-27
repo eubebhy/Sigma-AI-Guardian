@@ -221,19 +221,20 @@ Chi tiết bằng chứng, phạm vi và cách kiểm chứng nằm trong
 [`ROI-reports/roadmap.md`](ROI-reports/roadmap.md). Không làm các mục này bằng
 refactor hàng loạt.
 
-## P1
+## Đã hoàn thành
 
-1. Đảm bảo `screenlocker` luôn cleanup input/overlay khi UI hoặc input blocker lỗi;
-   thêm lifecycle test fake.
+1. `screenlocker` cleanup input/overlay có lifecycle test fake, gồm lỗi UI và input
+   blocker.
+2. `ProcessKiller` stop/start không để daemon cũ chạy song song; health state vẫn là
+   backlog riêng.
+3. Web blocker dùng sidecar lock liên-process và có concurrent-worker coverage.
 
 ## P2
 
-1. Làm `ProcessKiller` stop/start deterministic và định nghĩa health state.
-2. Không để hosts update mất dữ liệu khi có nhiều writer; chọn lock liên-process phù hợp.
-3. Chuẩn hóa collection/gate test, đặc biệt classifier runner phải fail khi quality
+1. Chuẩn hóa collection/gate test, đặc biệt classifier runner phải fail khi quality
    expectation fail.
-4. Tách capability tĩnh và readiness runtime trước command đặc quyền.
-5. Đặt budget input/token cho classifier bằng benchmark và corpus cố định.
+2. Tách capability tĩnh và readiness runtime trước command đặc quyền.
+3. Đặt budget input/token cho classifier bằng benchmark và corpus cố định.
 
 ## P3
 

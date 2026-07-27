@@ -116,7 +116,9 @@ trước khi Agent shutdown.
 
 `status` mô tả adapter có thể chọn. Nó không khẳng định thao tác đặc quyền sẽ
 thành công: ghi hosts, grab `/dev/input`, `BlockInput` và desktop Xorg vẫn có thể
-thất bại do quyền hoặc session. Feature phải trả lỗi thực tế đó cho caller.
+thất bại do quyền hoặc session. `ProcessKiller` hiện vẫn suppress
+`PermissionError`/`ProcessLookupError` và không có result/health contract; caller
+không được suy ra kill thành công chỉ từ việc gọi feature.
 
 ## Kiểm thử
 

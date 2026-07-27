@@ -26,6 +26,9 @@ Khi lỗi, runner chỉ in dòng sau rồi trả exit code `1`:
 [web_blocker][fake] domain không được thêm vào hosts tạm
 ```
 
+Một test gắn nhiều safe mode chỉ chạy một lần trong mỗi invocation; runner dùng mode
+đầu tiên của test nằm trong mode caller chọn.
+
 ## Mode
 
 - `fake`: thay dependency hệ điều hành bằng implementation giả.
@@ -75,6 +78,7 @@ sudo ./.pyvenv/bin/python tests/test_input_controller.py real logger --kb --mous
 # Hosts: automatic luôn cleanup; block persistent cần xác nhận rõ.
 sudo ./.pyvenv/bin/python tests/test_web_blocker.py real automatic https://pornhub.com
 sudo ./.pyvenv/bin/python tests/test_web_blocker.py real block --keep-changes
+sudo ./.pyvenv/bin/python tests/test_web_blocker.py real unblock
 
 # Desktop.
 ./.pyvenv/bin/python tests/test_screen_capture.py real benchmark 3 1.0
@@ -182,8 +186,9 @@ Ví dụ chỉ minh họa cấu trúc; thay `example_feature` bằng public API 
 
 1. Tạo một file `test_<feature>.py`; không tạo thư mục con.
 2. Import `add_source_path`, `run_module`, `test_modes` từ `test_support`.
-3. Gắn `@test_modes("fake")`, `@test_modes("mock")`,
-   `@test_modes("smoke")` hoặc `@test_modes("real")` cho từng test method.
+3. Gắn `@test_modes("fake")`, `@test_modes("mock")` hoặc
+   `@test_modes("smoke")` cho từng safe test method. Real command không chạy method
+   có decorator; nó gọi hàm module-level `run_real(arguments)` trực tiếp.
 4. Test mặc định phải dùng fake/mock hoặc temporary path, không thao tác desktop,
    input device, process hoặc system hosts thật.
 5. Thêm entry point:

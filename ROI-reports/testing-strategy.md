@@ -4,7 +4,8 @@
 
 Automated test phải fake side effect. Runner chuẩn là `tests/tester.py`; nó nạp mọi
 file phẳng `tests/test_*.py`, chạy fake/mock/smoke mặc định và chỉ in failure. Không
-chạy mode `real` trong workflow mặc định.
+chạy mode `real` trong workflow mặc định. Test gắn nhiều safe mode chỉ chạy một lần;
+runner chọn mode khai báo đầu tiên khớp với mode caller chọn.
 
 ## Test matrix
 
@@ -12,7 +13,7 @@ chạy mode `real` trong workflow mặc định.
 | --- | --- | --- | --- |
 | Safe suite | Mọi feature qua fake/mock/smoke | `python tests/tester.py` | An toàn, không đụng system hosts, desktop hay input thật. |
 | Một feature | Fake/mock/smoke của feature đó | `python tests/test_<feature>.py` | An toàn. |
-| Manual/system | Hosts, lock, input, window scan, browser/capture thật | `python tests/test_<feature>.py real <command>` | Chỉ theo session có chủ đích; xem `--info` trước vì có thể side effect. |
+| Manual/system | Hosts, lock, input, window scan, browser/capture thật | `python tests/test_<feature>.py real <command>` | Gọi `run_real()` của feature, không chạy unittest `@test_modes("real")`; chỉ theo session có chủ đích, xem `--info` trước vì có thể side effect. |
 
 Thay `python` bằng `./.pyvenv/bin/python` trên Linux. Đặt
 `PYTHONDONTWRITEBYTECODE=1` khi cần giữ tree sạch.
