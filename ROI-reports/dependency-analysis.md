@@ -2,8 +2,9 @@
 
 ## TL;DR
 
-`requirements.txt` có 14 dependency runtime chưa pin/hash; không có lockfile hay
-dev-tool dependency. Venv audit có `pip check` sạch, nhưng Pyright lấy từ global PATH
+`requirements.txt` có 12 dependency runtime chưa pin/hash; base/Linux/Windows được
+nhóm theo platform marker, nhưng chưa có lockfile hay dev-tool dependency. Venv audit
+có `pip check` sạch, nhưng Pyright lấy từ global PATH
 và không resolve `pyperclip` trong `scripts/record_clip_board.py`.
 
 ## Mapping trực tiếp

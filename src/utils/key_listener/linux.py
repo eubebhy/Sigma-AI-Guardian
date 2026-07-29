@@ -1,15 +1,17 @@
 """Lắng nghe input và đọc NumLock trên Linux qua evdev/X11.
 
 File path: `src/utils/key_listener/linux.py`
-Input: các device `/dev/input/event*` có capability phím A-Z.
+Input: các device `/dev/input/event*` có capability phím A-Z và stop event tùy chọn.
 Output: generator event chuẩn hóa và trạng thái NumLock hiện tại.
 Nguyên lý: quét danh sách device một lần rồi cache lại để tránh IO lặp; vòng lặp
-chính dùng `select` để chỉ đọc device khi kernel báo có event sẵn. NumLock dùng
+chính dùng `select` để chỉ đọc device khi kernel báo có event sẵn; stop event được
+kiểm tra giữa các lần chờ. NumLock dùng
 kết nối X11 ngắn hạn để không chia sẻ lifecycle với input injection.
 """
 
 from collections.abc import Callable, Iterator, Sequence
 import select
+import threading
 from typing import Final, Protocol, cast
 
 import evdev
@@ -129,7 +131,10 @@ def get_num_lock_state() -> bool:
         display.close()
 
 
-def listen_keys(timeout: float | None = None) -> Iterator[KeyEvent]:
+def listen_keys(
+    timeout: float | None = None,
+    stop_event: threading.Event | None = None,
+) -> Iterator[KeyEvent]:
     """Sinh keyboard event đã chuẩn hóa từ device evdev.
 
     `timeout=None` chờ vô hạn trong `select`; số giây cụ thể giúp caller tự
@@ -140,8 +145,9 @@ def listen_keys(timeout: float | None = None) -> Iterator[KeyEvent]:
     if not keyboards:
         raise RuntimeError("No Linux keyboard input device found")
 
-    while True:
-        readable, _, _ = select.select(keyboards, [], [], timeout)
+    select_timeout = 0.1 if stop_event is not None and timeout is None else timeout
+    while stop_event is None or not stop_event.is_set():
+        readable, _, _ = select.select(keyboards, [], [], select_timeout)
 
         for device in readable:
             read_events = cast(
@@ -200,16 +206,20 @@ def _get_mice() -> list[_InputDevice]:
     return mice
 
 
-def listen_mice(timeout: float | None = None) -> Iterator[MouseEvent]:
+def listen_mice(
+    timeout: float | None = None,
+    stop_event: threading.Event | None = None,
+) -> Iterator[MouseEvent]:
     """Sinh mouse event gồm nút chuột, di chuyển tương đối và cuộn."""
 
     mice: list[_InputDevice] = _get_mice()
     if not mice:
         raise RuntimeError("No Linux mouse input device found")
 
-    while True:
+    select_timeout = 0.1 if stop_event is not None and timeout is None else timeout
+    while stop_event is None or not stop_event.is_set():
         readable, _, _ = select.select(
-            mice, [], [], timeout
+            mice, [], [], select_timeout
         )  # Hoc theo docs tren evdev, toi chua thuc su hieu doan nay lam
 
         for device in readable:

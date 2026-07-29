@@ -2,8 +2,10 @@
 
 ## TL;DR
 
-Windows 10/11 và Ubuntu/Debian GNOME **trên Xorg** là target hiện tại. Capability
-tĩnh không phải readiness; feature phải phản ánh lỗi permission/session thực tế.
+Windows 10/11 và Linux desktop **trên Xorg** là target hiện tại. Core không phụ thuộc
+Ubuntu, Debian, `apt` hay init system; package native và deployment phải theo
+distribution. Capability tĩnh không phải readiness; feature phải phản ánh lỗi
+permission/session thực tế. Đây không phải tuyên bố hỗ trợ mọi hệ POSIX hoặc macOS.
 
 | Khả năng | Linux | Windows | Điều chưa xác minh |
 | --- | --- | --- | --- |
@@ -17,8 +19,9 @@ tĩnh không phải readiness; feature phải phản ánh lỗi permission/sessi
 
 ## Điều kiện Linux
 
-Theo [`README.md`](../README.md), cần GNOME on Xorg, `ps`, `xdotool`, `xclip`,
-Tk/X11, `evdev` và `/dev/uinput`. Source virtual mouse còn gọi
+Theo [`README.md`](../README.md), cần desktop X11/Xorg, `ps`, `xdotool`, `xclip`,
+Tk/X11, `evdev` và `/dev/uinput`. GNOME on Xorg là cấu hình đã được tài liệu hóa;
+desktop manager và package manager phụ thuộc distribution. Source virtual mouse còn gọi
 `xinput` tại `src/device_controler/input_controller/linux/sendinput_mouse.py`; hướng dẫn cài
 đặt phải có binary này trước khi coi sender Linux là ready. Wayland không được quảng
 bá là hỗ trợ hoàn chỉnh.

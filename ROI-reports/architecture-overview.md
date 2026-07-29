@@ -3,7 +3,8 @@
 ## TL;DR
 
 `src/main.py` chỉ chạy command an toàn `status`. `agent/` chọn một bộ adapter
-Windows/Linux; feature desktop dùng contract chung hoặc compatibility singleton.
+Windows/Linux; core không phụ thuộc distribution Linux hay init system cụ thể.
+Feature desktop dùng contract chung hoặc compatibility singleton.
 Không có transport, command dispatcher, Server hoặc Teacher Console đang hoạt động.
 
 ## Trạng thái đã xác nhận
@@ -52,7 +53,8 @@ thật ([`src/agent/platform/factory.py`](../src/agent/platform/factory.py)).
 Điểm cần biết: một số feature hiện vẫn tự lấy compatibility singleton (`browser_tab`,
 `process_killer`, `web_blocker`, `windows_tracker`). Đây không phải vòng dependency,
 nhưng command layer tương lai phải truyền `AgentRuntime.services` thay vì tạo adapter
-mới để giữ một lifecycle rõ ràng.
+mới để giữ một lifecycle rõ ràng. Factory hiện chỉ hỗ trợ Linux và Windows; không suy
+ra macOS hoặc mọi hệ POSIX được hỗ trợ chỉ vì core không hard-code distribution.
 
 ### Content classifier
 
@@ -66,12 +68,14 @@ nhiều thread trong luồng Agent hiện tại.
 
 - `ProcessKiller` chạy daemon thread, quét tên process exact-match theo `interval`.
   Chỉ `ProcessLookupError` được tiếp tục; lỗi scan/kill khác dừng daemon, được caller
-  đọc lại bằng `raise_if_failed()`.
+  đọc lại bằng `raise_if_failed()`. `stop()` không join chính daemon khi được gọi từ
+  callback của nó.
 - `screenlocker.lock()` tạo Tk overlay daemon thread, chờ UI ready rồi block input;
   UI dừng hoặc cleanup lỗi đều raise. `unlock()` signal UI, unblock input và xác nhận
   UI đã thoát.
-- `LocalAI` tạo daemon idle monitor, lazy-load model; `close()` signal stop và bỏ
-  instance reference, nhưng module-global `_model` vẫn có thể giữ model trong memory.
+- `LocalAI` tạo daemon idle monitor, lazy-load model; `close()` signal, join monitor
+  rồi bỏ instance reference, nhưng module-global `_model` vẫn có thể giữ model trong
+  memory.
 - Linux input blocker giữ file descriptor evdev trong global registry; descriptor
   phải còn mở thì grab mới còn hiệu lực.
 

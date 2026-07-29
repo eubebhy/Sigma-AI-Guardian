@@ -9,7 +9,8 @@ Nguyên lý hoạt động:
 - Model chỉ được load khi gọi `predict()` để import package không tốn RAM ngay.
 - Model được giữ trong bộ nhớ khi còn dùng và được thread nền unload sau thời gian
   idle ước tính theo kích thước file model.
-- Caller phải gọi `close()` nếu tạo object ngắn hạn để dừng thread nền rõ ràng.
+- Caller phải gọi `close()` nếu tạo object ngắn hạn để signal, join và dừng thread
+  nền rõ ràng.
 """
 
 import threading
@@ -121,4 +122,6 @@ class LocalAI:
     def close(self) -> None:
         """Stop background monitoring and unload the model."""
         self._stop_event.set()
+        if self._monitor_thread is not threading.current_thread():
+            self._monitor_thread.join()
         self._unload_model()

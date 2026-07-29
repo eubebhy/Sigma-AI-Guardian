@@ -1,7 +1,8 @@
 """Lắng nghe input và đọc NumLock Windows qua ``pynput``/Win32.
 
 File path: `src/utils/key_listener/window.py`
-Input: raw callback từ `pynput.keyboard` hoặc `pynput.mouse` và timeout chờ.
+Input: raw callback từ `pynput.keyboard` hoặc `pynput.mouse`, timeout chờ và stop
+event tùy chọn.
 Output: iterator `KeyEvent` hoặc `MouseEvent` và trạng thái NumLock.
 Nguyên lý: callback hook chỉ đưa raw event vào queue; generator xử lý tuần tự,
 theo dõi trạng thái listener và luôn dừng/join hook trong khối ``finally``.
@@ -12,6 +13,7 @@ from __future__ import annotations
 from collections.abc import Callable, Iterator
 import ctypes
 import importlib
+import threading
 from queue import Empty, Queue
 from typing import Final, Protocol, cast
 
@@ -169,7 +171,10 @@ def get_num_lock_state() -> bool:
     return bool(windows_dll.user32.GetKeyState(0x90) & 1)
 
 
-def listen_keys(timeout: float | None = None) -> Iterator[KeyEvent]:
+def listen_keys(
+    timeout: float | None = None,
+    stop_event: threading.Event | None = None,
+) -> Iterator[KeyEvent]:
     """Sinh keyboard event `KEY_*`; timeout chỉ giới hạn từng lần chờ queue."""
 
     keyboard = cast(_KeyboardModule, importlib.import_module("pynput.keyboard"))
@@ -187,7 +192,7 @@ def listen_keys(timeout: float | None = None) -> Iterator[KeyEvent]:
     joined = False
     try:
         listener.wait()
-        while True:
+        while stop_event is None or not stop_event.is_set():
             if not listener.is_alive() and raw_events.empty():
                 joined = True
                 listener.join()
@@ -213,7 +218,10 @@ def listen_keys(timeout: float | None = None) -> Iterator[KeyEvent]:
             listener.join()
 
 
-def listen_mice(timeout: float | None = None) -> Iterator[MouseEvent]:
+def listen_mice(
+    timeout: float | None = None,
+    stop_event: threading.Event | None = None,
+) -> Iterator[MouseEvent]:
     """Sinh button, relative motion và scroll event theo đúng thứ tự callback."""
 
     mouse = cast(_MouseModule, importlib.import_module("pynput.mouse"))
@@ -238,7 +246,7 @@ def listen_mice(timeout: float | None = None) -> Iterator[MouseEvent]:
     joined = False
     try:
         listener.wait()
-        while True:
+        while stop_event is None or not stop_event.is_set():
             if not listener.is_alive() and raw_events.empty():
                 joined = True
                 listener.join()

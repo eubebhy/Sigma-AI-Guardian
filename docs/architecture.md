@@ -104,14 +104,15 @@ thống nhất để dừng tài nguyên mới.
 
 Thread dài hạn của `ProcessKiller` và `screenlocker` phải là daemon thread theo
 quy tắc `src/README.md`; command handler tương lai phải gọi `stop()`/`unlock()`
-trước khi Agent shutdown.
+trước khi Agent shutdown. Các hàm này signal và chờ thread của mình kết thúc; hard
+kill process không thể chạy Python `finally`.
 
 ## Platform và capability
 
 | Platform | Hỗ trợ hiện tại | Điều kiện |
 | --- | --- | --- |
 | Windows 10/11 | process, browser, hosts, window, input | `tasklist`, `taskkill`, PyWinCtl; admin cho hosts/input block |
-| Ubuntu/Debian GNOME on Xorg | process, browser, hosts, window, input | `ps`, `xdotool`, Xorg, evdev/UInput permission |
+| Linux desktop X11/Xorg | process, browser, hosts, window, input | `ps`, `xdotool`, Xorg, evdev/UInput permission; package/init system tùy distribution |
 | Wayland | Không hỗ trợ đầy đủ | không quảng bá là tương thích |
 | macOS/OS khác | Không hỗ trợ | runtime ném `NotImplementedError`, không fallback Linux |
 
@@ -121,6 +122,11 @@ thất bại do quyền hoặc session. `ProcessLookupError` được bỏ qua k
 thoát. Lỗi scan/kill khác được ProcessKiller lưu lại và caller gọi
 `raise_if_failed()` để nhận exception; caller vẫn không được suy ra kill thành công
 chỉ từ việc gọi feature.
+
+Core Python và protocol adapter không giả định Ubuntu, Debian, `apt` hoặc `systemd`.
+Các dependency native, desktop backend và cách khởi động tiến trình là deployment
+concern riêng theo distribution. Điều này không có nghĩa macOS hay mọi hệ POSIX được
+hỗ trợ: factory hiện chỉ có adapter Linux và Windows.
 
 ## Kiểm thử
 

@@ -1,14 +1,16 @@
-rapidfuzz
-pyperclip
-scikit-learn
 joblib
-Pillow
-PyWinCtl
-
 numpy
 mss
+Pillow
+pyperclip
+PyWinCtl
+rapidfuzz
+scikit-learn
 
-evdev; platform_system == "Linux"
-python-xlib; platform_system == "Linux"
-pydirectinput-rgx; platform_system == "Windows"
-pynput; platform_system == "Windows"
+# Linux desktop input
+evdev; sys_platform == "linux"
+python-xlib; sys_platform == "linux"
+
+# Windows desktop input
+pydirectinput-rgx; sys_platform == "win32"
+pynput; sys_platform == "win32"

@@ -1,7 +1,7 @@
 """API lắng nghe input và đọc NumLock theo hệ điều hành.
 
 File path: `src/utils/key_listener/__init__.py`.
-Input: timeout chờ event hoặc lời gọi đọc trạng thái NumLock.
+Input: timeout chờ event, stop event tùy chọn hoặc lời gọi đọc trạng thái NumLock.
 Output: generator keyboard/mouse event đã chuẩn hóa và trạng thái NumLock `bool`.
 Nguyên lý: facade chọn backend Linux hoặc Windows khi import; dependency native chỉ
 được nạp khi listener bắt đầu hoặc NumLock được đọc.

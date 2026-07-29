@@ -598,6 +598,21 @@ class ProcessGuardTests(unittest.TestCase):
         self.assertIsNone(killer._thread)
         self.assertIsNone(killer._stop_event)
 
+    @test_modes("fake")
+    def test_stop_from_daemon_does_not_join_itself(self) -> None:
+        killer = ProcessKiller(_FakeProcessOperations([]))
+        stop_event = threading.Event()
+        killer.running = True
+        killer._stop_event = stop_event
+        killer._thread = threading.current_thread()
+
+        killer.stop()
+
+        self.assertTrue(stop_event.is_set())
+        self.assertFalse(killer.running)
+        self.assertIsNone(killer._thread)
+        self.assertIsNone(killer._stop_event)
+
 class RealProcessGuardCommandTests(unittest.TestCase):
     def test_parse_real_fixture_command(self) -> None:
         command = _parse_real_arguments(("fixture",))

@@ -5,7 +5,8 @@ Input: event `(KEY_*, "down" | "up" | "hold")` từ `listen_keys()`.
 Output: `get_current_buffer()` trả toàn bộ text `str` trong virtual buffer;
 `raise_if_listener_failed()` ném lại lỗi backend đã lưu nếu có.
 Nguyên lý: text là danh sách tối đa 6767 ký tự, cursor là offset; sửa và điều hướng
-chỉ thay đổi state process, không ghi xuống đĩa.
+chỉ thay đổi state process, không ghi xuống đĩa. `stop()` signal listener, chờ
+backend đóng rồi mới trả về.
 
 EDUCATION PURPOSE ONLY: Module chỉ phục vụ bài tập mô phỏng editor với input tự
 nguyện trong môi trường học tập. Không lưu bền, truyền mạng hoặc dùng dữ liệu
@@ -106,6 +107,8 @@ class KeyLogger:
     """Giữ virtual text buffer và cursor cho bài tập mô phỏng editor."""
 
     _listener: threading.Thread | None = None
+    _listener_stop_event: threading.Event | None = None
+    _listener_lock = threading.Lock()
     _listening = False
     _listener_error: Exception | None = None
     _buffer: list[str] = []
@@ -115,31 +118,53 @@ class KeyLogger:
 
     @classmethod
     def start(cls) -> None:
-        if cls._listener is not None and cls._listener.is_alive():
-            return
-        cls._listener_error = None
-        cls._listening = True
-        cls._listener = threading.Thread(target=cls._listen, daemon=True)
-        cls._listener.start()
+        while True:
+            with cls._listener_lock:
+                listener = cls._listener
+                stop_event = cls._listener_stop_event
+                if listener is None or not listener.is_alive():
+                    cls._listener_error = None
+                    cls._listening = True
+                    cls._listener_stop_event = threading.Event()
+                    cls._listener = threading.Thread(
+                        target=cls._listen,
+                        args=(cls._listener_stop_event,),
+                        daemon=True,
+                    )
+                    cls._listener.start()
+                    return
+                if stop_event is None or not stop_event.is_set():
+                    return
+            listener.join()
 
     @classmethod
     def stop(cls) -> None:
-        """Yêu cầu listener dừng ở event kế tiếp từ backend."""
+        """Dừng listener và chờ backend đóng trước khi trả về."""
 
-        cls._listening = False
+        with cls._listener_lock:
+            cls._listening = False
+            stop_event = cls._listener_stop_event
+            listener = cls._listener
+            if stop_event is not None:
+                stop_event.set()
+        if listener is not None and listener is not threading.current_thread():
+            listener.join()
 
     @classmethod
-    def _listen(cls) -> None:
+    def _listen(cls, stop_event: threading.Event) -> None:
         try:
-            for event in listen_keys():
-                if not cls._listening:
+            for event in listen_keys(timeout=0.1, stop_event=stop_event):
+                if stop_event.is_set():
                     break
                 cls._keylogger(event)
         except Exception as error:
             cls._listener_error = error
         finally:
-            cls._listening = False
-            cls._listener = None
+            with cls._listener_lock:
+                cls._listening = False
+                if cls._listener_stop_event is stop_event:
+                    cls._listener_stop_event = None
+                    cls._listener = None
 
     @classmethod
     def get_listener_error(cls) -> Exception | None:

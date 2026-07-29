@@ -8,7 +8,9 @@ UI không duy trì trạng thái sẵn sàng. `unlock()` trả `True` khi input 
 thành công, hoặc raise lỗi cleanup.
 Nguyên lý: Pillow dựng một ảnh khóa theo đúng độ phân giải từng monitor; Tkinter
 chỉ hiển thị ảnh toàn màn hình. `unlock()` signal UI thread, mở input ngay và chờ UI
-thread tự đóng cửa sổ. Lỗi UI được lưu bằng event để `unlock()` báo cho caller.
+thread tự đóng cửa sổ. Lock/unlock được serialize để không một `unlock()` thành
+công trước khi một `lock()` đang khởi tạo hoàn tất. Lỗi UI được lưu bằng event để
+`unlock()` báo cho caller.
 """
 
 from __future__ import annotations
@@ -48,7 +50,7 @@ While waiting for unlock, you are strictly required to follow these rules:
 Improper shutdown or unauthorized interference with the system may result in 
 UNINTENDED CONSEQUENCES.
 """
-_lock = threading.Lock()
+_lock = threading.RLock()
 _thread: threading.Thread | None = None
 _stop_event: threading.Event | None = None
 _ui_exited_event: threading.Event | None = None
@@ -245,52 +247,80 @@ def _start_ui(
     return ready_event, failed_event, _stop_event, _ui_exited_event
 
 
-def _raise_after_lock_cleanup(error: Exception) -> NoReturn:
+def _raise_after_lock_cleanup(
+    error: Exception,
+    lock_stop_event: threading.Event,
+) -> NoReturn:
     """Dọn trạng thái lock dở dang trước khi báo lỗi ban đầu cho caller."""
 
-    try:
-        unlock()
-    except Exception as cleanup_error:
-        raise error from cleanup_error
+    with _lock:
+        if _stop_event is not lock_stop_event:
+            raise error
+        try:
+            _unlock_locked()
+        except Exception as cleanup_error:
+            raise error from cleanup_error
     raise error
 
 
 def lock() -> None:
     """Phủ mọi monitor và chặn input sau khi overlay sẵn sàng."""
 
-    global _stop_event, _thread
     with _lock:
-        if _thread is not None and _thread.is_alive():
-            return
-        regions = screen_capture.get_monitors()
-        if not regions:
-            raise RuntimeError("No monitors were found")
-        ready_event, failed_event, stop_event, exited_event = _start_ui(regions)
+        _lock_locked()
+
+
+def _lock_locked() -> None:
+    """Tạo và block đúng một locker khi caller đang giữ `_lock`."""
+
+    global _stop_event, _thread
+    if _thread is not None and _thread.is_alive():
+        return
+    regions = screen_capture.get_monitors()
+    if not regions:
+        raise RuntimeError("No monitors were found")
+    ready_event, failed_event, stop_event, exited_event = _start_ui(regions)
 
     if not ready_event.wait(timeout=5.0):
         _raise_after_lock_cleanup(
-            RuntimeError("Screen locker UI did not start within 5 seconds")
+            RuntimeError("Screen locker UI did not start within 5 seconds"),
+            stop_event,
         )
     if failed_event.is_set():
-        _raise_after_lock_cleanup(RuntimeError("Screen locker UI failed to start"))
+        _raise_after_lock_cleanup(
+            RuntimeError("Screen locker UI failed to start"),
+            stop_event,
+        )
     if stop_event.is_set() or exited_event.is_set():
-        _raise_after_lock_cleanup(RuntimeError("Screen locker UI stopped unexpectedly"))
+        _raise_after_lock_cleanup(
+            RuntimeError("Screen locker UI stopped unexpectedly"),
+            stop_event,
+        )
     try:
         input_blocker.block()
     except Exception as error:
-        _raise_after_lock_cleanup(error)
+        _raise_after_lock_cleanup(error, stop_event)
     if failed_event.is_set() or stop_event.is_set() or exited_event.is_set():
-        _raise_after_lock_cleanup(RuntimeError("Screen locker UI stopped unexpectedly"))
+        _raise_after_lock_cleanup(
+            RuntimeError("Screen locker UI stopped unexpectedly"),
+            stop_event,
+        )
 
 
 def unlock() -> bool:
     """Mở input và xác nhận UI đã dọn xong, hoặc báo mọi lỗi cleanup."""
 
     with _lock:
-        stop_event = _stop_event
-        exited_event = _ui_exited_event
-        failed_event = _ui_failed_event
-        ui_thread = _thread
+        return _unlock_locked()
+
+
+def _unlock_locked() -> bool:
+    """Dọn đúng locker hiện tại khi caller đang giữ `_lock`."""
+
+    stop_event = _stop_event
+    exited_event = _ui_exited_event
+    failed_event = _ui_failed_event
+    ui_thread = _thread
     if stop_event is not None:
         stop_event.set()
     errors: list[Exception] = []
@@ -306,6 +336,8 @@ def unlock() -> bool:
         errors.append(RuntimeError("Cannot confirm UI cleanup from the UI thread"))
     elif not exited_event.wait(timeout=_UI_EXIT_TIMEOUT_SECONDS):
         errors.append(RuntimeError("Screen locker UI cleanup was not confirmed"))
+    elif ui_thread is not None:
+        ui_thread.join()
     if failed_event is not None and failed_event.is_set():
         errors.append(RuntimeError("Screen locker UI cleanup failed"))
     if len(errors) == 1:

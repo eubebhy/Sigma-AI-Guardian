@@ -64,10 +64,10 @@ hien tai cua SAG Agent voi dinh huong san pham trong tuong lai.
 
 ## Yêu cầu
 
-* Windows 10/11 hoặc Ubuntu/Debian có GNOME chạy bằng Xorg.
+* Windows 10/11 hoặc Linux có desktop X11/Xorg. Linux input và window backend hiện
+  chưa hỗ trợ đầy đủ Wayland.
 * Python 3.13 (khuyến nghị; tối thiểu 3.11).
-* Các thư viện Python trong `requirements.txt` cùng `Pillow`, `PyWinCtl` và
-  `joblib` đang được mã nguồn import trực tiếp.
+* Các thư viện Python runtime trong `requirements.txt`.
 
 ## Phần mềm và binary hệ thống
 
@@ -86,20 +86,19 @@ hien tai cua SAG Agent voi dinh huong san pham trong tuong lai.
 * **Microsoft Edge**: trình duyệt mặc định thường có sẵn. Có thể thay bằng một
   trình duyệt được SAG hỗ trợ.
 
-### Ubuntu/Debian GNOME
+### Linux desktop X11/Xorg
 
-* **GNOME, GDM và Xorg**: cung cấp phiên desktop đồ họa cho khóa/chụp màn hình,
-  clipboard và theo dõi cửa sổ. Hãy chọn phiên **GNOME on Xorg** tại màn hình
-  đăng nhập; `xdotool`, `xclip` và backend theo dõi cửa sổ hiện chưa hỗ trợ đầy
-  đủ phiên Wayland.
+* **Desktop X11/Xorg**: cung cấp phiên desktop đồ họa cho khóa/chụp màn hình,
+  clipboard và theo dõi cửa sổ. GNOME on Xorg là cấu hình đã được tài liệu hóa;
+  `xdotool`, `xclip` và backend theo dõi cửa sổ hiện chưa hỗ trợ đầy đủ Wayland.
 * **`xdotool`**: đọc cửa sổ active và danh sách cửa sổ đang mở.
 * **`procps` (`ps`)**: liệt kê process.
 * **`xclip`**: backend clipboard X11 cho `pyperclip`.
 * **Tk và X11/XCB**: hiển thị khóa màn hình và hỗ trợ chụp màn hình.
 * **`evdev`, kernel `uinput` và các device `/dev/input/event*`, `/dev/uinput`**:
   nghe, chặn và giả lập input.
-* **`build-essential`, header Python và Linux**: biên dịch `evdev` nếu pip không
-  có wheel phù hợp.
+* **Compiler C, header Python và Linux**: biên dịch `evdev` nếu pip không có wheel
+  phù hợp.
 
 ### Công cụ chỉ dùng khi phát triển
 
@@ -152,7 +151,14 @@ per-process result/history, nên xem backlog trong
 [`ROI-reports/technical-debt.md`](ROI-reports/technical-debt.md) trước khi dùng
 process guard như enforcement đáng tin cậy.
 
-### Ubuntu minimal
+### Cài Python environment trên Linux
+
+Trên distribution Linux bất kỳ, cài Python, `venv`, `pip`, Tk, Xorg, `ps`,
+`xdotool`, `xinput`, `xclip`, compiler C và header Python/Linux bằng package manager
+của distribution. Tên package và display manager khác nhau theo distribution; không
+giả định `apt`, `systemctl`, GNOME hay GDM là chuẩn POSIX.
+
+Ví dụ package cho Ubuntu:
 
 ```bash
 sudo apt update
@@ -163,25 +169,10 @@ sudo apt install -y \
   libx11-6 libxfixes3 libxrandr2 \
   libxcb1 libxcb-randr0 libxcb-render0 libxcb-shm0 libxcb-xfixes0 \
   firefox
-sudo systemctl enable --now gdm3
 ```
 
-### Debian minimal
-
-```bash
-sudo apt update
-sudo apt install -y \
-  gnome-core gdm3 xorg gnome-session-xsession \
-  python3 python3-venv python3-pip python3-tk python3-dev \
-   build-essential linux-libc-dev procps xdotool xinput xclip \
-  libx11-6 libxfixes3 libxrandr2 \
-  libxcb1 libxcb-randr0 libxcb-render0 libxcb-shm0 libxcb-xfixes0 \
-  firefox-esr
-sudo systemctl enable --now gdm3
-```
-
-Sau khi GNOME khởi động, đăng nhập bằng phiên **GNOME on Xorg**. Trên cả Ubuntu
-và Debian, tạo môi trường Python từ thư mục gốc của dự án:
+Khởi động desktop/display manager bằng init system của distribution, đăng nhập vào
+phiên Xorg, rồi tạo môi trường Python từ thư mục gốc dự án:
 
 ```bash
 python3 -m venv .pyvenv
@@ -191,8 +182,9 @@ python3 -m venv .pyvenv
 
 #### Cấp quyền input trên Linux
 
-Nạp `uinput`, tự động nạp module này lúc boot và cấp quyền device cho nhóm
-`input`:
+Nạp `uinput`, tự động nạp module này lúc boot và cấp quyền device cho nhóm `input`.
+Các lệnh dưới đây dành cho Linux dùng systemd và udev; distribution dùng OpenRC hoặc
+udev khác phải áp dụng quy tắc tương đương theo tài liệu của distribution:
 
 ```bash
 sudo modprobe uinput

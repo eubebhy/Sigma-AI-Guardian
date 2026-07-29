@@ -88,6 +88,10 @@ class ProcessKiller:
                     return
                 if self._stop_event:
                     self._stop_event.set()
+                if thread is threading.current_thread():
+                    self._thread = None
+                    self._stop_event = None
+                    return
             thread.join()
             with self._lifecycle_lock:
                 if self._thread is thread:

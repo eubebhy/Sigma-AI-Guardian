@@ -246,6 +246,8 @@ class ScreenLockerTests(unittest.TestCase):
         ui_exited_event.wait.return_value = True
         screenlocker._ui_exited_event = ui_exited_event
         screenlocker._ui_failed_event = threading.Event()
+        ui_thread = unittest.mock.MagicMock()
+        screenlocker._thread = ui_thread
 
         with patch.object(screenlocker.input_blocker, "unblock") as unblock:
             completed = screenlocker.unlock()
@@ -253,6 +255,7 @@ class ScreenLockerTests(unittest.TestCase):
         self.assertTrue(stop_event.is_set())
         unblock.assert_called_once()
         ui_exited_event.wait.assert_called_once_with(timeout=5.0)
+        ui_thread.join.assert_called_once()
         self.assertTrue(completed)
 
     @test_modes("fake")
@@ -448,6 +451,23 @@ class ScreenLockerTests(unittest.TestCase):
 
         self.assertTrue(stop_event.is_set())
         exited_event.wait.assert_called_once_with(timeout=5.0)
+
+    @test_modes("fake")
+    def test_failed_lock_does_not_unlock_a_newer_locker(self) -> None:
+        old_stop_event = threading.Event()
+        screenlocker._stop_event = threading.Event()
+        screenlocker._ui_exited_event = threading.Event()
+        screenlocker._ui_failed_event = threading.Event()
+        screenlocker._thread = None
+
+        with patch.object(screenlocker.input_blocker, "unblock") as unblock:
+            with self.assertRaisesRegex(RuntimeError, "old lock failed"):
+                screenlocker._raise_after_lock_cleanup(
+                    RuntimeError("old lock failed"),
+                    old_stop_event,
+                )
+
+        unblock.assert_not_called()
 
     @test_modes("fake")
     def test_linux_block_rolls_back_when_one_device_grab_fails(self) -> None:

@@ -15,6 +15,7 @@ import importlib
 import io
 import os
 import sys
+import threading
 import unittest
 from collections.abc import Callable, Iterator, Sequence
 from threading import Thread
@@ -76,22 +77,34 @@ def _preflight_logger() -> None:
 
 
 def _log_events(keyboard: bool, mouse: bool) -> None:
-    if keyboard and mouse:
-        Thread(target=_log_keyboard, daemon=True).start()
-        _log_mouse()
-    elif keyboard:
-        _log_keyboard()
-    else:
-        _log_mouse()
+    stop_event = threading.Event()
+    keyboard_thread: Thread | None = None
+    try:
+        if keyboard and mouse:
+            keyboard_thread = Thread(
+                target=_log_keyboard,
+                args=(stop_event,),
+                daemon=True,
+            )
+            keyboard_thread.start()
+            _log_mouse(stop_event)
+        elif keyboard:
+            _log_keyboard(stop_event)
+        else:
+            _log_mouse(stop_event)
+    finally:
+        stop_event.set()
+        if keyboard_thread is not None:
+            keyboard_thread.join()
 
 
-def _log_keyboard() -> None:
-    for event in key_listener.listen_keys():
+def _log_keyboard(stop_event: threading.Event) -> None:
+    for event in key_listener.listen_keys(stop_event=stop_event):
         print("kb:", event, flush=True)
 
 
-def _log_mouse() -> None:
-    for event in key_listener.listen_mice():
+def _log_mouse(stop_event: threading.Event) -> None:
+    for event in key_listener.listen_mice(stop_event=stop_event):
         print("mouse:", event, flush=True)
 
 
@@ -138,6 +151,26 @@ class KeyListenerRealCommandFakeTests(unittest.TestCase):
         self.assertEqual(output.getvalue().splitlines(), [
             "Logging events. Press Ctrl+C to stop.", "Logging stopped.",
         ])
+
+    def test_combined_logger_stops_keyboard_thread_after_mouse_exits(self) -> None:
+        keyboard_started = threading.Event()
+        keyboard_stopped = threading.Event()
+
+        def log_keyboard(stop_event: threading.Event) -> None:
+            keyboard_started.set()
+            stop_event.wait()
+            keyboard_stopped.set()
+
+        def log_mouse(_: threading.Event) -> None:
+            self.assertTrue(keyboard_started.wait(timeout=1.0))
+
+        with (
+            patch(__name__ + "._log_keyboard", side_effect=log_keyboard),
+            patch(__name__ + "._log_mouse", side_effect=log_mouse),
+        ):
+            _log_events(keyboard=True, mouse=True)
+
+        self.assertTrue(keyboard_stopped.is_set())
 
 
 class _FakeEvent:
@@ -204,6 +237,17 @@ class LinuxListenerFakeTests(unittest.TestCase):
         with patch.object(linux_listener, "_get_keyboards", return_value=[]):
             with self.assertRaisesRegex(RuntimeError, "No Linux keyboard"):
                 next(linux_listener.listen_keys())
+
+    def test_listener_stops_before_waiting_when_stop_event_is_set(self) -> None:
+        stop_event = threading.Event()
+        stop_event.set()
+
+        with patch.object(linux_listener.select, "select") as select:
+            events = linux_listener.listen_keys(stop_event=stop_event)
+            with self.assertRaises(StopIteration):
+                next(events)
+
+        select.assert_not_called()
 
 
 class _FakeKey:
@@ -342,6 +386,18 @@ class WindowListenerFakeTests(unittest.TestCase):
             ("BTN_FORWARD", "down"),
         ])
         events.close()
+
+    def test_keyboard_listener_stops_hook_when_stop_event_is_set(self) -> None:
+        stop_event = threading.Event()
+        stop_event.set()
+
+        events = self.listener.listen_keys(stop_event=stop_event)
+        with self.assertRaises(StopIteration):
+            next(events)
+
+        fake = self.keyboard.listener
+        assert fake is not None
+        self.assertEqual((fake.stop_calls, fake.join_calls), (1, 1))
 
 
 if __name__ == "__main__":

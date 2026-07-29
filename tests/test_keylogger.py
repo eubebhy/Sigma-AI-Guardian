@@ -21,9 +21,11 @@ from __future__ import annotations
 import contextlib
 import io
 import sys
+import threading
 import time
 import unittest
-from collections.abc import Sequence
+from collections.abc import Iterator, Sequence
+from typing import cast
 from unittest.mock import patch
 
 from test_support import add_source_path, run_module, test_modes
@@ -32,6 +34,24 @@ from test_support import add_source_path, run_module, test_modes
 add_source_path()
 
 from system_monitor.keylogger import KeyLogger
+from utils.key_listener import KeyEvent
+
+
+class _StoppingListener:
+    def __init__(self, is_alive: bool) -> None:
+        self._is_alive = is_alive
+        self.join_calls = 0
+        self.start_calls = 0
+
+    def is_alive(self) -> bool:
+        return self._is_alive
+
+    def join(self) -> None:
+        self.join_calls += 1
+        self._is_alive = False
+
+    def start(self) -> None:
+        self.start_calls += 1
 
 
 def _parse_real_arguments(arguments: Sequence[str]) -> bool:
@@ -152,7 +172,7 @@ class KeyLoggerTests(unittest.TestCase):
 
         with patch("system_monitor.keylogger.listen_keys", return_value=events):
             KeyLogger._listening = True
-            KeyLogger._listen()
+            KeyLogger._listen(threading.Event())
 
         self.assertEqual(KeyLogger.get_current_buffer(), "Ab")
 
@@ -160,10 +180,61 @@ class KeyLoggerTests(unittest.TestCase):
     def test_listener_records_backend_error(self) -> None:
         with patch("system_monitor.keylogger.listen_keys", side_effect=OSError("denied")):
             KeyLogger._listening = True
-            KeyLogger._listen()
+            KeyLogger._listen(threading.Event())
 
         self.assertEqual(str(KeyLogger.get_listener_error()), "denied")
         self.assertFalse(KeyLogger._listening)
+
+    @test_modes("mock")
+    def test_stop_signals_and_joins_listener_without_input(self) -> None:
+        KeyLogger._listening = False
+        KeyLogger._listener = None
+        KeyLogger._listener_error = None
+        started = threading.Event()
+        received_stop_event: threading.Event | None = None
+
+        def wait_for_stop(
+            *, timeout: float | None, stop_event: threading.Event | None
+        ) -> Iterator[KeyEvent]:
+            del timeout
+            nonlocal received_stop_event
+            received_stop_event = stop_event
+            started.set()
+            assert stop_event is not None
+            stop_event.wait()
+            return
+            yield "KEY_A", "down"
+
+        with patch("system_monitor.keylogger.listen_keys", side_effect=wait_for_stop):
+            KeyLogger.start()
+            self.assertTrue(started.wait(timeout=1.0))
+            KeyLogger.stop()
+
+        self.assertIsNotNone(received_stop_event)
+        assert received_stop_event is not None
+        self.assertTrue(received_stop_event.is_set())
+        self.assertIsNone(KeyLogger._listener)
+
+    @test_modes("mock")
+    def test_start_waits_for_stopping_listener_before_restarting(self) -> None:
+        stopping_listener = _StoppingListener(is_alive=True)
+        stop_event = threading.Event()
+        stop_event.set()
+        new_listener = _StoppingListener(is_alive=False)
+        KeyLogger._listener = cast(threading.Thread, stopping_listener)
+        KeyLogger._listener_stop_event = stop_event
+
+        with patch(
+            "system_monitor.keylogger.threading.Thread",
+            return_value=cast(threading.Thread, new_listener),
+        ):
+            KeyLogger.start()
+
+        self.assertEqual(stopping_listener.join_calls, 1)
+        self.assertEqual(new_listener.start_calls, 1)
+        self.assertIs(KeyLogger._listener, new_listener)
+        KeyLogger._listener = None
+        KeyLogger._listener_stop_event = None
 
     @test_modes("mock")
     def test_raise_if_listener_failed_raises_stored_backend_error(self) -> None:
