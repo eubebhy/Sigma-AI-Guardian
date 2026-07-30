@@ -8,7 +8,7 @@ Output: runner trả exit code 1 khi case tự động thất bại.
 Nguyên lý: case mặc định chỉ gọi clean text và rule-based engine; mode ``real corpus``
 chạy đúng số case caller truyền. Dùng count ``1000000`` để chạy toàn bộ corpus.
 
-Ví dụ real dùng bởi ``--info``:
+Ví dụ real dùng bởi ``--help``:
 ``./.pyvenv/bin/python tests/test_classifier.py real text "rule 34" --engine rule
 --strict-level strict``
 ``./.pyvenv/bin/python tests/test_classifier.py real corpus all 10 mid --engine main

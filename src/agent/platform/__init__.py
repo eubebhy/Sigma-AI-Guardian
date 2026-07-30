@@ -36,7 +36,7 @@ class PlatformServices:
 
 
 def create_platform_services(platform_name: str | None = None) -> PlatformServices:
-    """Tạo adapter của Windows hoặc Linux; OS khác không được fallback."""
+    """Tao adpter theo moi truong."""
 
     normalized_name = platform_name or platform.system().lower()
 

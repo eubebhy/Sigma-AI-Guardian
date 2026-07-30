@@ -1,7 +1,7 @@
 """Runner hàng loạt cho mọi file ``tests/test_*.py``.
 
 File path: ``tests/tester.py``.
-Input: safe mode positional ``fake mock smoke`` hoặc ``--info``.
+Input: safe mode positional ``fake mock smoke`` hoặc ``--help``.
 Output: im lặng và exit code 0 khi pass; lỗi in một dòng và exit code 1.
 Nguyên lý: tự nạp mọi test feature phẳng, bỏ qua file hỗ trợ này. Lệnh real chỉ
 được chạy trực tiếp: ``test_<feature>.py real [feature arguments ...]``.
@@ -30,10 +30,7 @@ def _test_files() -> list[Path]:
 def main(arguments: list[str] | None = None) -> int:
     """Chạy toàn bộ test feature ở thư mục ``tests``."""
 
-    modes = parse_modes(arguments)
-    if modes is None:
-        print(__doc__)
-        return 0
+    modes = parse_modes(arguments, __doc__)
     return run_files(_test_files(), modes)
 
 

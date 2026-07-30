@@ -35,7 +35,7 @@ class _RealCommand(NamedTuple):
     arguments: tuple[str, ...]
 
 
-_FeatureCommand: TypeAlias = tuple[str, ...] | None | _RealCommand
+_FeatureCommand: TypeAlias = tuple[str, ...] | _RealCommand
 _TEST_MODE_BY_ID: dict[str, str] = {}
 
 
@@ -60,18 +60,19 @@ def test_modes(*modes: str) -> Callable[[_TestFunction], _TestFunction]:
     return _decorate
 
 
-def parse_modes(arguments: Sequence[str] | None = None) -> tuple[str, ...] | None:
-    """Đọc safe mode của bulk runner hoặc in thông tin runner."""
+def parse_modes(
+    arguments: Sequence[str] | None = None,
+    help_description: str | None = None,
+) -> tuple[str, ...]:
+    """Đọc safe mode của bulk runner hoặc in trợ giúp chuẩn."""
 
     parser = _create_parser(
-        "tests/tester.py [fake|mock|smoke ...] | --info",
-        "Chạy real qua: tests/test_<feature>.py real [feature arguments ...]",
+        "tests/tester.py [fake|mock|smoke ...]",
+        help_description or "Chạy real qua: tests/test_<feature>.py real [feature arguments ...]",
     )
     values = tuple(arguments) if arguments is not None else tuple(sys.argv[1:])
     if values == ("--help",):
         parser.parse_args(values)
-    if values == ("--info",):
-        return None
     if not values:
         return DEFAULT_MODES
     invalid_modes = set(values).difference(DEFAULT_MODES)
@@ -86,16 +87,15 @@ def _create_parser(usage: str, description: str) -> argparse.ArgumentParser:
 
 def _parse_feature_command(
     arguments: Sequence[str] | None,
+    help_description: str,
 ) -> _FeatureCommand:
     parser = _create_parser(
-        "test_<feature>.py [fake|mock|smoke ...] | real [feature arguments ...] | --info",
-        "Mode real gọi run_real(arguments) của feature.",
+        "test_<feature>.py [fake|mock|smoke ...] | real [feature arguments ...]",
+        help_description,
     )
     values = tuple(arguments) if arguments is not None else tuple(sys.argv[1:])
     if values == ("--help",):
         parser.parse_args(values)
-    if values == ("--info",):
-        return None
     if not values:
         return DEFAULT_MODES
     if values[0] == "real":
@@ -206,10 +206,8 @@ def run_suite(suite: unittest.TestSuite, modes: tuple[str, ...]) -> int:
 def run_module(module: ModuleType, arguments: Sequence[str] | None = None) -> int:
     """Chạy trực tiếp một file test feature."""
 
-    command = _parse_feature_command(arguments)
-    if command is None:
-        print(inspect.getdoc(module) or "Test feature không có mô tả.")
-        return 0
+    help_description = inspect.getdoc(module) or "Test feature không có mô tả."
+    command = _parse_feature_command(arguments, help_description)
     if isinstance(command, _RealCommand):
         return _run_real(module, command.arguments)
     suite = unittest.defaultTestLoader.loadTestsFromModule(module)

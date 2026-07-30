@@ -14,11 +14,11 @@ browser thật.
 
 # Một feature và metadata manual command của nó.
 ./.pyvenv/bin/python tests/test_browser.py
-./.pyvenv/bin/python tests/test_browser.py --info
+./.pyvenv/bin/python tests/test_browser.py --help
 ```
 
 `fake`, `mock` và `smoke` là safe mode. Runner trả `0` khi pass và `1` khi fail.
-`real` chỉ chạy trực tiếp một file test; đọc `--info` trước vì command có thể thay đổi
+`real` chỉ chạy trực tiếp một file test; đọc `--help` trước vì command có thể thay đổi
 hệ thống.
 
 ## REAL MODE
@@ -40,7 +40,7 @@ Chạy trên session test có chủ đích; không gọi từ CI hoặc safe sui
 - Test side effect hoặc race dùng fake, temporary path, `Event` hoặc barrier; không
   dùng `sleep` dài hay OS thật.
 - `real` command phải mô tả prerequisite, side effect, cách dừng và cleanup trong
-  `--info`.
+  `--help`.
 - File test mới tên `test_<feature>.py`, dùng `add_source_path`, `run_module` và
   `test_modes` từ `test_support`.
 

@@ -7,7 +7,7 @@ Nguyên lý: ``automatic`` block toàn bộ list mặc định, kiểm tra domai
 xóa domain do nó thêm trong ``finally``, giữ nguyên state SAG có từ trước. ``block``
 chỉ được giữ thay đổi khi có xác nhận rõ.
 
-Real usage dùng bởi ``--info``:
+Real usage dùng bởi ``--help``:
 ``./.pyvenv/bin/python tests/test_web_blocker.py real automatic [URL]``
 ``./.pyvenv/bin/python tests/test_web_blocker.py real block --keep-changes``
 ``./.pyvenv/bin/python tests/test_web_blocker.py real unblock``

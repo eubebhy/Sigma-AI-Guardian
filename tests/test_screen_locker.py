@@ -9,7 +9,7 @@ Nguyên lý: chờ ``DELAY`` giây trước khi khóa, giữ khóa ``SECONDS`` g
 ``unlock()``; ``finally`` luôn gọi lại unlock để dọn input và overlay nếu có lỗi.
 Nếu cleanup raise lỗi, command in lỗi và trả exit code 1.
 
-Real usage dùng bởi ``--info``:
+Real usage dùng bởi ``--help``:
 ``./.pyvenv/bin/python tests/test_screen_locker.py real lock DELAY SECONDS``
 Ví dụ: ``./.pyvenv/bin/python tests/test_screen_locker.py real lock 3 15``.
 
