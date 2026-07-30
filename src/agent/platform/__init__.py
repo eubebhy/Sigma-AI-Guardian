@@ -48,7 +48,7 @@ def create_platform_services(platform_name: str | None = None) -> PlatformServic
         from agent.platform.windows import create_services
 
         return create_services()
-    raise NotImplementedError(f"Unsupported platform: {system_name}")
+    raise NotImplementedError(f"Unsupported platform: {normalized_name}")
 
 
 _default_services: PlatformServices | None = None
