@@ -89,3 +89,90 @@ vi vay:
   PlatformServices = apdater operations theo platform
   cac feature chi la tap hop cac logic goi PlatformServices
   Agent thi lai goi feature, quan ly lifecycle.
+
+
+## Bo sung: feature co the chay doc lap
+
+Feature co hai cach nhan platform operations:
+
+```python
+# Cach 1: runtime hoac caller truyen services ro rang
+open_tab(url, platform_services=runtime.services)
+
+# Cach 2: feature tu lay services mac dinh cua process
+open_tab(url)
+```
+
+`get_default_platform_services()` la compatibility entry point cho cach thu hai.
+Ham nay lazy-create mot `PlatformServices` theo OS hien tai va cache lai trong
+process. Nhung lan goi sau se dung lai cung object services do.
+
+```text
+feature khong duoc truyen services
+    |
+    v
+get_default_platform_services()
+    |
+    v
+PlatformServices cua OS hien tai
+    |
+    v
+Linux adapter hoac Windows adapter
+```
+
+Muc dich cua ham nay la de feature van co the duoc goi doc lap tu CLI, test nho hoac
+caller cu ma khong bat buoc moi caller phai tu tao `AgentRuntime`. Ham nay khong chua
+logic feature va khong thay the `AgentRuntime` trong luong chay chinh cua Agent.
+
+Khi co `AgentRuntime`, uu tien truyen `runtime.services` vao feature. Cach nay lam
+dependency hien ro, dung dung adapter da duoc runtime tao va de test bang fake de hon.
+`get_default_platform_services()` chu yeu danh cho compatibility va feature API can
+tu chay khong qua runtime.
+
+
+## Cach tu build mot feature theo kien truc hien tai
+
+Vi du nen doc: `browser_tab`.
+
+Doc theo thu tu:
+
+1. `src/device_controler/browser_tab/__init__.py`
+2. `src/agent/contracts.py`
+3. `src/agent/platform/__init__.py`
+4. `src/agent/platform/linux/browser.py`
+5. `src/agent/platform/windows/browser.py`
+6. `src/agent/runtime.py`
+
+Luon doc feature chung truoc, sau do doc contract, object gom services, adapter tung
+OS va cuoi cung la runtime tao dependency nhu the nao.
+
+Luong cua `browser_tab`:
+
+```text
+browser_tab.open_tab(url, platform_services)
+    |
+    +-- logic chung: validate URL, chon browser, fallback
+    |
+    +-- platform_services.processes
+    |
+    `-- platform_services.browser
+             |
+             +-- Linux browser adapter
+             `-- Windows browser adapter
+```
+
+`browser_tab` khong can biet dang chay tren Linux hay Windows. No chi biet cac
+operation trong `ProcessOperations` va `BrowserOperations`. Phan khac nhau giua cac OS
+nam trong `src/agent/platform/linux/browser.py` va
+`src/agent/platform/windows/browser.py`.
+
+Khi tu them feature moi, co the dung checklist sau:
+
+1. Viet logic chung cua feature trong package feature.
+2. Xac dinh operation ma feature can trong `src/agent/contracts.py`.
+3. Them operation vao `PlatformServices` neu day la capability cua OS.
+4. Tao adapter cho Linux va Windows trong package platform tuong ung.
+5. Cho feature nhan `PlatformServices` tu caller; fallback default chi dung khi can
+   compatibility.
+6. Doc `runtime.py` de dam bao runtime tao services mot lan va owner lifecycle ro rang.
+7. Test feature bang fake operation, khong goi OS that trong safe test.
