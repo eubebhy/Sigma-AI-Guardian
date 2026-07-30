@@ -6,7 +6,8 @@ Output: `AgentRuntime` cung cấp service OS và `status()` cho entry point.
 Nguyên lý: runtime tạo adapter đúng một lần và là owner của tài nguyên shutdown.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+import threading
 
 from agent.platform import PlatformServices, create_platform_services
 
@@ -29,6 +30,11 @@ class AgentRuntime:
     """
 
     services: PlatformServices
+    _closed: bool = field(default=False, init=False)
+    _shutdown_lock: threading.Lock = field(
+        default_factory=threading.Lock,
+        init=False,
+    )
 
     def status(self) -> str:
         """Trả capability status của Agent mà không đụng desktop thật."""
@@ -36,7 +42,24 @@ class AgentRuntime:
         return self.services.capabilities.format_status()
 
     def shutdown(self) -> None:
-        """Kết thúc runtime; feature hiện có tự quản lý lifecycle của chúng."""
+        """Đóng resource platform do runtime sở hữu."""
+
+        with self._shutdown_lock:
+            if self._closed:
+                return
+            errors: list[Exception] = []
+            for operations in (
+                self.services.input_controller,
+                self.services.key_listener,
+                self.services.input_blocker,
+            ):
+                try:
+                    operations.close()
+                except Exception as error:
+                    errors.append(error)
+            if errors:
+                raise ExceptionGroup("Agent runtime cleanup failed", errors)
+            self._closed = True
 
 
 def create_runtime(platform_name: str | None = None) -> AgentRuntime:

@@ -31,7 +31,7 @@ add_source_path()
 try:
     from evdev import ecodes
     from utils import key_listener
-    from utils.key_listener import linux as linux_listener
+    from agent.platform.linux import key_listener_backend as linux_listener
 except ModuleNotFoundError:
     _linux_fake_tests_available = False
     ecodes = cast(Any, None)
@@ -198,6 +198,9 @@ class _FakeInputDevice:
     def read(self) -> Iterator[_FakeEvent]:
         return iter(self._events)
 
+    def close(self) -> None:
+        return None
+
 
 @unittest.skipUnless(
     _linux_fake_tests_available,
@@ -209,6 +212,11 @@ class LinuxListenerFakeTests(unittest.TestCase):
         self.assertTrue(callable(key_listener.listen_keys))
         self.assertTrue(callable(key_listener.listen_mice))
         self.assertTrue(callable(key_listener.get_num_lock_state))
+
+        from utils.key_listener import linux, window
+
+        self.assertTrue(callable(linux.listen_keys))
+        self.assertTrue(callable(window.listen_keys))
 
     def test_listener_normalizes_and_validates_devices(self) -> None:
         keyboard = _FakeInputDevice([_FakeEvent(ecodes.EV_KEY, ecodes.KEY_A, 1)])
@@ -312,7 +320,7 @@ class WindowListenerFakeTests(unittest.TestCase):
     def setUp(self) -> None:
         self.keyboard = _FakePynputModule("pynput.keyboard")
         self.mouse = _FakePynputModule("pynput.mouse")
-        sys.modules.pop("utils.key_listener.window", None)
+        sys.modules.pop("agent.platform.windows.key_listener_backend", None)
         actual = importlib.import_module
 
         def import_fake(name: str, package: str | None = None) -> ModuleType:
@@ -328,11 +336,13 @@ class WindowListenerFakeTests(unittest.TestCase):
             side_effect=import_fake,
         )
         self.patch.start()
-        self.listener = importlib.import_module("utils.key_listener.window")
+        self.listener = importlib.import_module(
+            "agent.platform.windows.key_listener_backend"
+        )
 
     def tearDown(self) -> None:
         self.patch.stop()
-        sys.modules.pop("utils.key_listener.window", None)
+        sys.modules.pop("agent.platform.windows.key_listener_backend", None)
 
     def test_normalizes_keyboard_events_and_cleanup(self) -> None:
         original = self.keyboard.Listener

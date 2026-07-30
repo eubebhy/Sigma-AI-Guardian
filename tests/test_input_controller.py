@@ -46,8 +46,8 @@ add_source_path()
 try:
     from evdev import ecodes
     from device_controler.input_controller import linux as linux_api
-    from device_controler.input_controller.linux import sendinput_kb, sendinput_mouse
-    from device_controler.input_controller.linux import utils as linux_utils
+    from agent.platform.linux.input_controller import sendinput_kb, sendinput_mouse
+    from agent.platform.linux.input_controller import utils as linux_utils
     from device_controler.input_controller.types import MouseButton
     from utils import key_listener
 except ModuleNotFoundError:
@@ -398,7 +398,7 @@ def _load_linux_sender(module_name: str) -> tuple[ModuleType, _FakeUInput]:
     with (
         patch.object(linux_utils, "UInput", _FakeUInput),
         patch.object(linux_utils, "_wait_for_xinput_device") as wait,
-        patch("device_controler.input_controller.linux.sendinput_mouse.subprocess.run"),
+        patch("agent.platform.linux.input_controller.sendinput_mouse.subprocess.run"),
     ):
         module = importlib.import_module(module_name)
         assert _FakeUInput.last_instance is None
@@ -424,7 +424,7 @@ class LinuxFakeTests(unittest.TestCase):
 
     def test_keyboard_capabilities_and_events(self) -> None:
         module, fake = _load_linux_sender(
-            "device_controler.input_controller.linux.sendinput_kb"
+            "agent.platform.linux.input_controller.sendinput_kb"
         )
         self.assertTrue(fake.name.startswith("Sigma Virtual Keyboard "))
         self.assertEqual(fake.capabilities[ecodes.EV_REP], [])
@@ -465,7 +465,7 @@ class LinuxFakeTests(unittest.TestCase):
 
     def test_mouse_capabilities_motion_and_scrolling(self) -> None:
         module, fake = _load_linux_sender(
-            "device_controler.input_controller.linux.sendinput_mouse"
+            "agent.platform.linux.input_controller.sendinput_mouse"
         )
         self.assertEqual(
             fake.capabilities[ecodes.EV_KEY],
@@ -488,7 +488,7 @@ class LinuxFakeTests(unittest.TestCase):
 
     def test_mouse_relative_duration_and_none_axis(self) -> None:
         module, fake = _load_linux_sender(
-            "device_controler.input_controller.linux.sendinput_mouse"
+            "agent.platform.linux.input_controller.sendinput_mouse"
         )
         with patch.object(module.time, "sleep") as sleep:
             module.moveRel(10, 0, duration=0.2)
@@ -553,9 +553,9 @@ class WindowFakeTests(unittest.TestCase):
         self.fake = _FakeDirectInput()
         sys.modules["pydirectinput"] = self.fake
         for name in (
-            "device_controler.input_controller.window",
-            "device_controler.input_controller.window.sendinput_kb",
-            "device_controler.input_controller.window.sendinput_mouse",
+            "agent.platform.windows.input_controller",
+            "agent.platform.windows.input_controller.sendinput_kb",
+            "agent.platform.windows.input_controller.sendinput_mouse",
         ):
             sys.modules.pop(name, None)
 
@@ -563,7 +563,7 @@ class WindowFakeTests(unittest.TestCase):
         sys.modules.pop("pydirectinput", None)
 
     def test_exports_match_linux_and_are_lazy(self) -> None:
-        package_name = "device_controler.input_controller.window"
+        package_name = "agent.platform.windows.input_controller"
         for name in ("pydirectinput",):
             sys.modules.pop(name, None)
         window = importlib.import_module(package_name)
@@ -578,7 +578,7 @@ class WindowFakeTests(unittest.TestCase):
 
     def test_keyboard_delegates_and_normalizes_names(self) -> None:
         keyboard = importlib.import_module(
-            "device_controler.input_controller.window.sendinput_kb"
+            "agent.platform.windows.input_controller.sendinput_kb"
         )
         keyboard.keyDown("leftctrl")
         keyboard.keyUp("leftctrl")
@@ -593,7 +593,7 @@ class WindowFakeTests(unittest.TestCase):
 
     def test_mouse_delegates_all_operations(self) -> None:
         mouse = importlib.import_module(
-            "device_controler.input_controller.window.sendinput_mouse"
+            "agent.platform.windows.input_controller.sendinput_mouse"
         )
         mouse.click(button="back")
         mouse.mouseDown("forward")

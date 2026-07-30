@@ -9,14 +9,14 @@ contract và adapter nằm trong [architecture document](../docs/architecture.md
 
 | Path | Responsibility |
 | --- | --- |
-| `agent/` | Runtime, contracts và adapter process/browser/window/hosts Linux hoặc Windows. |
+| `agent/` | Runtime, contracts và adapter process/browser/window/hosts/input Linux hoặc Windows. |
 | `device_controler/` | Browser, process guard, screen, input và web blocker. |
 | `system_monitor/` | Keylogger và window tracker. |
 | `content_classifier/` | Rule classifier và local model classifier. |
-| `utils/` | Helper không phụ thuộc feature cấp cao, gồm input blocker và key listener. |
+| `utils/` | Compatibility facade cho input blocker/key listener và helper dùng chung. |
 
-Native platform code nằm trong `agent/platform/`, `input_controller/` và
-`key_listener/` theo trách nhiệm của chúng. Feature không được import adapter
+Native platform code nằm trong `agent/platform/`. Compatibility facade không được
+chứa OS selection hoặc native implementation. Feature không được import adapter
 `agent.platform.linux` hoặc `agent.platform.windows` trực tiếp.
 
 ## RULES

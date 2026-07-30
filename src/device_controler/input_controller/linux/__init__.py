@@ -1,29 +1,29 @@
-"""Backend điều khiển input Linux theo tập con API PyAutoGUI.
+"""Compatibility facade cho Linux input controller.
 
-File path: `src/device_controler/input_controller/linux/__init__.py`.
-Input: lời gọi sender chuẩn hóa từ facade package cha.
-Output: API sender dùng virtual evdev/UInput.
-Nguyên lý: module chỉ re-export sender; listener nằm tại `utils.key_listener`.
+Implementation native nằm tại `agent.platform.linux.input_controller`; facade giữ
+một operation adapter để tham gia lifecycle process-wide.
 """
 
-from device_controler.input_controller.linux.sendinput_kb import (
-    keyDown,
-    keyUp,
-    press,
-    supportedKeys,
-    supportedWriteCharacters,
-    write,
+from agent.platform.linux.input_controller_operations import (
+    LinuxInputControllerOperations,
 )
-from device_controler.input_controller.linux.sendinput_mouse import (
-    click,
-    mouseDown,
-    mouseUp,
-    moveRel,
-    moveTo,
-    position,
-    scroll,
-    sideScroll,
-)
+
+
+_operations = LinuxInputControllerOperations()
+click = _operations.click
+keyDown = _operations.keyDown
+keyUp = _operations.keyUp
+moveRel = _operations.moveRel
+moveTo = _operations.moveTo
+mouseDown = _operations.mouseDown
+mouseUp = _operations.mouseUp
+position = _operations.position
+press = _operations.press
+scroll = _operations.scroll
+sideScroll = _operations.sideScroll
+supportedKeys = _operations.supportedKeys
+supportedWriteCharacters = _operations.supportedWriteCharacters
+write = _operations.write
 
 __all__ = [
     "click",

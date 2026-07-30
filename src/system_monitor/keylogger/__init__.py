@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import threading
 
+from agent.contracts import KeyListenerOperations
 from utils.key_listener import KeyEvent, get_num_lock_state, listen_keys
 
 
@@ -111,18 +112,20 @@ class KeyLogger:
     _listener_lock = threading.Lock()
     _listening = False
     _listener_error: Exception | None = None
+    _key_listener_operations: KeyListenerOperations | None = None
     _buffer: list[str] = []
     _cursor = 0
     _modifiers: set[str] = set()
     _caps_lock = False
 
     @classmethod
-    def start(cls) -> None:
+    def start(cls, operations: KeyListenerOperations | None = None) -> None:
         while True:
             with cls._listener_lock:
                 listener = cls._listener
                 stop_event = cls._listener_stop_event
                 if listener is None or not listener.is_alive():
+                    cls._key_listener_operations = operations
                     cls._listener_error = None
                     cls._listening = True
                     cls._listener_stop_event = threading.Event()
@@ -153,7 +156,13 @@ class KeyLogger:
     @classmethod
     def _listen(cls, stop_event: threading.Event) -> None:
         try:
-            for event in listen_keys(timeout=0.1, stop_event=stop_event):
+            operations = cls._key_listener_operations
+            events = (
+                listen_keys(timeout=0.1, stop_event=stop_event)
+                if operations is None
+                else operations.listen_keys(timeout=0.1, stop_event=stop_event)
+            )
+            for event in events:
                 if stop_event.is_set():
                     break
                 cls._keylogger(event)
@@ -165,6 +174,7 @@ class KeyLogger:
                 if cls._listener_stop_event is stop_event:
                     cls._listener_stop_event = None
                     cls._listener = None
+                    cls._key_listener_operations = None
 
     @classmethod
     def get_listener_error(cls) -> Exception | None:
@@ -209,7 +219,7 @@ class KeyLogger:
     @classmethod
     def _handle_navigation(cls, key_name: str) -> bool:
         action = _NAVIGATION.get(key_name)
-        if action is None and not get_num_lock_state():
+        if action is None and not cls._get_num_lock_state():
             action = _KEYPAD_NAVIGATION.get(key_name)
         if action is None:
             return False
@@ -225,7 +235,7 @@ class KeyLogger:
             return _KEY_SYMBOLS[key_name]
         if key_name in _KEYPAD_SYMBOLS:
             return _KEYPAD_SYMBOLS[key_name]
-        if key_name.startswith("KEY_KP") and get_num_lock_state():
+        if key_name.startswith("KEY_KP") and cls._get_num_lock_state():
             suffix = key_name[6:]
             if suffix.isdigit():
                 return suffix
@@ -239,6 +249,15 @@ class KeyLogger:
         if shifted:
             return _SHIFTED_DIGITS.get(character, character)
         return character
+
+    @classmethod
+    def _get_num_lock_state(cls) -> bool:
+        """Đọc NumLock qua dependency được inject hoặc compatibility facade."""
+
+        operations = cls._key_listener_operations
+        if operations is None:
+            return get_num_lock_state()
+        return operations.get_num_lock_state()
 
     @classmethod
     def _insert(cls, text: str) -> None:

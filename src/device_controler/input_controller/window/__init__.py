@@ -1,31 +1,29 @@
-"""Facade Windows cho gửi sự kiện bàn phím và chuột.
+"""Compatibility facade cho Windows input controller.
 
-File path: `src/device_controler/input_controller/window/__init__.py`
-Input: lời gọi theo contract chung của input controller.
-Output: API sender có cùng chữ ký với backend Linux.
-Nguyên lý: chỉ re-export các module con; dependency nền tảng được import lazy bên
-trong từng API để package vẫn import được trên Linux. Listener nằm tại
-`utils.key_listener`.
+Implementation native nằm tại `agent.platform.windows.input_controller`; facade giữ
+một operation adapter để caller cũ đi qua cùng contract.
 """
 
-from device_controler.input_controller.window.sendinput_kb import (
-    keyDown,
-    keyUp,
-    press,
-    supportedKeys,
-    supportedWriteCharacters,
-    write,
+from agent.platform.windows.input_controller_operations import (
+    WindowsInputControllerOperations,
 )
-from device_controler.input_controller.window.sendinput_mouse import (
-    click,
-    mouseDown,
-    mouseUp,
-    moveRel,
-    moveTo,
-    position,
-    scroll,
-    sideScroll,
-)
+
+
+_operations = WindowsInputControllerOperations()
+click = _operations.click
+keyDown = _operations.keyDown
+keyUp = _operations.keyUp
+moveRel = _operations.moveRel
+moveTo = _operations.moveTo
+mouseDown = _operations.mouseDown
+mouseUp = _operations.mouseUp
+position = _operations.position
+press = _operations.press
+scroll = _operations.scroll
+sideScroll = _operations.sideScroll
+supportedKeys = _operations.supportedKeys
+supportedWriteCharacters = _operations.supportedWriteCharacters
+write = _operations.write
 
 __all__ = [
     "click",

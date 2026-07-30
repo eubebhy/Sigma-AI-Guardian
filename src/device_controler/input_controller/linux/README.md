@@ -2,10 +2,10 @@
 
 File path: `src/device_controler/input_controller/linux/README.md`
 
-Vai tro: tao virtual keyboard/mouse bang `evdev.UInput` va gui event cho Xorg.
-Input la API sender chung; output la event native. `types.py` mo ta UInput/XInput,
+Vai tro: compatibility facade cho Linux input controller. Native implementation nam
+tai `src/agent/platform/linux/input_controller/`: `types.py` mo ta UInput/XInput,
 `utils.py` quan ly lifecycle, con `sendinput_kb.py` va `sendinput_mouse.py` phat
-event. Package nay khong doc input vat ly; dung `utils.key_listener.linux`.
+event. Package nay khong doc input vat ly; dung `utils.key_listener`.
 
 `UInputManager.get_ui()` tra device cache con khoe, hoac dong device chet va tao
 generation moi. `create_ui()` chi tra sau khi XInput2 thay device, tranh gui event

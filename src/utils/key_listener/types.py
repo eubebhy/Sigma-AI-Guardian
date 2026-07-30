@@ -6,14 +6,14 @@ Output: type alias event cho caller của listener.
 Nguyên lý: event không phụ thuộc backend để system monitor dùng cùng một contract.
 """
 
-from typing import Literal, TypeAlias
-
-KeyState: TypeAlias = Literal["down", "up", "hold"]
-KeyEvent: TypeAlias = tuple[str, KeyState]
-MouseState: TypeAlias = Literal["down", "up"]
-MouseButtonEvent: TypeAlias = tuple[str, MouseState]
-MouseMoveEvent: TypeAlias = tuple[str, int]
-MouseEvent: TypeAlias = MouseButtonEvent | MouseMoveEvent
+from agent.contracts import (
+    KeyEvent,
+    KeyState,
+    MouseButtonEvent,
+    MouseEvent,
+    MouseMoveEvent,
+    MouseState,
+)
 
 __all__ = [
     "KeyEvent",

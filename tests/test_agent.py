@@ -17,6 +17,7 @@ from collections.abc import Sequence
 from contextlib import redirect_stderr, redirect_stdout
 from io import StringIO
 import sys
+import threading
 import unittest
 from unittest.mock import patch
 
@@ -64,6 +65,52 @@ class AgentTests(unittest.TestCase):
         runtime = create_runtime(platform_name="windows")
 
         self.assertIn("Platform: Windows", runtime.status())
+
+    @test_modes("fake")
+    def test_runtime_exposes_input_platform_operations(self) -> None:
+        from agent.runtime import create_runtime
+
+        runtime = create_runtime(platform_name="linux")
+
+        self.assertTrue(callable(runtime.services.input_blocker.block))
+        self.assertTrue(callable(runtime.services.key_listener.listen_keys))
+        self.assertTrue(callable(runtime.services.input_controller.click))
+
+    @test_modes("fake")
+    def test_runtime_shutdown_closes_input_platform_operations(self) -> None:
+        from agent.runtime import create_runtime
+
+        runtime = create_runtime(platform_name="linux")
+        with (
+            patch.object(runtime.services.input_blocker, "close") as blocker_close,
+            patch.object(runtime.services.key_listener, "close") as listener_close,
+            patch.object(runtime.services.input_controller, "close") as controller_close,
+        ):
+            runtime.shutdown()
+
+        blocker_close.assert_called_once_with()
+        listener_close.assert_called_once_with()
+        controller_close.assert_called_once_with()
+
+    @test_modes("fake")
+    def test_runtime_shutdown_is_thread_safe(self) -> None:
+        from agent.runtime import create_runtime
+
+        runtime = create_runtime(platform_name="linux")
+        with (
+            patch.object(runtime.services.input_blocker, "close") as blocker_close,
+            patch.object(runtime.services.key_listener, "close") as listener_close,
+            patch.object(runtime.services.input_controller, "close") as controller_close,
+        ):
+            threads = [threading.Thread(target=runtime.shutdown) for _ in range(2)]
+            for thread in threads:
+                thread.start()
+            for thread in threads:
+                thread.join()
+
+        blocker_close.assert_called_once_with()
+        listener_close.assert_called_once_with()
+        controller_close.assert_called_once_with()
 
     @test_modes("smoke")
     def test_main_status_returns_success(self) -> None:

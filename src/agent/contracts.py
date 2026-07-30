@@ -1,15 +1,35 @@
 """Contract giữa feature SAG Agent và adapter hệ điều hành.
 
 File path: `src/agent/contracts.py`.
-Input: adapter cung cấp process, browser và window theo các protocol ở đây.
+Input: adapter cung cấp process, browser, window, hosts và input theo protocol ở đây.
 Output: feature nhận dữ liệu chuẩn hóa, không phụ thuộc lệnh native từng OS.
 Nguyên lý: contract chỉ mô tả capability nhỏ; nó không import adapter hay feature.
 """
 
 from __future__ import annotations
 
+from collections.abc import Iterator, Sequence
 from pathlib import Path
-from typing import Protocol
+import threading
+from typing import Literal, Protocol, TypeAlias
+
+
+Key: TypeAlias = str
+MouseButton: TypeAlias = Literal[
+    "primary",
+    "secondary",
+    "left",
+    "right",
+    "middle",
+    "forward",
+    "back",
+]
+KeyState: TypeAlias = Literal["down", "up", "hold"]
+KeyEvent: TypeAlias = tuple[str, KeyState]
+MouseState: TypeAlias = Literal["down", "up"]
+MouseButtonEvent: TypeAlias = tuple[str, MouseState]
+MouseMoveEvent: TypeAlias = tuple[str, int]
+MouseEvent: TypeAlias = MouseButtonEvent | MouseMoveEvent
 
 
 class ProcessOperations(Protocol):
@@ -65,4 +85,93 @@ class HostsPathOperations(Protocol):
     def get_hosts_path(self) -> Path:
         """Trả đường dẫn hosts chuẩn của platform."""
 
+        ...
+
+
+class InputBlockingOperations(Protocol):
+    """Chặn và mở chặn input vật lý trên desktop hiện tại."""
+
+    def block(self) -> None:
+        """Chặn keyboard và mouse, hoặc raise lỗi native."""
+        ...
+
+    def unblock(self) -> None:
+        """Mở chặn keyboard và mouse, hoặc raise lỗi cleanup."""
+        ...
+
+    def close(self) -> None:
+        """Dọn trạng thái block còn thuộc adapter này."""
+        ...
+
+
+class KeyListenerOperations(Protocol):
+    """Đọc input vật lý và trạng thái NumLock theo format Agent."""
+
+    def get_num_lock_state(self) -> bool:
+        """Trả trạng thái NumLock hiện tại."""
+        ...
+
+    def listen_keys(
+        self,
+        timeout: float | None = None,
+        stop_event: threading.Event | None = None,
+    ) -> Iterator[KeyEvent]:
+        """Sinh keyboard event đã chuẩn hóa."""
+        ...
+
+    def listen_mice(
+        self,
+        timeout: float | None = None,
+        stop_event: threading.Event | None = None,
+    ) -> Iterator[MouseEvent]:
+        """Sinh mouse event đã chuẩn hóa."""
+        ...
+
+    def close(self) -> None:
+        """Đóng resource listener được adapter cache."""
+        ...
+
+
+class InputControllerOperations(Protocol):
+    """Gửi keyboard và mouse event theo public API chung."""
+
+    def click(
+        self,
+        x: int | None = None,
+        y: int | None = None,
+        button: MouseButton = "primary",
+    ) -> None: ...
+
+    def keyDown(self, key: str) -> None: ...
+
+    def keyUp(self, key: str) -> None: ...
+
+    def mouseDown(self, button: MouseButton) -> None: ...
+
+    def mouseUp(self, button: MouseButton) -> None: ...
+
+    def moveRel(
+        self, x: int | None, y: int | None, duration: float = 0.0
+    ) -> None: ...
+
+    def moveTo(
+        self, x: int | None, y: int | None, duration: float = 0.0
+    ) -> None: ...
+
+    def position(self, take_new: bool = False) -> tuple[int, int]: ...
+
+    def press(self, keys: str | Sequence[str]) -> None: ...
+
+    def scroll(self, amount: int) -> None: ...
+
+    def sideScroll(self, amount: int) -> None: ...
+
+    def supportedKeys(self) -> tuple[str, ...]: ...
+
+    def supportedWriteCharacters(self) -> str: ...
+
+    def write(self, message: str, interval: float = 0.0) -> None: ...
+
+    def close(self) -> None:
+        """Đóng virtual device và connection được adapter cache."""
         ...

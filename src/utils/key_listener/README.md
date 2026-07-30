@@ -2,17 +2,21 @@
 
 File path: `src/utils/key_listener/README.md`
 
-Vai tro: lang nghe keyboard/mouse va doc NumLock theo Linux hoac Windows. Input la
+Vai tro: compatibility facade lang nghe keyboard/mouse va doc NumLock theo Linux
+hoac Windows qua `PlatformServices.key_listener`. Input la
 `timeout`, `stop_event` tuy chon cho moi lan cho event hoac loi goi doc NumLock;
 output la generator event da chuan hoa va `bool`. Module khong gui input; dung
 `device_controler.input_controller` cho control.
 
 ```text
-key_listener/
-├── types.py                 # KeyEvent, KeyState, MouseEvent va MouseState
-├── linux.py                 # evdev/select va X11 NumLock
-├── window.py                # pynput hook va Win32 NumLock
-└── __init__.py              # facade theo platform
+utils/key_listener/
+├── types.py                 # compatibility event type
+├── linux.py                 # compatibility API Linux
+├── window.py                # compatibility API Windows
+└── __init__.py              # public facade qua Agent platform service
+
+agent/platform/<os>/key_listener_backend.py
+└── native evdev/X11 hoac pynput/Win32
 ```
 
 ## Import va contract

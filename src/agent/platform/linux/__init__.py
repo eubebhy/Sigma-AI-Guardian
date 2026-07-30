@@ -10,6 +10,11 @@ from agent.capabilities import Capability, PlatformCapabilities
 from agent.platform import PlatformServices
 from agent.platform.linux.browser import LinuxBrowserOperations
 from agent.platform.linux.hosts import LinuxHostsPathOperations
+from agent.platform.linux.input_blocker import LinuxInputBlockingOperations
+from agent.platform.linux.input_controller_operations import (
+    LinuxInputControllerOperations,
+)
+from agent.platform.linux.key_listener import LinuxKeyListenerOperations
 from agent.platform.linux.processes import LinuxProcessOperations
 from agent.platform.linux.windows import LinuxWindowOperations
 
@@ -24,6 +29,9 @@ def create_services() -> PlatformServices:
             Capability("browser_launch", True, "subprocess"),
             Capability("window_tracking", True, "PyWinCtl with xdotool fallback"),
             Capability("hosts_file", True, "/etc/hosts permission required"),
+            Capability("input_blocking", True, "evdev permission required"),
+            Capability("input_listening", True, "evdev and X11 required"),
+            Capability("input_control", True, "UInput and X11 required"),
         ),
     )
     return PlatformServices(
@@ -33,4 +41,7 @@ def create_services() -> PlatformServices:
         browser=LinuxBrowserOperations(),
         windows=LinuxWindowOperations(),
         hosts=LinuxHostsPathOperations(),
+        input_blocker=LinuxInputBlockingOperations(),
+        key_listener=LinuxKeyListenerOperations(),
+        input_controller=LinuxInputControllerOperations(),
     )

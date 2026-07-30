@@ -47,7 +47,10 @@ AgentRuntime.services
     +-- process adapter  -> browser_tab, process_killer
     +-- browser adapter  -> browser_tab
     +-- window adapter   -> windows_tracker
-    `-- hosts adapter    -> web_blocker
+    +-- hosts adapter    -> web_blocker
+    +-- input blocker    -> screenlocker
+    +-- key listener     -> keylogger
+    `-- input controller -> compatibility facade / caller
 ```
 
 `main.py` chỉ parse CLI, tạo runtime và luôn gọi `runtime.shutdown()` khi thoát.
@@ -73,10 +76,10 @@ agent.contracts -> adapter hoặc feature                       # cấm
 feature -> agent.platform.linux hoặc agent.platform.windows  # cấm
 ```
 
-`agent.contracts` gồm các protocol nhỏ: `ProcessOperations`,
-`BrowserOperations`, `WindowOperations`, `HostsPathOperations`. Không có một
-`PlatformBackend` lớn vì process, browser, hosts và window có lifecycle/permission
-khác nhau; fake adapter cho test cũng đơn giản hơn.
+`agent.contracts` gồm các protocol nhỏ theo capability: process, browser, window,
+hosts, input blocking, key listener và input controller. Không có một
+`PlatformBackend` lớn vì mỗi capability có lifecycle/permission khác nhau; fake
+adapter cho test cũng đơn giản hơn.
 
 ## Code chung và code riêng platform
 
@@ -86,21 +89,22 @@ khác nhau; fake adapter cho test cũng đơn giản hơn.
 | Browser | validate URL, ưu tiên browser đang chạy | process spawn/session flags |
 | Web block | parse domain, dedupe, marker, atomic write | đường dẫn hosts |
 | Window monitor | API title/process chuẩn hóa | PyWinCtl, fallback `xdotool` trên Linux |
-| Input | facade public chung | evdev/UInput; Win32/SendInput/pynput |
+| Input | facade public và event chuẩn hóa | adapter evdev/UInput/X11; Win32/SendInput/pynput |
 | Screen capture | `ScreenRegion`, downsample, lock | MSS backend đa nền tảng |
 
-Code native hiện chỉ được phép nằm tại `src/agent/platform/linux/`,
-`src/agent/platform/windows/`, `src/device_controler/input_controller/` hoặc
-`src/utils/key_listener/`.
+Code native process, browser, window, hosts và input nằm tại
+`src/agent/platform/linux/` hoặc `src/agent/platform/windows/`. Các package
+`device_controler/input_controller`, `utils/input_blocker` và `utils/key_listener`
+chỉ giữ compatibility facade cho public API cũ.
 Feature trong `device_controler/` và `system_monitor/` không gọi `ps`,
 `tasklist`, `taskkill`, `xdotool`, `os.name`, `sys.platform` hay đường dẫn hosts.
 
 ## Lifecycle
 
-Runtime hiện chỉ sở hữu việc chọn platform. `ScreenCapture`, `screenlocker` và
-input facade giữ lifecycle hiện có để đợt tái cấu trúc không đổi hành vi desktop.
-`main.py` vẫn luôn gọi `runtime.shutdown()` để command Agent tương lai có một nơi
-thống nhất để dừng tài nguyên mới.
+Runtime sở hữu platform adapter và đóng input blocker, key listener, virtual input
+device cùng X11 resource do input controller cache. `ScreenCapture` và overlay của
+`screenlocker` vẫn giữ lifecycle feature hiện có; caller phải `unlock()` trước khi
+Agent shutdown.
 
 Thread dài hạn của `ProcessKiller` và `screenlocker` phải là daemon thread theo
 quy tắc `src/README.md`; command handler tương lai phải gọi `stop()`/`unlock()`

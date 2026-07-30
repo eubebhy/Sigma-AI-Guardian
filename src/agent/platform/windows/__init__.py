@@ -10,6 +10,11 @@ from agent.capabilities import Capability, PlatformCapabilities
 from agent.platform import PlatformServices
 from agent.platform.windows.browser import WindowsBrowserOperations
 from agent.platform.windows.hosts import WindowsHostsPathOperations
+from agent.platform.windows.input_blocker import WindowsInputBlockingOperations
+from agent.platform.windows.input_controller_operations import (
+    WindowsInputControllerOperations,
+)
+from agent.platform.windows.key_listener import WindowsKeyListenerOperations
 from agent.platform.windows.processes import WindowsProcessOperations
 from agent.platform.windows.windows import WindowsWindowOperations
 
@@ -24,6 +29,9 @@ def create_services() -> PlatformServices:
             Capability("browser_launch", True, "Windows subprocess"),
             Capability("window_tracking", True, "PyWinCtl"),
             Capability("hosts_file", True, "Administrator permission required"),
+            Capability("input_blocking", True, "Administrator permission required"),
+            Capability("input_listening", True, "pynput and Win32"),
+            Capability("input_control", True, "pydirectinput and Win32"),
         ),
     )
     return PlatformServices(
@@ -33,4 +41,7 @@ def create_services() -> PlatformServices:
         browser=WindowsBrowserOperations(),
         windows=WindowsWindowOperations(),
         hosts=WindowsHostsPathOperations(),
+        input_blocker=WindowsInputBlockingOperations(),
+        key_listener=WindowsKeyListenerOperations(),
+        input_controller=WindowsInputControllerOperations(),
     )

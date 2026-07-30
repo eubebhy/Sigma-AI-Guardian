@@ -4,16 +4,17 @@ File path: `src/device_controler/input_controller/README.md`
 
 Vai tro: gui va dieu khien keyboard/mouse tren Linux hoac Windows. Input la ten
 phim/nut chung, toa do hoac thoi luong; output la event dieu khien native. Package
-nay khong lang nghe input hoac doc NumLock; dung `utils.key_listener` cho hai nhu
-cau do.
+nay la compatibility facade qua `PlatformServices.input_controller`; no khong lang
+nghe input hoac doc NumLock. Dung `utils.key_listener` cho hai nhu cau do.
 
 ```text
-input_controller/
-├── types.py                 # Key, MouseButton va InputBackend
-├── linux/                   # evdev/UInput, Xlib va lifecycle virtual device
-│   └── __init__.py          # facade sender Linux
-└── window/                  # pydirectinput-rgx / WinAPI SendInput
-    └── __init__.py          # facade sender Windows
+device_controler/input_controller/
+├── types.py                 # compatibility type
+├── linux/                   # compatibility facade Linux
+└── window/                  # compatibility facade Windows
+
+agent/platform/<os>/input_controller/
+└── native sender va lifecycle cua platform
 ```
 
 ## Import
@@ -69,10 +70,14 @@ so duong len; `sideScroll(amount)` cuon ngang, so duong sang phai.
 
 ## Backend va lifecycle
 
+Native implementation nam trong `src/agent/platform/linux/input_controller/` va
+`src/agent/platform/windows/input_controller/`.
+
 Linux can `evdev`, `python-xlib`, kernel module `uinput`, quyen ghi `/dev/uinput`,
 phien X11 co `DISPLAY` va binary `xinput`. `UInputManager` giu virtual keyboard va
 mouse, poll XInput2 den khi Xorg nhan dien, cache health 5 giay va tao generation
-moi neu device chet. Wayland khong duoc ho tro cho API dua tren Xlib.
+moi neu device chet. `AgentRuntime.shutdown()` dong virtual device va X11 connection
+da cache. Wayland khong duoc ho tro cho API dua tren Xlib.
 
 Windows can `pydirectinput-rgx`. Ung dung dich co dac quyen cao hon co the khong
 nhan input. Mouse movement duoc thu vien noi suy thanh toa do tuyet doi de tranh

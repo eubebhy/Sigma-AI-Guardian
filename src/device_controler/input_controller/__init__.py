@@ -2,49 +2,79 @@
 
 File path: `src/device_controler/input_controller/__init__.py`.
 Input: lời gọi gửi keyboard hoặc mouse với tham số theo PyAutoGUI.
-Output: API gửi input của backend phù hợp với hệ điều hành đang chạy.
-Nguyên lý: facade chọn Linux hoặc Windows lúc import; mỗi backend tự nạp dependency
-khi cần gửi event. Listener nằm ở `utils.key_listener`.
+Output: API gửi input qua platform service phù hợp với hệ điều hành đang chạy.
+Nguyên lý: facade giữ public API cũ và lấy adapter mặc định từ Agent. Listener nằm
+ở `utils.key_listener`.
 """
 
-import sys
+from collections.abc import Sequence
 
-if sys.platform == "win32":
-    from device_controler.input_controller.window import (
-        click,
-        keyDown,
-        keyUp,
-        moveRel,
-        moveTo,
-        mouseDown,
-        mouseUp,
-        press,
-        position,
-        scroll,
-        sideScroll,
-        supportedKeys,
-        supportedWriteCharacters,
-        write,
-    )
-elif sys.platform.startswith("linux"):
-    from device_controler.input_controller.linux import (
-        click,
-        keyDown,
-        keyUp,
-        moveRel,
-        moveTo,
-        mouseDown,
-        mouseUp,
-        press,
-        position,
-        scroll,
-        sideScroll,
-        supportedKeys,
-        supportedWriteCharacters,
-        write,
-    )
-else:
-    raise NotImplementedError(f"Unsupported OS: {sys.platform}")
+from agent.contracts import InputControllerOperations, MouseButton
+from agent.platform import get_default_platform_services
+
+
+def _get_operations() -> InputControllerOperations:
+    return get_default_platform_services().input_controller
+
+
+def click(
+    x: int | None = None,
+    y: int | None = None,
+    button: MouseButton = "primary",
+) -> None:
+    _get_operations().click(x, y, button)
+
+
+def keyDown(key: str) -> None:
+    _get_operations().keyDown(key)
+
+
+def keyUp(key: str) -> None:
+    _get_operations().keyUp(key)
+
+
+def mouseDown(button: MouseButton) -> None:
+    _get_operations().mouseDown(button)
+
+
+def mouseUp(button: MouseButton) -> None:
+    _get_operations().mouseUp(button)
+
+
+def moveRel(x: int | None, y: int | None, duration: float = 0.0) -> None:
+    _get_operations().moveRel(x, y, duration)
+
+
+def moveTo(x: int | None, y: int | None, duration: float = 0.0) -> None:
+    _get_operations().moveTo(x, y, duration)
+
+
+def position(take_new: bool = False) -> tuple[int, int]:
+    return _get_operations().position(take_new)
+
+
+def press(keys: str | Sequence[str]) -> None:
+    _get_operations().press(keys)
+
+
+def scroll(amount: int) -> None:
+    _get_operations().scroll(amount)
+
+
+def sideScroll(amount: int) -> None:
+    _get_operations().sideScroll(amount)
+
+
+def supportedKeys() -> tuple[str, ...]:
+    return _get_operations().supportedKeys()
+
+
+def supportedWriteCharacters() -> str:
+    return _get_operations().supportedWriteCharacters()
+
+
+def write(message: str, interval: float = 0.0) -> None:
+    _get_operations().write(message, interval)
 
 
 __all__ = [
