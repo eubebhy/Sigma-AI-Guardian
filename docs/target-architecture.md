@@ -1,22 +1,10 @@
-# Kiến trúc đích: SAG Server và SAG Agent
+# Kiến trúc đích: SAG Server, SAG Service và SAG Agent
 
-## TL;DR
+## Phạm vi
 
-SAG gồm một Server trung tâm trong LAN và nhiều Agent trên máy học sinh. Giáo viên
-gửi ý định đến Server; Server gửi command/policy có schema đến Agent; Agent là thành
-phần duy nhất được thao tác desktop và hệ điều hành cục bộ.
-
-## Mục tiêu
-
-Giúp giáo viên áp policy lớp học lên máy học sinh bằng dữ liệu đơn giản, có kết quả
-rõ ràng, không cho phép thực thi code hoặc shell tùy ý qua mạng.
-
-## Không phải mục tiêu giai đoạn đầu
-
-- Remote shell, gửi Python code, generic command execution.
-- Remote desktop streaming, remote input, WebRTC hoặc screen capture liên tục.
-- Database lớn, nhiều tenant, phân quyền phức tạp hoặc deployment Internet.
-- Để Teacher Console gọi API Windows/Linux trực tiếp.
+SAG gồm một Server trung tâm và nhiều máy học sinh. Mỗi máy học sinh có hai thành
+phần: SAG Service và SAG Agent. Tài liệu này chỉ mô tả trách nhiệm kiến trúc; cơ chế
+giao tiếp, format dữ liệu và tool call chưa được thiết kế.
 
 ## Sơ đồ tổng thể
 
@@ -25,60 +13,47 @@ Teacher Console
       |
       v
 SAG Server
-  - nhận yêu cầu giáo viên
-  - giữ Agent online
-  - tạo command/policy
-  - nhận kết quả
+      |
+      v
+SAG Service x N
       |
       v
 SAG Agent x N
-  - kiểm tra message
-  - kiểm tra readiness cục bộ
-  - chạy command allowlist
-  - trả CommandResult
       |
       v
 Windows/Linux desktop
 ```
 
-Server nên là hub duy nhất. Máy giáo viên không giao tiếp peer-to-peer trực tiếp với
-từng máy học sinh. Agent chủ động tạo kết nối đến Server để Server không cần biết
-chi tiết mạng nội bộ của từng máy Agent.
+SAG Server là điểm trung tâm giữa Teacher Console và các máy học sinh. Teacher Console
+không giao tiếp trực tiếp với SAG Service, SAG Agent hoặc desktop của máy học sinh.
 
-## Boundary trách nhiệm
+## Trách nhiệm
 
 | Thành phần | Chịu trách nhiệm | Không chịu trách nhiệm |
 | --- | --- | --- |
-| Teacher Console | Người giáo viên tạo yêu cầu/policy và xem kết quả | Gọi OS API, giữ connection Agent, quyết định native action |
-| SAG Server | Nhận yêu cầu, xác định Agent đích, chuyển command, lưu trạng thái tối thiểu | Gọi hosts, process, browser, input hoặc desktop OS |
-| SAG Agent | Kiểm tra command, readiness, action allowlist, cleanup và result | Xác thực giáo viên, quản lý lớp học, tự tạo policy quản trị |
-| Platform adapter | Thực thi API Windows/Linux | Network, policy, teacher identity |
+| Teacher Console | Giáo viên tạo yêu cầu và xem trạng thái/kết quả | Gọi API hệ điều hành hoặc desktop máy học sinh |
+| SAG Server | Nhận yêu cầu giáo viên, điều phối đến máy học sinh và quản lý trạng thái phía Server | Thao tác desktop hoặc API Windows/Linux |
+| SAG Service | Khởi động cùng hệ điều hành, kết nối và giao tiếp với SAG Server, chuyển việc đến SAG Agent | Trực tiếp gọi tool, feature hoặc API desktop |
+| SAG Agent | Gọi tool/feature cục bộ, quản lý lifecycle của tool và shutdown sạch | Kết nối Server hoặc quản lý session phía Server |
+| Platform adapter | Thực thi khác biệt Windows/Linux cho SAG Agent | Network, session hoặc nghiệp vụ Server |
 
-## Boundary tin cậy và quyền
+## SAG Service
 
-Teacher Console gửi yêu cầu nhân danh giáo viên, nhưng chỉ **Server** được xác định
-yêu cầu đó có hợp lệ và giáo viên có quyền áp action lên Agent đích hay không. Sau khi
-Server chấp nhận, Server tạo command mới cho Agent.
+SAG Service là tiến trình nền trên máy học sinh. Nó khởi động cùng hệ điều hành bằng
+Windows Service trên Windows hoặc service manager như `systemd` hay OpenRC trên Linux.
 
-Agent không xác thực giáo viên và không nhận quyền trực tiếp từ Teacher Console. Agent
-chỉ tin command đến từ Server đã được Agent nhận diện là Server của mình; sau đó Agent
-vẫn kiểm tra command name, payload, expiry và readiness cục bộ. Nhờ vậy, một teacher
-request không thể đi thẳng đến desktop máy học sinh.
+Service chịu trách nhiệm duy trì kết nối và giao tiếp với SAG Server. Khi cần mở rộng,
+Service cũng là nơi quản lý session gắn với account hoặc học sinh. Service không trực
+tiếp thao tác desktop; nó yêu cầu SAG Agent thực hiện công việc cục bộ.
 
-## Nguyên tắc dữ liệu
+## SAG Agent
 
-Data qua mạng là một ngôn ngữ command nhỏ, không là source code:
-
-```text
-command name + payload đã biết -> behavior đã định nghĩa trong Agent
-```
-
-Ví dụ `open_url` được Agent map sang `open_tab`; message không thể chứa script để
-Agent chạy. Tính mạnh đến từ tổ hợp command allowlist, không đến từ khả năng chạy dữ
-liệu tùy ý.
+SAG Agent là chương trình thực thi cục bộ. Agent nhận công việc từ SAG Service, gọi các
+tool và feature đã có, quản lý lifecycle tài nguyên của chúng, rồi shutdown sạch khi
+được yêu cầu. Agent là boundary duy nhất được phép thao tác Windows/Linux desktop.
 
 ## Trạng thái hiện tại
 
-`src/main.py` mới có `status`; `AgentRuntime` mới chọn platform. Command dispatcher,
-Agent network client và Server chưa tồn tại. Xem [`architecture.md`](architecture.md)
-để phân biệt code hiện có với kiến trúc đích này.
+Repository hiện chỉ có Agent cục bộ với `status` và platform runtime. SAG Server, SAG
+Service, cơ chế Service–Agent và Teacher Console chưa tồn tại. Xem
+[`architecture.md`](architecture.md) để biết code đang có.

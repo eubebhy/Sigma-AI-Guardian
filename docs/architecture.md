@@ -1,14 +1,14 @@
 # Kiến trúc SAG Agent
 
-> Đây là kiến trúc **code hiện tại**. Blueprint Agent–Server tương lai nằm tại
-> [`index.md`](index.md); không nhầm tài liệu đích với feature đã tồn tại.
+> Đây là kiến trúc **code hiện tại**. Kiến trúc đích có SAG Server, SAG Service và
+> SAG Agent nằm tại [`target-architecture.md`](target-architecture.md).
 
 ## Phạm vi
 
-Repository hiện tại là **SAG Agent**: ứng dụng cục bộ chạy trên một máy học sinh.
-Agent phát hiện platform và cung cấp adapter/capability cho feature desktop có sẵn;
-CLI hiện chỉ chạy `status`, chưa dispatch feature desktop. Repository chưa có Server,
-Teacher Console, mạng LAN, protocol từ xa hoặc remote desktop streaming.
+Repository hiện tại là ứng dụng cục bộ tiền thân của **SAG Agent** trên máy học sinh.
+Nó phát hiện platform và cung cấp adapter/capability cho feature desktop có sẵn; CLI
+hiện chỉ chạy `status`, chưa dispatch feature desktop. SAG Server, SAG Service,
+Teacher Console và cơ chế giao tiếp giữa chúng chưa tồn tại.
 
 ## Chạy Agent
 
@@ -149,10 +149,3 @@ Khi sửa script Python, chạy thêm:
 ```bash
 scripts/clean_pyright_check.sh scripts
 ```
-
-## Hướng phát triển sau SAG Agent
-
-Chỉ sau khi Agent có command lifecycle ổn định mới tạo Server và Teacher Console.
-Server tương lai chỉ gửi command đã xác thực đến Agent; nó không được chứa adapter
-Windows/Linux hoặc gọi API desktop. Remote desktop và network protocol là dự án
-riêng, không thuộc kiến trúc Agent hiện tại.
