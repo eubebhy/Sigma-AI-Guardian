@@ -1,21 +1,23 @@
 # `content_classifier.local`
 
-Nhom module nay phu trach classifier chay model scikit-learn cuc bo qua
-`joblib`.
+## DESCRIPTION
 
-## Thanh phan
+Package chạy local scikit-learn model qua `joblib`. Public API là
+`local_ai_classifier(text, strict_level="mid")`; input là text và strict level, output
+là `ContentCategory`.
 
-- `ai_assistant.py`: wrapper lazy-load model va du doan.
-- `classifier.py`: lop/ham boc muc cao hon de goi local AI classifier.
+```python
+from content_classifier.local import local_ai_classifier
 
-## Du lieu lien quan
+result = local_ai_classifier("example text", "mid")
+```
 
-- Model runtime hien duoc luu trong `data/models/` va duoc load tu file
-  `Ritchie.pkl`.
-- Du lieu huan luyen dung cho model nam trong `data/training/`.
+## LIFECYCLE
 
-## Ghi chu
+Model được lazy-load khi API được gọi. `ai_assistant.py` giữ monitor daemon và cung cấp
+`close()` để signal, join monitor và bỏ reference instance khi owner đã dùng xong.
 
-- Giu module gon, tranh tao them file neu chua that su can.
-- Neu `scikit-learn` thieu type stub, chi ignore dung dong bao loi lien quan den
-  thu vien nay.
+## TRUST BOUNDARY
+
+Runtime load `data/models/Ritchie.pkl`. `joblib.load()` có thể deserialize code; chỉ
+load artifact từ build/release được tin cậy. Data training nằm tại `data/training/`.

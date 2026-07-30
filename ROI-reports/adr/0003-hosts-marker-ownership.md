@@ -2,8 +2,8 @@
 
 ## TL;DR
 
-SAG chỉ thêm/xóa domain trong marker section của hosts và replace file atomically cho
-một writer; concurrent writer là debt được ghi riêng.
+SAG chỉ thêm/xóa domain trong marker section của hosts. Sidecar lock serialize các
+writer SAG; replace atomic tránh hosts dở khi một writer hoàn tất.
 
 ## Trạng thái
 
@@ -18,7 +18,8 @@ thêm/xóa nhiều domain mà không phá nội dung ngoài phạm vi của mìn
 
 `web_blocker` chỉ parse/render domain giữa `START_MARKER`/`END_MARKER`. Nội dung ngoài
 marker được giữ; update tính trong memory và ghi temporary file cùng directory rồi
-`os.replace()`. Marker start không có marker end là lỗi `ValueError`.
+`os.replace()`. Sidecar lock được giữ trong toàn bộ read-modify-write. Marker start
+không có marker end là lỗi `ValueError`.
 
 ## Lựa chọn thay thế và trade-off
 
@@ -28,8 +29,8 @@ marker được giữ; update tính trong memory và ghi temporary file cùng di
 
 ## Hệ quả
 
-Một writer không để hosts bị ghi dở và domain được dedupe/sort. Quyết định **không**
-`technical-debt.md` trước khi thay semantics.
+Writer SAG đồng thời không mất update và domain được dedupe/sort. Lock không điều phối
+công cụ ngoài SAG, không bảo toàn mọi metadata và không đảm bảo durability khi mất điện.
 
 ## Xem xét lại khi
 

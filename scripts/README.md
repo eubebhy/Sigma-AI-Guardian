@@ -1,19 +1,25 @@
-# Script ho tro
+# Scripts
 
-Cac script trong thu muc nay phuc vu phat trien, huan luyen model va kiem tra cuc bo.
-Chung khong phai API runtime cong khai cua ung dung.
+## DESCRIPTION
 
-## Tao du lieu va huan luyen
+Các script phục vụ phát triển, huấn luyện model và kiểm tra cục bộ; chúng không là API
+runtime công khai. Chạy từ project root để relative path trỏ đúng dữ liệu repository.
 
-- `record_clip_board.py`: ghi noi dung clipboard vao file.
-- `train_model.py`: huan luyen model tu du lieu huan luyen hien co.
+## COMMANDS
 
-## Khac
+| Script | Input | Output / side effect |
+| --- | --- | --- |
+| `record_clip_board.py` | Clipboard hiện tại | Ghi dữ liệu clipboard vào file; xem là dữ liệu nhạy cảm, không commit. |
+| `train_model.py` | Dữ liệu training | Tạo hoặc thay model artifact trong `data/`. |
+| `clean_pyright_check.sh <target>` | Một file hoặc directory Python | Chạy Pyright strict và rút gọn JSON result. |
 
-- `clean_pyright_check.sh`: chay Pyright theo cach rut gon de de doc loi.
+Ví dụ:
 
-## Ghi chu
+```bash
+scripts/clean_pyright_check.sh src
+```
 
-- Chay script tu project root de cac duong dan tuong doi tro dung du lieu trong repo.
-- Script ghi du lieu hoac huan luyen model co the tao/thay doi file trong `data/`.
-- Khi sua file Python, dung `scripts/clean_pyright_check.sh <path>` de kiem tra rieng file do.
+## REQUIREMENTS
+
+Checker cần Bash, Pyright và `jq` trên `PATH`. Script ghi dữ liệu hoặc train model có
+thể thay đổi `data/`; kiểm tra diff trước khi stage.

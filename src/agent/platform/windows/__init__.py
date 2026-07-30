@@ -7,7 +7,7 @@ Nguyên lý: module ghép adapter capability nhỏ; feature không import packag
 """
 
 from agent.capabilities import Capability, PlatformCapabilities
-from agent.platform.factory import PlatformServices
+from agent.platform import PlatformServices
 from agent.platform.windows.browser import WindowsBrowserOperations
 from agent.platform.windows.hosts import WindowsHostsPathOperations
 from agent.platform.windows.processes import WindowsProcessOperations

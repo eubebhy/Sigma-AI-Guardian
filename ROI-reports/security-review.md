@@ -13,20 +13,22 @@ kết luận có exploit đang hoạt động.
 - Native command hiện dùng argv-list (`ps`, `tasklist`, `taskkill`, `xdotool`), không
   dùng shell string.
 - `open_tab()` chặn URL không bắt đầu HTTP(S), nhưng validation host chi tiết chưa có.
-- Web blocker ghi hosts bằng temporary file cùng directory rồi `os.replace()` và chỉ
-  sở hữu section có marker.
+- Web blocker chỉ sở hữu section có marker, giữ sidecar lock cho giao dịch SAG và ghi
+  temporary file cùng directory rồi `os.replace()`.
 
 ## Rủi ro và hardening
 
 | Priority | Rủi ro | Evidence | Xử lý trước khi mở command/network boundary |
 | --- | --- | --- | --- |
-| P1 | UI lỗi sau input block có thể làm người dùng không điều khiển máy | `screenlocker/__init__.py` | Cleanup fail-safe, manual test có recovery rõ. |
-| P2 | Hosts writer đồng thời mất policy | `web_blocker/__init__.py` | Serialize read-modify-write, test temp file concurrency. |
 | P2 | Process kill có privilege cao và PID reuse | `process_killer`, OS adapters | Identity revalidation, allowlist policy, audit result trước remote command. |
 | P2 | Linux lock fail-open nhưng caller không biết | `utils/input_blocker/linux.py` | Structured result và policy fail-open/fail-closed đã quyết định. |
 | P3 | `joblib.load()` deserialize pickle | `content_classifier/local/ai_assistant.py` | Chỉ load artifact tin cậy; hash/provenance trước load. |
 | P3 | Keylogger/input manual test có dữ liệu nhạy cảm | `system_monitor/keylogger`, input test scripts | Không log/commit dữ liệu thật; manual opt-in và xóa artifact. |
 | P3 | Classifier input lớn gây resource exhaustion | Rule/fuzzy classifier | Length/token budget có benchmark. |
+
+Screenlocker cleanup và concurrent SAG hosts writer đã có lifecycle/concurrency
+coverage. Residual risk vẫn gồm native permission, công cụ ngoài SAG lock và desktop
+session thật; automated test không xác nhận các điều kiện này.
 
 ## Chính sách bắt buộc trước transport tương lai
 

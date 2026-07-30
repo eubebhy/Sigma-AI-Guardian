@@ -1,12 +1,15 @@
-# Quy uoc file keyword
-- Moi dong la mot keyword
-- Moi keyword khong nen dai qua 10 ki tu va 3 tu
-- Su dung "#" de comment
-- Moi keyword khong nen qua ngang duoi 3 ki tu.
-vi du:
+# Keyword file convention
+
+## FORMAT
+
+Mỗi dòng là một keyword hoặc phrase. Phần sau `#` là comment.
+
 ```text
 Minecraft
-RealCraft # Ban nhai Minecraft
+RealCraft # bản nhái Minecraft
 ```
-```
-```
+
+## NOTES
+
+Giữ keyword ngắn, rõ nghĩa và một mục mỗi dòng để review dễ. Giới hạn độ dài hoặc số
+từ là convention biên tập, không phải validation do code enforce.

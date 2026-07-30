@@ -2,19 +2,18 @@
 
 ## TL;DR
 
-Chưa có benchmark gate đáng tin cậy. Classifier rule/fuzzy là hotspot đã đo; capture
-benchmark tồn tại nhưng dùng desktop thật. Không tối ưu trước khi có corpus/metric cố định.
+Chưa có benchmark gate đáng tin cậy. Classifier rule/fuzzy là hotspot từ source;
+screen-capture benchmark chỉ chạy manual trên desktop thật. Không tối ưu trước khi có
+corpus và metric cố định.
 
 ## Quan sát không dùng làm baseline
 
 - Rule/fuzzy classifier không giới hạn số ký tự hoặc token trước khi so khớp; đây là
   rủi ro hiệu năng từ source, chưa có benchmark tái lập được commit trong repository.
-- Rule runner mặc định có thể in failure nhưng exit code 0; không dùng làm
-  accuracy/performance gate.
 - Log lịch sử classifier có sample size/setting khác nhau; không phải baseline so
   sánh trực tiếp.
-- `tests/benchmark_screen_capture.py` đọc màn hình thật, chịu ảnh hưởng resolution,
-  compositor, desktop load và sharpness.
+- `tests/test_screen_capture.py real benchmark ...` đọc màn hình thật, chịu ảnh hưởng
+  resolution, compositor, desktop load và sharpness.
 
 ## Benchmark cần có khi sửa khu vực tương ứng
 

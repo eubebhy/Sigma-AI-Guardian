@@ -1,28 +1,35 @@
 # Web Blocker
 
-`src/device_controler/web_blocker` chan website bang cach them domain vao hosts
-file cua he dieu hanh.
+## DESCRIPTION
 
-## Dau vao
+`src/device_controler/web_blocker/` quản lý domain SAG trong hosts file. Module chỉ
+sở hữu nội dung giữa `START_MARKER` và `END_MARKER`; nội dung ngoài marker được giữ.
 
-- `block(file_path)`: nhan file text chua domain hoac URL, moi dong mot gia tri.
-- `unblock(file_path)`: nhan cung dinh dang file de xoa domain khoi trang thai block.
+## INPUT
 
-## Dau ra
+`block(file_path)` và `unblock(file_path)` nhận text file gồm một domain hoặc URL mỗi
+dòng. Comment bắt đầu bằng `#` bị bỏ qua.
 
-- Hosts file duoc cap nhat trong block nam giua marker cua SAG.
-- Neu noi dung khong doi, module khong ghi lai hosts file.
+```text
+example.com
+https://www.example.org/path
+```
 
-## Nguyen ly
+## OUTPUT
 
-Module doc danh sach domain, chuan hoa ve hostname, doc hosts hien tai, thay doi
-block cua SAG trong bo nho roi ghi atomic replace. Cach nay giu phan hosts ben
-ngoai marker khong thuoc quyen quan ly cua module.
+- `block()` trả `set[str]` domain được thêm mới.
+- `unblock()` trả `None`.
+- Module chỉ ghi hosts khi nội dung thay đổi. Marker lỗi raise `ValueError`.
 
-## Quyen he thong
+## OPERATION
 
-- Linux: thuong can quyen ghi `/etc/hosts`.
-- Windows: thuong can quyen admin de ghi `C:\Windows\System32\drivers\etc\hosts`.
+Module chuẩn hóa hostname, giữ sidecar lock trong toàn bộ giao dịch read-modify-write,
+rồi ghi temporary file và `os.replace()`. Lock chỉ serialize writer SAG cùng dùng hosts
+path; nó không điều khiển công cụ không dùng lock này và không bảo đảm durability khi
+mất điện.
 
-Cho coding agent:
-File rat lon, khong doc: `./porn-sites.txt`.
+## PERMISSIONS
+
+Linux thường cần quyền ghi `/etc/hosts`; Windows thường cần Administrator để ghi hosts.
+Automated test phải truyền fake hosts adapter hoặc temporary path, không gọi public API
+mặc định với hosts thật.

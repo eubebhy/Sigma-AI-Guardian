@@ -1,4 +1,4 @@
-# Mục tiêu hiện tại: SAG Agent đa nền tảng
+# SAG Agent roadmap
 
 Repository này hiện chỉ xây dựng **SAG Agent** chạy trên máy học sinh. Agent là
 tiến trình cục bộ có entry point, phát hiện Windows/Linux một lần và tạo adapter
@@ -22,7 +22,7 @@ tool calling mới, UI mới và protocol mạng đều ngoài phạm vi hiện 
 6. Test tự động dùng fake/mock, không đụng desktop, input device hay hosts thật
    mặc định; Pyright strict đạt cho mã Python đã sửa.
 
-## Công việc được duyệt
+## Platform foundation đã hoàn thành
 
 ### 1. Runtime Agent
 
@@ -49,168 +49,97 @@ tool calling mới, UI mới và protocol mạng đều ngoài phạm vi hiện 
 - Không thêm command điều khiển mới ngoài `status`; các feature hiện hữu không
   được đổi hành vi chỉ để tái cấu trúc.
 
-### 4. Kiểm chứng và tài liệu
+Runtime, contracts và adapter Linux/Windows đã được tách. Public API feature giữ
+compatibility fallback; command dispatcher chưa tồn tại.
 
-- Thêm test contract/factory/CLI không cần OS desktop thật.
-- Giữ hoặc cập nhật test feature liên quan khi dependency injection thay đổi.
-- Chạy các script test an toàn, Pyright strict và `git diff --check`.
-- Viết tài liệu kiến trúc tại `docs/architecture.md` và kế hoạch thực hiện tại
-  `docs/superpowers/plans/`.
+## Next: SAG Agent Core
 
-## Không làm trong đợt này
-
-- Server, web API, WebSocket, database, LAN discovery, Teacher Console.
-- Streaming remote desktop, điều khiển từ xa qua mạng, WebRTC hoặc protocol.
-- Hệ thống config/log mới, UI mới, dependency mới hoặc thay đổi classifier.
-- Refactor không cần thiết ngoài ranh giới runtime/platform Agent.
-
-## Điều kiện hoàn thành
-
-- Không còn nhánh OS/lệnh `ps`, `tasklist`, `taskkill`, `xdotool` hay đường dẫn
-  hosts trong feature đã migration.
-- Adapter không import feature; contract không import adapter; feature không
-  import backend Windows/Linux trực tiếp.
-- Mọi capability thiếu dependency/quyền/desktop session đều có trạng thái hoặc
-  lỗi rõ ràng, không fallback sai OS.
-- Không thay đổi hành vi public ngoài entry point `status` mới.
-
----
-
-# Hướng phát triển tiếp: SAG Agent vận hành được
-
-Blueprint kiến trúc đích để build dần Server nằm tại
-[`docs/index.md`](docs/index.md). Các tài liệu này mô tả boundary và data flow, không
-chọn framework, library hoặc kỹ thuật networking cụ thể.
-
-## SAG Agent thực sự là gì?
-
-SAG Agent là tiến trình cài trên **mỗi máy học sinh**. Nó là lớp duy nhất được
-phép thao tác với desktop và hệ điều hành của máy đó: khóa màn hình, mở URL,
-chặn domain, quản lý process, đọc trạng thái desktop và sau này gửi frame màn
-hình. Agent không phải Server, không hiển thị giao diện giáo viên, không quản lý
-lớp học và không tự đưa ra quyết định quản trị.
-
-Khi dự án đầy đủ, Server sẽ xác thực lệnh giáo viên rồi gửi command đã định nghĩa
-đến Agent. Agent kiểm tra capability/quyền/policy cục bộ, thực thi feature và trả
-`CommandResult`. Server không được gọi Win32, evdev, hosts hay API desktop.
-
-```text
-Teacher Console (tương lai)
-        -> SAG Server (tương lai: auth, classroom, audit, relay)
-        -> SAG Agent (repo hiện tại: capability và OS action)
-        -> Windows/Linux desktop
-```
-
-Trong giai đoạn hiện tại chưa có network. Cần xây dựng **command dispatcher chạy
-trong cùng process Agent** trước; transport LAN sau này chỉ là một caller khác của
-dispatcher đó.
-
-## Kiến trúc đích của Agent
+Repository hiện có **platform foundation**, chưa có Agent nhận command: `main.py`
+tạo `AgentRuntime`, runtime chọn `PlatformServices` Linux/Windows một lần, rồi CLI
+chỉ in `status`. `AgentRuntime` không phải Server, không giao tiếp mạng và chưa sở
+hữu feature chạy lâu.
 
 ```text
 main.py
-  -> AgentApplication                 # start/shutdown của một Agent process
-      -> AgentRuntime                 # platform services đã chọn một lần
-      -> CommandDispatcher            # allowlist command và kiểm tra capability
-          -> Feature service          # lock/web/process/browser/window
-              -> agent.contracts
-                  -> adapter Windows/Linux
+  -> AgentRuntime
+      -> PlatformServices
+          -> adapter Linux/Windows
+          -> feature local
 ```
 
-Command có dạng dữ liệu rõ ràng, không phải shell string:
+`PlatformServices` là túi adapter process/browser/window/hosts cho đúng OS. Các
+feature mới phải nhận `runtime.services` trực tiếp. `get_default_platform_services()`
+chỉ là compatibility fallback cho API cũ; xóa nó sau khi mọi feature đang dùng đã
+được migration sang dependency injection.
 
-```python
-AgentCommand(name="open_url", payload={"url": "https://example.com"})
-CommandResult(command_id="...", status="success", detail="...")
-```
-
-Command allowlist ban đầu chỉ gồm action hiện có và an toàn để kiểm thử:
+## Phase 1: Command Core
 
 ```text
-status
-open_url
-block_domains
-unblock_domains
-start_process_guard
-stop_process_guard
+CLI hiện tại / fake transport tương lai / TCP LAN tương lai
+  -> CommandRequest
+  -> AgentRuntime.execute()
+  -> validate action và args
+  -> feature
+  -> CommandResult
 ```
 
-`lock_screen`/`unlock_screen` chỉ được thêm khi Agent đã có process lifecycle dài
-hạn; không tạo CLI một-lệnh rồi thoát vì daemon UI/input sẽ bị dừng ngay khi process
-kết thúc. Không thêm `run_shell` trong Agent; đó là rủi ro bảo mật và ngoài phạm vi.
+Không tạo `AgentLoop`, Poll, queue global, registry động hoặc abstraction mới chưa
+cần. Transport không gọi feature trực tiếp và không tự chọn OS.
 
-## Việc làm ngay ngày mai
+1. Thêm `CommandRequest` và `CommandResult` tối giản vào `agent.runtime`.
+2. Thêm `AgentRuntime.execute(command)` với allowlist tĩnh.
+3. Chỉ hỗ trợ `agent.status` trước; test action hợp lệ và action không tồn tại.
+4. Thêm `classifier.rule_based` sau khi flow `status` ổn định.
 
-### A. Chốt command contract và application lifecycle
+**Xong khi:** CLI gọi `AgentRuntime.execute()` thay vì gọi `status()` trực tiếp; test
+fake chứng minh request được validate, route và trả result mà không đụng desktop.
 
-1. Tạo `agent/commands.py`: `AgentCommand`, `CommandResult`, enum trạng thái và
-   lỗi command. Payload phải được validate theo từng command, không dùng
-   `dict[str, object]` không kiểm soát ở feature.
-2. Tạo `agent/application.py`: sở hữu một `AgentRuntime`, dispatcher và lifecycle
-   start/shutdown. Không tạo thread/network trong module import.
-3. Tạo `agent/dispatcher.py`: registry tường minh bằng mapping command-name sang
-   handler; không dùng reflection hoặc execute shell.
-4. Viết fake runtime/feature test cho command success, unsupported command,
-   capability unavailable và feature exception.
+## Phase 2: Lifecycle feature
 
-**Xong khi:** command dispatcher có thể chạy `status` qua `AgentApplication` và
-mọi test không cần desktop thật.
+Feature tự quản lý worker thread; Runtime chỉ là owner của feature mà nó đã start.
 
-### B. Đưa browser và web blocker vào command handler
+```text
+process_guard.start -> Runtime giữ ProcessKiller -> feature tạo worker
+Agent shutdown      -> Runtime stop/close feature theo thứ tự ngược lúc start
+```
 
-1. Tạo handler `open_url`; chỉ nhận URL `http://`/`https://`, gọi `open_tab` qua
-   platform services đã có.
-2. Tạo handler `block_domains`/`unblock_domains`; chỉ nhận path block-list được
-   caller cung cấp, gọi API web blocker hiện có và trả lỗi permission rõ ràng.
-3. Không đổi parser domain, marker hosts, atomic write hoặc thứ tự ưu tiên browser
-   nếu không có test lỗi chứng minh cần đổi.
-4. Test handler bằng fake browser/hosts adapter và temporary hosts file; test mặc
-   định không ghi `/etc/hosts` hay hosts Windows.
+1. Thêm `process_guard.start/stop` sau khi ownership và cleanup có test fake.
+2. Sau đó mới thêm `keylogger.start/stop`, `screen.lock/unlock` và `LocalAI.close`.
+3. Shutdown phải ngừng nhận command mới, dừng feature đang chạy và join worker có
+   timeout phù hợp.
+4. Hosts web block là persistent policy; không tự unblock khi Agent shutdown trừ khi
+   có command policy riêng.
 
-**Xong khi:** feature được gọi bằng command data thay vì CLI logic rải rác và API
-public cũ vẫn chạy.
+**Xong khi:** shutdown hợp lệ không để worker/thread của feature do Runtime sở hữu
+chạy tiếp hoặc giữ input/UI state dở dang.
 
-### C. Đưa process guard vào lifecycle Agent
+## Phase 3: Transport LAN
 
-1. Tạo handler `start_process_guard` và `stop_process_guard` quanh `ProcessKiller`
-   hiện có; một Agent chỉ có một guard đang chạy.
-2. Định nghĩa rõ payload blacklist/whitelist/interval, validate process name và
-   không kill process trong unit test.
-3. Shutdown Agent luôn gọi `ProcessKiller.stop()` trước khi runtime đóng.
-4. Test start idempotent, stop idempotent, whitelist ưu tiên và shutdown cleanup.
+Chỉ bắt đầu sau khi Command Core và lifecycle ổn định:
 
-**Xong khi:** guard sống theo lifecycle Agent, không phụ thuộc một CLI process ngắn.
+```text
+network packet -> CommandRequest -> AgentRuntime.execute() -> CommandResult -> packet
+```
 
-### D. Nâng `status` thành readiness report thật
+Transport chỉ encode/decode và giao tiếp mạng. Nó không biết feature, Linux/Windows
+hay policy desktop. Không thêm polling hoặc persistent connection nếu chưa có yêu cầu
+nghiệp vụ.
 
-1. Tách capability tĩnh khỏi readiness runtime: dependency binary, permission,
-   desktop session và hosts writable phải có trạng thái riêng.
-2. `status` chỉ đọc/kiểm tra an toàn; không grab input, kill process, sửa hosts,
-   tạo screen overlay hoặc mở browser.
-3. Output ổn định cho người và JSON-ready model cho Server tương lai; chưa cần API
-   JSON/HTTP trong ngày mai.
-4. Test từng readiness checker bằng dependency fake hoặc monkeypatch, không phụ
-   thuộc máy dev có Xorg/Windows Administrator.
+## Phase 4: Server và deployment
 
-**Xong khi:** giáo viên/kỹ thuật viên biết chính xác Agent thiếu quyền hay binary
-nào trước khi gửi command.
+```text
+Teacher Server <-> authenticated transport <-> Agent Core <-> Feature
+```
 
-## Không làm ngày mai
+Sau Agent Core mới quyết định TLS/authentication, systemd/OpenRC/Windows Service,
+reconnect, session helper, remote input và screen streaming. Remote desktop realtime
+là dự án riêng sau cùng.
 
-- Không Server, Teacher Console, database, WebSocket, HTTP API hoặc LAN discovery.
-- Không remote desktop streaming, remote input qua mạng, WebRTC hay screen relay.
-- Không shell command từ xa, auto-elevation hoặc bypass quyền OS.
-- Không thay classifier, input backend, screenlocker lifecycle hoặc format block
-  list nếu command layer không bắt buộc phải chạm tới.
+## Không làm trước Phase 3
 
-## Thứ tự sau ngày mai
-
-1. Agent process lâu dài và local transport được kiểm thử.
-2. Server tối thiểu: Agent enrollment, authentication và command relay.
-3. Teacher Console tối thiểu: danh sách Agent online và gửi command allowlist.
-4. Audit log/policy lớp học.
-5. Screen capture theo snapshot thấp tần suất; remote desktop realtime là dự án
-   sau cùng.
+- Server, Teacher Console, database, WebSocket, HTTP API hoặc LAN discovery.
+- Remote desktop streaming, remote input qua mạng, WebRTC hay screen relay.
+- Shell command từ xa, auto-elevation hoặc bypass quyền OS.
 
 ---
 

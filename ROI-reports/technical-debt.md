@@ -2,25 +2,17 @@
 
 ## TL;DR
 
-Không phát hiện P0 trong code được audit. Rủi ro ROI cao nhất còn lại là cleanup
-screen locker, lifecycle/process identity, hosts concurrent writer, classifier input
-budget và test/automation không làm gate. Không refactor hàng loạt trước khi có test.
-
-## P1
-
-| Vấn đề | Ảnh hưởng/bằng chứng | Nguyên nhân và hậu quả | Xử lý, effort/risk/ROI | Điều kiện và verification |
-| --- | --- | --- | --- | --- |
-| Guard process từng chết khi PID biến mất | `ProcessKiller._scan_and_kill()` trước audit | Race list→kill làm daemon thoát, bỏ process sau. | **Đã sửa trong audit:** chỉ bỏ qua `ProcessLookupError`; lỗi scan/kill khác được lưu để caller lấy qua `raise_if_failed()`; S / thấp / cao. | Fake PID đầu biến mất, PID sau vẫn được xử lý; fake lỗi khác phải được caller nhận. |
+Không phát hiện P0 trong code được audit. Process guard stop/start, screen-locker
+cleanup, hosts concurrent writer và classifier test gate đã có coverage. Rủi ro ROI
+cao nhất còn lại là process identity, readiness và classifier input budget.
 
 ## P2
 
 | Vấn đề | Ảnh hưởng/bằng chứng | Nguyên nhân và hậu quả | Xử lý, effort/risk/ROI | Điều kiện và verification |
 | --- | --- | --- | --- | --- |
-| Stop/start process guard race | `src/device_controler/process_killer/__init__.py:51-68` | `stop()` chỉ đổi boolean; start ngay khi thread cũ sleep có thể return, sau đó thread cũ thoát. | State machine `Event`/lock hoặc join trước restart; S-M / thấp / cao. | Fake clock/Event, stop-start liên tiếp vẫn scan. |
 | PID reuse kill nhầm | Process snapshot chỉ `(pid, name)`; Linux/Windows kill theo PID | Đã list lại ngay trước kill và bỏ qua PID mất/đổi tên; PID có thể vẫn bị tái dùng bởi process cùng tên trước `SIGKILL`/`/F`. | Bổ sung process identity/start time vào contract; M / trung bình / cao. | Fake PID đổi identity trước kill không bị kill. |
-| Lost update hosts | `src/device_controler/web_blocker/__init__.py:113-134` | Atomic replace tránh file dở nhưng không khóa read-modify-write liên process. | Cross-platform file lock hoặc serialized owner; M / trung bình / cao. | Hai worker dùng temporary hosts, union domain không mất. |
 | Classifier không có input budget | `clean_text.py`, `rule_based/__init__.py` fuzzy matching | Text/token lớn có thể làm CPU tăng; repository chưa có benchmark tái lập để đặt budget. | Xác định limit bằng golden/adversarial benchmark; M / trung bình / cao. | Regression metric cho normal và adversarial corpus, không tăng false negative ngoài ngưỡng. |
-| Test không phải gate | Nested test không được discovery; classifier runner exit 0 khi 10/40 case fail | Regression có thể merge dù test logic đang fail. | Canonical safe test command + CI sau khi chuẩn hóa expected result; M / thấp / cao. | Collection inventory và job fail khi test/gate fail. |
+| Capability không phản ánh readiness | `PlatformCapabilities` chỉ mô tả adapter có thể tạo | Command đặc quyền có thể fail vì binary, permission hoặc desktop session. | Tách readiness report tại action boundary; M / thấp / cao. | Fake binary/permission/session, không side effect. |
 
 ## P3
 

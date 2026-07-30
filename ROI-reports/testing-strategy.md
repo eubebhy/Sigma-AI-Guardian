@@ -46,6 +46,6 @@ scripts/clean_pyright_check.sh scripts
 
 ## Khoảng trống ưu tiên
 
-Xem [technical-debt.md](technical-debt.md): process guard lifecycle/failure, screen
-locker cleanup, hosts concurrent writer, classifier input budget, input queue và
-model provenance. Trước khi thêm CI, cần quyết định test classifier nào là quality
+Xem [technical-debt.md](technical-debt.md): process identity, readiness, classifier
+input budget, input queue và model provenance. Trước khi thêm CI, cần chốt corpus,
+expected label và môi trường classifier làm quality gate.

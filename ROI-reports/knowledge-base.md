@@ -27,8 +27,8 @@
 
 - Chỉ content giữa `# SAG - Web block list start` và `# SAG - Web block list end`
   thuộc SAG. Marker thiếu end phải fail, không repair tự động.
-- `_atomic_write()` chỉ đảm bảo replace file không dở cho **một writer**; không đảm
-  bảo concurrent update, toàn bộ metadata hay power-loss durability.
+- Sidecar lock serialize read-modify-write giữa writer SAG; atomic replace không đảm
+  bảo toàn bộ metadata, công cụ ngoài SAG lock hay power-loss durability.
 - Default public API chọn hosts thật khi import; automated test phải gọi internal seam
   với `HostsPathOperations` fake/temp path, không gọi `block()` mặc định.
 
@@ -37,8 +37,8 @@
 - `lock()` chờ overlay ready rồi mới block input; `unlock()` là con đường release.
 - Linux input grab tồn tại khi `InputDevice` còn mở; không clear registry trước close.
 - API sender input phải cân bằng `keyDown`/`keyUp` và `mouseDown`/`mouseUp`.
-- Facade Linux/Windows có **17** export chung, gồm `get_num_lock_state`; tên package
-  Windows giữ là `window` để compatibility, không đổi thành `windows` hàng loạt.
+- Input controller có 14 API gửi input chung. `get_num_lock_state` thuộc
+  `utils.key_listener`; tên package Windows giữ là `window` để compatibility.
 
 ### Classifier/model
 

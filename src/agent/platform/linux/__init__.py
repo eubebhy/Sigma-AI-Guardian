@@ -7,7 +7,7 @@ Nguyên lý: module ghép adapter capability nhỏ; feature không import packag
 """
 
 from agent.capabilities import Capability, PlatformCapabilities
-from agent.platform.factory import PlatformServices
+from agent.platform import PlatformServices
 from agent.platform.linux.browser import LinuxBrowserOperations
 from agent.platform.linux.hosts import LinuxHostsPathOperations
 from agent.platform.linux.processes import LinuxProcessOperations

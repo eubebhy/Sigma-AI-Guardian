@@ -35,4 +35,4 @@ phải được kiểm soát khi thêm lifecycle command; không để command t
 ## Xem xét lại khi
 
 Có capability mới cần lifecycle chung thực sự, hoặc support OS mới chứng minh bốn
-contract không đủ. Files: `src/agent/contracts.py`, `src/agent/platform/factory.py`.
+contract không đủ. Files: `src/agent/contracts.py`, `src/agent/platform/__init__.py`.

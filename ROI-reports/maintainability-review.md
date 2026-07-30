@@ -3,8 +3,8 @@
 ## TL;DR
 
 Platform boundary và fake adapter là nền tốt. Chi phí bảo trì hiện đến từ lifecycle
-phân tán, test collection không hoàn chỉnh, docs drift và dependency/tooling không tái
-lập. Không có bằng chứng cần rewrite kiến trúc.
+phân tán, dependency/tooling chưa tái lập và các giới hạn native. Không có bằng chứng
+cần rewrite kiến trúc.
 
 ## Điểm mạnh đã xác nhận
 
@@ -22,15 +22,7 @@ lập. Không có bằng chứng cần rewrite kiến trúc.
 | Runtime/feature | Nhiều feature tự lấy process-wide default service | Command layer tương lai có thể tạo lifecycle lẫn lộn | Command handler phải nhận runtime services; không migrate mù. |
 | Thread/global state | locker, capture, keylogger, local model, Linux input dùng module/class state | Test order/race/cleanup khó quan sát | Chỉ sửa cùng lifecycle test có chủ đích. |
 | Classifier data | Keyword, clean-text phrase, training data và model mapping phân tán | Category mới dễ lệch rule/model/docs | Dùng checklist extension trong knowledge base. |
-| Docs/test | README cũ mô tả file/flag không tồn tại; nested tests không discovery | Onboarding sai và regression bị bỏ sót | Đồng bộ trong audit; thêm inventory/CI sau khi gate green. |
-
-## Tài liệu đã được đồng bộ trong audit
-
-- Root README input-controller map được thay bằng layout hiện có và có link ROI reports.
-- `src/README.md` bỏ clipboard tracker không tồn tại.
-- `scripts/README.md` bỏ script dedupe không tồn tại.
-- `tests/README.md` mô tả đúng side effect manual thay vì flag/hosts dev không tồn tại.
-- Input docs tách 14 API control khỏi listener/NumLock và nêu rõ đường dẫn import.
+| Docs/test | Contract feature và giới hạn native dễ drift | Onboarding hoặc manual test sai | Cập nhật docs cùng thay đổi public API, command hoặc side effect. |
 
 ## Workflow tối thiểu cho maintainer
 

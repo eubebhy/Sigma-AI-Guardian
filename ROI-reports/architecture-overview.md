@@ -12,7 +12,7 @@ Không có transport, command dispatcher, Server hoặc Teacher Console đang ho
 ```text
 src/main.py
   -> agent.runtime.create_runtime()
-     -> agent.platform.factory.create_platform_services()
+      -> agent.platform.create_platform_services()
         -> agent.platform.linux.* | agent.platform.windows.*
      -> AgentRuntime.status()
 ```
@@ -37,7 +37,7 @@ adapter có thể tạo, không khẳng định quyền hoặc desktop session s
 
 `PlatformServices` là dataclass immutable gồm bốn protocol nhỏ. Đây là boundary
 testable: test truyền fake adapter thay vì gọi `ps`, `taskkill`, browser hay desktop
-thật ([`src/agent/platform/factory.py`](../src/agent/platform/factory.py)).
+thật ([`src/agent/platform/__init__.py`](../src/agent/platform/__init__.py)).
 
 ## Luồng dữ liệu và điều khiển
 

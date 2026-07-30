@@ -36,7 +36,7 @@ src/main.py
     v
 agent.runtime.create_runtime()
     |
-    +-- agent.platform.factory.create_platform_services()
+    +-- agent.platform.create_platform_services()
     |       |
     |       +-- agent.platform.linux.*
     |       `-- agent.platform.windows.*
@@ -59,7 +59,7 @@ hiện OS.
 ## Phân lớp và hướng import
 
 ```text
-main.py -> agent.runtime -> agent.platform.factory -> agent.platform.<os>
+main.py -> agent.runtime -> agent.platform -> agent.platform.<os>
 feature -> agent.contracts
 feature -> agent.platform (chỉ khi không được runtime truyền dependency)
 agent.platform.<os> -> standard library / dependency native

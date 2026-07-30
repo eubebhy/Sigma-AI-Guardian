@@ -39,9 +39,9 @@ nó không sửa hosts, grab input, kill process hay mở browser.
 
 ## Không làm trong routine development
 
-- Không chạy `tests/web_blocker.py`, `tests/screen_locker.py`,
-  `tests/window_tracker_guard.py`, input control/logger hoặc benchmark capture như
-  một phần unit test.
+- Không chạy `tests/test_web_blocker.py`, `tests/test_screen_locker.py`,
+  `tests/test_window_tracker.py`, input control/logger hoặc benchmark capture như một
+  phần unit test.
 - Không gọi `run_shell`, auto-elevation, network transport hoặc remote desktop vào
   Agent hiện tại.
 - Không sửa model `Ritchie.pkl` trực tiếp; train theo quy trình reproducibility khi

@@ -6,8 +6,6 @@ Output: `AgentRuntime` cung cấp service OS và `status()` cho entry point.
 Nguyên lý: runtime tạo adapter đúng một lần và là owner của tài nguyên shutdown.
 """
 
-from __future__ import annotations
-
 from dataclasses import dataclass
 
 from agent.platform import PlatformServices, create_platform_services
