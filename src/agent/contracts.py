@@ -46,6 +46,14 @@ class ProcessOperations(Protocol):
         ...
 
 
+class CursorOperations(Protocol):
+    """An va hien cursor, dung trong screen locker"""
+
+    def show_cursor(self) -> None: ...
+
+    def hide_cursor(self) -> None: ...
+
+
 class BrowserOperations(Protocol):
     """Khởi chạy browser mà không chặn Agent process."""
 
@@ -150,13 +158,9 @@ class InputControllerOperations(Protocol):
 
     def mouseUp(self, button: MouseButton) -> None: ...
 
-    def moveRel(
-        self, x: int | None, y: int | None, duration: float = 0.0
-    ) -> None: ...
+    def moveRel(self, x: int | None, y: int | None, duration: float = 0.0) -> None: ...
 
-    def moveTo(
-        self, x: int | None, y: int | None, duration: float = 0.0
-    ) -> None: ...
+    def moveTo(self, x: int | None, y: int | None, duration: float = 0.0) -> None: ...
 
     def position(self, take_new: bool = False) -> tuple[int, int]: ...
 

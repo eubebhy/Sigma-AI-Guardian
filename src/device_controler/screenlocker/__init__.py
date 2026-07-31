@@ -23,7 +23,8 @@ from typing import NoReturn, cast
 
 from PIL import Image, ImageDraw, ImageFont, ImageTk
 
-from agent.contracts import InputBlockingOperations
+from agent.contracts import CursorOperations, InputBlockingOperations
+from agent.platform import get_default_platform_services
 from device_controler import screen_capture
 from utils import input_blocker
 
@@ -103,6 +104,7 @@ def _fit_body_font_size(
     region: screen_capture.ScreenRegion,
     header_height: int,
     padding: int,
+    body_text: str = BODY_TEXT,
 ) -> int:
     """Giảm font body đến khi bounding box nằm trọn trong monitor."""
 
@@ -114,7 +116,7 @@ def _fit_body_font_size(
     while low <= high:
         font_size = (low + high) // 2
         font = ImageFont.truetype(FONT_PATH, font_size)
-        body = _wrap_text(draw, BODY_TEXT, font, region.width - (padding * 2))
+        body = _wrap_text(draw, body_text, font, region.width - (padding * 2))
         bounds = draw.multiline_textbbox(
             (0, header_height + (font_size * 2)),
             body,
@@ -129,7 +131,11 @@ def _fit_body_font_size(
     return best_size
 
 
-def _create_lock_image(region: screen_capture.ScreenRegion) -> Image.Image:
+def _create_lock_image(
+    region: screen_capture.ScreenRegion,
+    header_text: str = HEADER_TEXT,
+    body_text: str = BODY_TEXT,
+) -> Image.Image:
     """Dựng ảnh khóa responsive gồm header và body cho một monitor."""
 
     image = Image.new("RGB", (region.width, region.height), BACKGROUND_COLOR)
@@ -139,22 +145,22 @@ def _create_lock_image(region: screen_capture.ScreenRegion) -> Image.Image:
     header_font = ImageFont.truetype(FONT_PATH, header_font_size)
     padding = max(16, round(region.width * 0.012))
     while (
-        draw.textbbox((0, 0), HEADER_TEXT, font=header_font)[2] > region.width - padding
+        draw.textbbox((0, 0), header_text, font=header_font)[2] > region.width - padding
         and header_font_size > 8
     ):
         header_font_size -= 1
         header_font = ImageFont.truetype(FONT_PATH, header_font_size)
     header_y = body_font_size // 3
-    header_bottom = draw.textbbox((0, header_y), HEADER_TEXT, font=header_font)[3]
+    header_bottom = draw.textbbox((0, header_y), header_text, font=header_font)[3]
     header_gap = header_font_size
     separator_height = 20
     separator_y = header_bottom + header_gap + (separator_height // 2)
     body_top = header_bottom + header_gap + separator_height
-    body_font_size = _fit_body_font_size(region, body_top, padding)
+    body_font_size = _fit_body_font_size(region, body_top, padding, body_text)
     body_font = ImageFont.truetype(FONT_PATH, body_font_size)
     draw.text(
         (0, header_y),
-        HEADER_TEXT,
+        header_text,
         font=header_font,
         fill=TEXT_COLOR,
     )
@@ -163,7 +169,7 @@ def _create_lock_image(region: screen_capture.ScreenRegion) -> Image.Image:
         fill=TEXT_COLOR,
         width=separator_height,
     )
-    body = _wrap_text(draw, BODY_TEXT, body_font, region.width - (padding * 2))
+    body = _wrap_text(draw, body_text, body_font, region.width - (padding * 2))
     draw.multiline_text(
         (0, body_top + (body_font_size * 2)),
         body,
@@ -190,6 +196,8 @@ def _close_when_unlocked(
 
 def _create_windows(
     regions: list[screen_capture.ScreenRegion],
+    header_text: str = HEADER_TEXT,
+    body_text: str = BODY_TEXT,
 ) -> tuple[tk.Tk, list[tk.Tk | tk.Toplevel]]:
     """Tạo một cửa sổ overlay cho từng monitor."""
 
@@ -199,7 +207,7 @@ def _create_windows(
         window = root if index == 0 else tk.Toplevel(root)
         if window is not root:
             windows.append(window)
-        App(window, _create_lock_image(region), region)
+        App(window, _create_lock_image(region, header_text, body_text), region)
     return root, windows
 
 
@@ -209,6 +217,9 @@ def _run_ui(
     failed_event: threading.Event,
     stop_event: threading.Event,
     exited_event: threading.Event,
+    header_text: str = HEADER_TEXT,
+    body_text: str = BODY_TEXT,
+    cursor_operations: CursorOperations | None = None,
 ) -> None:
     """Tạo overlay và chạy Tk event loop trên UI thread."""
 
@@ -216,10 +227,14 @@ def _run_ui(
 
     operations = _input_operations or cast(InputBlockingOperations, input_blocker)
     input_blocked = False
+    cursor_hidden = False
     try:
-        root, windows = _create_windows(regions)
+        root, windows = _create_windows(regions, header_text, body_text)
         operations.block()
         input_blocked = True
+        if cursor_operations is not None:
+            cursor_operations.hide_cursor()
+            cursor_hidden = True
         ready_event.set()
         _close_when_unlocked(root, windows, stop_event)
         root.mainloop()
@@ -230,6 +245,12 @@ def _run_ui(
         failed_event.set()
         ready_event.set()
     finally:
+        if cursor_hidden and cursor_operations is not None:
+            try:
+                cursor_operations.show_cursor()
+            except Exception as error:
+                _ui_error = error
+                failed_event.set()
         if input_blocked:
             try:
                 operations.unblock()
@@ -241,6 +262,9 @@ def _run_ui(
 
 def _start_ui(
     regions: list[screen_capture.ScreenRegion],
+    header_text: str,
+    body_text: str,
+    cursor_operations: CursorOperations,
 ) -> tuple[threading.Event, threading.Event, threading.Event, threading.Event]:
     """Khởi động UI thread và trả event báo trạng thái khởi tạo."""
 
@@ -252,7 +276,16 @@ def _start_ui(
     _ui_failed_event = failed_event
     _thread = threading.Thread(
         target=_run_ui,
-        args=(regions, ready_event, failed_event, _stop_event, _ui_exited_event),
+        args=(
+            regions,
+            ready_event,
+            failed_event,
+            _stop_event,
+            _ui_exited_event,
+            header_text,
+            body_text,
+            cursor_operations,
+        ),
         daemon=True,
     )
     _thread.start()
@@ -275,26 +308,48 @@ def _raise_after_lock_cleanup(
     raise error
 
 
-def lock(input_operations: InputBlockingOperations | None = None) -> None:
+def lock(
+    input_operations: InputBlockingOperations | None = None,
+    *,
+    cursor_operations: CursorOperations | None = None,
+    header_text: str | None = None,
+    body_text: str | None = None,
+) -> None:
     """Phủ mọi monitor và chặn input sau khi overlay sẵn sàng."""
 
     with _lock:
-        _lock_locked(input_operations)
+        _lock_locked(
+            input_operations,
+            cursor_operations,
+            header_text or HEADER_TEXT,
+            body_text or BODY_TEXT,
+        )
 
 
-def _lock_locked(input_operations: InputBlockingOperations | None = None) -> None:
+def _lock_locked(
+    input_operations: InputBlockingOperations | None = None,
+    cursor_operations: CursorOperations | None = None,
+    header_text: str = HEADER_TEXT,
+    body_text: str = BODY_TEXT,
+) -> None:
     """Tạo và block đúng một locker khi caller đang giữ `_lock`."""
 
     global _input_operations, _stop_event, _thread, _ui_error
     if _thread is not None and _thread.is_alive():
         return
     operations = input_operations or cast(InputBlockingOperations, input_blocker)
+    cursor = cursor_operations or get_default_platform_services().cursor_controller
     _input_operations = operations
     _ui_error = None
     regions = screen_capture.get_monitors()
     if not regions:
         raise RuntimeError("No monitors were found")
-    ready_event, failed_event, stop_event, exited_event = _start_ui(regions)
+    ready_event, failed_event, stop_event, exited_event = _start_ui(
+        regions,
+        header_text,
+        body_text,
+        cursor,
+    )
 
     if not ready_event.wait(timeout=5.0):
         _raise_after_lock_cleanup(
@@ -311,6 +366,8 @@ def _lock_locked(input_operations: InputBlockingOperations | None = None) -> Non
             RuntimeError("Screen locker UI stopped unexpectedly"),
             stop_event,
         )
+
+
 def unlock() -> bool:
     """Mở input và xác nhận UI đã dọn xong, hoặc báo mọi lỗi cleanup."""
 

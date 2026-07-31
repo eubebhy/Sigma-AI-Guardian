@@ -21,6 +21,7 @@ import argparse
 from dataclasses import dataclass
 import sys
 import time
+import traceback
 import unittest
 from collections.abc import Sequence
 from typing import NoReturn
@@ -122,6 +123,7 @@ def run_real(arguments: Sequence[str]) -> int:
         return 130
     except Exception as error:
         print(f"Benchmark failed: {error}", file=sys.stderr)
+        traceback.print_exc()
         return 1
     return 0
 

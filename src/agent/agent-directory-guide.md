@@ -176,3 +176,8 @@ Khi tu them feature moi, co the dung checklist sau:
    compatibility.
 6. Doc `runtime.py` de dam bao runtime tao services mot lan va owner lifecycle ro rang.
 7. Test feature bang fake operation, khong goi OS that trong safe test.
+
+## Cach de tu build mot system service moi
+1. Dau tien, viet contract trong contracts.py qui dinh input, output, apis, cua service do
+2. viet adapter rieng cho tung os trong linux/ & window/
+3. Bo xung service moi vo create_serivce() cua linux/__init__ & window/__init__

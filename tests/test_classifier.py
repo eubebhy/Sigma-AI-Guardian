@@ -28,6 +28,7 @@ from pathlib import Path
 import random
 import sys
 import time
+import traceback
 from collections.abc import Callable, Sequence
 from typing import Literal, NoReturn, NotRequired, TypeAlias, TypedDict, cast
 import unittest
@@ -186,6 +187,7 @@ def _run_corpus(
             actual = classifier(text, strict_level)
         except Exception as error:
             print(f"[FAIL][{theme}] {text} | error={error}")
+            traceback.print_exc()
             print(f"Summary: {passed}/{len(cases)} passed, {len(cases) - passed} failed")
             print(f"Elapsed: {time.monotonic() - started:.3f}s")
             return 1
@@ -220,6 +222,7 @@ def run_real(arguments: Sequence[str]) -> int:
             result = classifier(command.text, strict_level)
         except Exception as error:
             print(f"Action failed: {error}", file=sys.stderr)
+            traceback.print_exc()
             return 1
         print(f"=== {engine_name} | strict={strict_level} ===")
         print(f"Input: {command.text}")
@@ -230,6 +233,7 @@ def run_real(arguments: Sequence[str]) -> int:
         cases = _selected_quality_cases(command.theme, command.count, command.order)
     except OSError as error:
         print(f"Action failed: {error}", file=sys.stderr)
+        traceback.print_exc()
         return 1
     return _run_corpus(engine_name, classifier, cases, strict_level)
 

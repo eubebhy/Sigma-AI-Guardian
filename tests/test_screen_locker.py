@@ -28,6 +28,7 @@ from io import StringIO
 import sys
 import threading
 import time
+import traceback
 from typing import NoReturn
 import unittest
 from unittest.mock import patch
@@ -42,6 +43,13 @@ add_source_path()
 
 from device_controler.screen_capture import ScreenRegion
 from device_controler import screenlocker
+
+
+_TEST_HEADER_TEXT = "TEST SCREEN LOCK"
+_TEST_BODY_TEXT = (
+    "Đây là test, bạn nên thấy cursor đã bị ẩn và màn hình đã bị khóa, "
+    "không thể thoát được."
+)
 
 
 class _RealArgumentParser(argparse.ArgumentParser):
@@ -90,7 +98,10 @@ def run_real(arguments: Sequence[str]) -> int:
         print(f"State: locking in {command.delay}s")
         _countdown("Countdown to lock", command.delay)
         print("State: locking")
-        screenlocker.lock()
+        screenlocker.lock(
+            header_text=_TEST_HEADER_TEXT,
+            body_text=_TEST_BODY_TEXT,
+        )
         print(f"State: locked for {command.seconds}s")
         _countdown("Countdown to unlock", command.seconds)
         print("State: timed unlock")
@@ -98,12 +109,14 @@ def run_real(arguments: Sequence[str]) -> int:
         print("State: unlocked")
     except Exception as error:
         print(f"Action failed: {error}", file=sys.stderr)
+        traceback.print_exc()
         result = 1
     finally:
         try:
             screenlocker.unlock()
         except Exception as error:
             print(f"Cleanup failed: {error}", file=sys.stderr)
+            traceback.print_exc()
             result = 1
         else:
             print("Cleanup: completed")
@@ -124,6 +137,17 @@ class _FakeRoot:
 class _FailingRoot(_FakeRoot):
     def mainloop(self) -> None:
         raise RuntimeError("UI loop failed")
+
+
+class _FakeCursorOperations:
+    def __init__(self) -> None:
+        self.events: list[str] = []
+
+    def hide_cursor(self) -> None:
+        self.events.append("hide")
+
+    def show_cursor(self) -> None:
+        self.events.append("show")
 
 
 class _FakeWindow:
@@ -238,6 +262,48 @@ class ScreenLockerTests(unittest.TestCase):
         self.assertFalse(failed_event.is_set())
 
     @test_modes("fake")
+    def test_run_ui_hides_and_shows_injected_cursor(self) -> None:
+        region = ScreenRegion(top=0, left=0, width=100, height=100)
+        ready_event = threading.Event()
+        failed_event = threading.Event()
+        stop_event = threading.Event()
+        stop_event.set()
+        cursor = _FakeCursorOperations()
+
+        with (
+            patch.object(screenlocker, "_create_windows", return_value=(_FakeRoot(), [])),
+            patch.object(screenlocker.input_blocker, "block"),
+            patch.object(screenlocker.input_blocker, "unblock"),
+        ):
+            screenlocker._run_ui(
+                [region],
+                ready_event,
+                failed_event,
+                stop_event,
+                threading.Event(),
+                cursor_operations=cursor,
+            )
+
+        self.assertEqual(cursor.events, ["hide", "show"])
+
+    @test_modes("fake")
+    def test_create_windows_uses_custom_lock_text(self) -> None:
+        region = ScreenRegion(top=0, left=0, width=100, height=100)
+
+        with (
+            patch.object(screenlocker.tk, "Tk", return_value=_FakeRoot()),
+            patch.object(screenlocker, "App"),
+            patch.object(screenlocker, "_create_lock_image", return_value=object()) as image,
+        ):
+            screenlocker._create_windows(
+                [region],
+                _TEST_HEADER_TEXT,
+                _TEST_BODY_TEXT,
+            )
+
+        image.assert_called_once_with(region, _TEST_HEADER_TEXT, _TEST_BODY_TEXT)
+
+    @test_modes("fake")
     def test_parse_real_lock_accepts_delay_and_duration(self) -> None:
         command = _parse_real_arguments(("lock", "3", "15"))
 
@@ -302,7 +368,7 @@ class ScreenLockerTests(unittest.TestCase):
         errors = StringIO()
 
         with (
-            patch.object(screenlocker, "lock"),
+            patch.object(screenlocker, "lock") as lock,
             patch.object(
                 screenlocker,
                 "unlock",
@@ -317,6 +383,10 @@ class ScreenLockerTests(unittest.TestCase):
         self.assertEqual(result, 1)
         self.assertNotIn("State: unlocked", output.getvalue())
         self.assertIn("Action failed: UI cleanup failed", errors.getvalue())
+        lock.assert_called_once_with(
+            header_text=_TEST_HEADER_TEXT,
+            body_text=_TEST_BODY_TEXT,
+        )
 
     @test_modes("fake")
     def test_lock_image_uses_full_screen_brand_layout(self) -> None:
@@ -384,6 +454,9 @@ class ScreenLockerTests(unittest.TestCase):
             failed_event: threading.Event,
             __: threading.Event,
             ___: threading.Event,
+            ____: str,
+            _____: str,
+            ______: object,
         ) -> None:
             failed_event.set()
             ready_event.set()
@@ -410,6 +483,9 @@ class ScreenLockerTests(unittest.TestCase):
 
         def start_ui(
             _: list[ScreenRegion],
+            __: str,
+            ___: str,
+            ____: object,
         ) -> tuple[threading.Event, threading.Event, threading.Event, threading.Event]:
             screenlocker._stop_event = stop_event
             screenlocker._ui_exited_event = exited_event
@@ -481,6 +557,7 @@ class ScreenLockerTests(unittest.TestCase):
         unblock.assert_not_called()
 
     @test_modes("fake")
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Linux only")
     def test_linux_input_blocker_releases_after_last_owner(self) -> None:
         from agent.platform.linux import input_blocker as blocker_adapter
         from agent.platform.linux import input_blocker_backend
@@ -502,6 +579,7 @@ class ScreenLockerTests(unittest.TestCase):
         unblock.assert_called_once_with()
 
     @test_modes("fake")
+    @unittest.skipUnless(sys.platform == "win32", "Windows only")
     def test_windows_input_blocker_rejects_a_second_owner_thread(self) -> None:
         import agent.platform.windows as windows_platform
         from agent.platform.windows import input_blocker as blocker_adapter
@@ -535,6 +613,7 @@ class ScreenLockerTests(unittest.TestCase):
         self.assertIn("another thread", str(errors[0]))
 
     @test_modes("fake")
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Linux only")
     def test_linux_block_rolls_back_when_one_device_grab_fails(self) -> None:
         from agent.platform.linux import input_blocker_backend as linux_input_blocker
 
@@ -570,6 +649,7 @@ class ScreenLockerTests(unittest.TestCase):
         )
 
     @test_modes("fake")
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Linux only")
     def test_linux_unblock_attempts_every_release_before_raising(self) -> None:
         from agent.platform.linux import input_blocker_backend as linux_input_blocker
 

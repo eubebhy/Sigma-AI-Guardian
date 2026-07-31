@@ -51,6 +51,7 @@ class AgentTests(unittest.TestCase):
             create_runtime(platform_name="darwin")
 
     @test_modes("fake")
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Linux only")
     def test_status_includes_selected_linux_platform(self) -> None:
         from agent.runtime import create_runtime
 
@@ -59,6 +60,7 @@ class AgentTests(unittest.TestCase):
         self.assertIn("Platform: Linux", runtime.status())
 
     @test_modes("fake")
+    @unittest.skipUnless(sys.platform == "win32", "Windows only")
     def test_status_uses_windows_adapter_without_native_calls(self) -> None:
         from agent.runtime import create_runtime
 

@@ -19,10 +19,11 @@ import argparse
 from io import StringIO
 from pathlib import Path
 import sys
+import traceback
 import unittest
 from collections.abc import Sequence
-from typing import NoReturn
-from unittest.mock import patch
+from typing import NoReturn, cast
+from unittest.mock import Mock, patch
 
 from test_support import add_source_path, run_module, test_modes
 
@@ -30,6 +31,12 @@ from test_support import add_source_path, run_module, test_modes
 add_source_path()
 
 from agent.capabilities import PlatformCapabilities
+from agent.contracts import (
+    CursorOperations,
+    InputBlockingOperations,
+    InputControllerOperations,
+    KeyListenerOperations,
+)
 from agent.platform import PlatformServices
 from device_controler import browser_tab
 
@@ -67,6 +74,7 @@ def run_real(arguments: Sequence[str]) -> int:
         return 130
     except Exception as error:
         print(f"Open failed: {error}", file=sys.stderr)
+        traceback.print_exc()
         return 1
     print("opened")
     return 0
@@ -112,6 +120,21 @@ class _FakeBrowserOperations:
         return None
 
 
+def _create_services(browser: _FakeBrowserOperations) -> PlatformServices:
+    return PlatformServices(
+        name="Test",
+        capabilities=PlatformCapabilities(platform_name="Test", items=()),
+        processes=_FakeProcessOperations(),
+        browser=browser,
+        windows=_FakeWindowOperations(),
+        hosts=_FakeHostsPathOperations(),
+        input_blocker=cast(InputBlockingOperations, Mock()),
+        key_listener=cast(KeyListenerOperations, Mock()),
+        input_controller=cast(InputControllerOperations, Mock()),
+        cursor_controller=cast(CursorOperations, Mock()),
+    )
+
+
 class BrowserTests(unittest.TestCase):
     @test_modes("fake")
     def test_open_tab_rejects_invalid_url(self) -> None:
@@ -121,14 +144,7 @@ class BrowserTests(unittest.TestCase):
     @test_modes("fake")
     def test_open_tab_raises_when_all_launches_fail(self) -> None:
         browser_operations = _FakeBrowserOperations(default_open_result=False)
-        services = PlatformServices(
-            name="Test",
-            capabilities=PlatformCapabilities(platform_name="Test", items=()),
-            processes=_FakeProcessOperations(),
-            browser=browser_operations,
-            windows=_FakeWindowOperations(),
-            hosts=_FakeHostsPathOperations(),
-        )
+        services = _create_services(browser_operations)
         browser = {
             "spec": browser_tab.BROWSERS[0],
             "executable": "/bin/browser",
@@ -161,14 +177,7 @@ class BrowserTests(unittest.TestCase):
     @test_modes("fake")
     def test_fallback_uses_injected_platform_adapter(self) -> None:
         browser_operations = _FakeBrowserOperations()
-        services = PlatformServices(
-            name="Test",
-            capabilities=PlatformCapabilities(platform_name="Test", items=()),
-            processes=_FakeProcessOperations(),
-            browser=browser_operations,
-            windows=_FakeWindowOperations(),
-            hosts=_FakeHostsPathOperations(),
-        )
+        services = _create_services(browser_operations)
 
         with patch.object(
             browser_tab,

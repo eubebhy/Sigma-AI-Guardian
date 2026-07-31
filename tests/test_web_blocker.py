@@ -31,6 +31,7 @@ import multiprocessing
 from pathlib import Path
 import socket
 import sys
+import traceback
 from tempfile import TemporaryDirectory
 import threading
 from typing import Any, NoReturn
@@ -170,6 +171,7 @@ def _run_automatic(url: str) -> int:
         result = 0 if blocked and dns_blocked else 1
     except Exception as error:
         print(f"Action failed: {error}", file=sys.stderr)
+        traceback.print_exc()
         result = 1
     finally:
         print("Cleanup: removing automatic domains")
@@ -178,6 +180,7 @@ def _run_automatic(url: str) -> int:
             print("Cleanup: complete")
         except Exception as error:
             print(f"Cleanup failed: {error}", file=sys.stderr)
+            traceback.print_exc()
             result = 1
     return result
 
@@ -202,6 +205,7 @@ def run_real(arguments: Sequence[str]) -> int:
             print("Cleanup: complete")
     except Exception as error:
         print(f"Action failed: {error}", file=sys.stderr)
+        traceback.print_exc()
         return 1
     return 0
 

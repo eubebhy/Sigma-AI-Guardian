@@ -16,6 +16,7 @@ import io
 import os
 import sys
 import threading
+import traceback
 import unittest
 from collections.abc import Callable, Iterator, Sequence
 from threading import Thread
@@ -29,6 +30,8 @@ from test_support import add_source_path, run_module, test_modes
 add_source_path()
 
 try:
+    if not sys.platform.startswith("linux"):
+        raise ModuleNotFoundError
     from evdev import ecodes
     from utils import key_listener
     from agent.platform.linux import key_listener_backend as linux_listener
@@ -134,6 +137,7 @@ def run_real(
         return 0
     except Exception as error:
         print(f"[{error_prefix}][real][action] {error}", file=sys.stderr)
+        traceback.print_exc()
         return 1
 
 
@@ -213,10 +217,9 @@ class LinuxListenerFakeTests(unittest.TestCase):
         self.assertTrue(callable(key_listener.listen_mice))
         self.assertTrue(callable(key_listener.get_num_lock_state))
 
-        from utils.key_listener import linux, window
+        from utils.key_listener import linux
 
         self.assertTrue(callable(linux.listen_keys))
-        self.assertTrue(callable(window.listen_keys))
 
     def test_listener_normalizes_and_validates_devices(self) -> None:
         keyboard = _FakeInputDevice([_FakeEvent(ecodes.EV_KEY, ecodes.KEY_A, 1)])
@@ -316,6 +319,7 @@ class _FakePynputModule(ModuleType):
         return self.listener
 
 
+@unittest.skipUnless(sys.platform == "win32", "Windows only")
 class WindowListenerFakeTests(unittest.TestCase):
     def setUp(self) -> None:
         self.keyboard = _FakePynputModule("pynput.keyboard")

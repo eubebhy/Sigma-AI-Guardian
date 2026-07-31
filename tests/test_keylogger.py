@@ -23,6 +23,7 @@ import io
 import sys
 import threading
 import time
+import traceback
 import unittest
 from collections.abc import Iterator, Sequence
 from typing import cast
@@ -88,6 +89,7 @@ def run_real(arguments: Sequence[str]) -> int:
         return 0
     except Exception as error:
         print(f"Keylogger listener failed: {error}", file=sys.stderr)
+        traceback.print_exc()
         return 1
     finally:
         KeyLogger.stop()

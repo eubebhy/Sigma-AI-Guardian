@@ -9,6 +9,7 @@ Nguyên lý: module ghép adapter capability nhỏ; feature không import packag
 from agent.capabilities import Capability, PlatformCapabilities
 from agent.platform import PlatformServices
 from agent.platform.windows.browser import WindowsBrowserOperations
+from agent.platform.windows.hide_cursor import WindowsCursorOperation
 from agent.platform.windows.hosts import WindowsHostsPathOperations
 from agent.platform.windows.input_blocker import WindowsInputBlockingOperations
 from agent.platform.windows.input_controller_operations import (
@@ -32,6 +33,7 @@ def create_services() -> PlatformServices:
             Capability("input_blocking", True, "Administrator permission required"),
             Capability("input_listening", True, "pynput and Win32"),
             Capability("input_control", True, "pydirectinput and Win32"),
+            Capability("cursor_controller", True, "X11 backend, cursor blur control"),
         ),
     )
     return PlatformServices(
@@ -44,4 +46,5 @@ def create_services() -> PlatformServices:
         input_blocker=WindowsInputBlockingOperations(),
         key_listener=WindowsKeyListenerOperations(),
         input_controller=WindowsInputControllerOperations(),
+        cursor_controller=WindowsCursorOperation(),
     )

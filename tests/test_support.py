@@ -2,7 +2,7 @@
 
 File path: ``tests/test_support.py``.
 Input: mode từ CLI và các ``unittest.TestCase`` có decorator ``test_modes``.
-Output: exit code 0 khi mọi test pass; khi fail chỉ in feature, mode và lỗi ngắn.
+Output: exit code 0 khi mọi test pass; khi fail in feature, mode và traceback gốc.
 Nguyên lý: runner lọc test theo mode trước khi chạy, nên test feature không cần kiểm
 tra OS hay tự xử lý output.
 """
@@ -13,6 +13,7 @@ import argparse
 import ast
 import inspect
 import sys
+import traceback
 import unittest
 from collections.abc import Iterable, Sequence
 from pathlib import Path
@@ -138,13 +139,14 @@ def _failure_message(error: _OptionalErrorInfo) -> str:
 
 
 def run_feature(feature: str, mode: str, action: Callable[[], object]) -> int:
-    """Chạy action feature và chỉ in lỗi ngắn khi action thất bại."""
+    """Chạy action feature và in traceback gốc khi action thất bại."""
 
     try:
         action()
     except Exception as error:
         message = str(error).strip() or error.__class__.__name__
         print(f"[{feature}][{mode}] {message.splitlines()[-1]}", file=sys.stderr)
+        traceback.print_exc()
         return 1
     return 0
 
@@ -163,6 +165,7 @@ class _QuietResult(unittest.TestResult):
     ) -> None:
         super().addError(test, err)
         self.messages.append(_format_failure(test, err))
+        traceback.print_exception(*err)
 
     def addFailure(
         self,
@@ -171,6 +174,7 @@ class _QuietResult(unittest.TestResult):
     ) -> None:
         super().addFailure(test, err)
         self.messages.append(_format_failure(test, err))
+        traceback.print_exception(*err)
 
     def addSubTest(
         self,
@@ -181,6 +185,7 @@ class _QuietResult(unittest.TestResult):
         super().addSubTest(test, subtest, err)
         if err is not None and err[1] is not None:
             self.messages.append(_format_failure(test, err))
+            traceback.print_exception(*err)
 
 
 def _format_failure(
@@ -193,7 +198,7 @@ def _format_failure(
 
 
 def run_suite(suite: unittest.TestSuite, modes: tuple[str, ...]) -> int:
-    """Chạy suite theo mode và chỉ in failure."""
+    """Chạy suite theo mode và in traceback cho mọi failure."""
 
     _TEST_MODE_BY_ID.clear()
     result = _QuietResult()
@@ -225,6 +230,7 @@ def _run_real(module: ModuleType, arguments: tuple[str, ...]) -> int:
     except Exception as error:
         message = str(error).strip() or error.__class__.__name__
         print(f"[{feature}][real][error] {message.splitlines()[-1]}", file=sys.stderr)
+        traceback.print_exc()
         return 1
 
 
@@ -263,6 +269,7 @@ def run_files(file_paths: Iterable[Path], modes: tuple[str, ...]) -> int:
         except Exception as error:
             feature_name = file_path.stem.removeprefix("test_")
             print(f"[{feature_name}][load] {error}", file=sys.stderr)
+            traceback.print_exc()
             return 1
         combined_suite.addTests(unittest.defaultTestLoader.loadTestsFromModule(module))
     return run_suite(combined_suite, modes)

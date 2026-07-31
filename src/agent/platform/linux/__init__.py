@@ -17,6 +17,7 @@ from agent.platform.linux.input_controller_operations import (
 from agent.platform.linux.key_listener import LinuxKeyListenerOperations
 from agent.platform.linux.processes import LinuxProcessOperations
 from agent.platform.linux.windows import LinuxWindowOperations
+from agent.platform.linux.hide_cursor import LinuxCursorOperations
 
 
 def create_services() -> PlatformServices:
@@ -32,6 +33,7 @@ def create_services() -> PlatformServices:
             Capability("input_blocking", True, "evdev permission required"),
             Capability("input_listening", True, "evdev and X11 required"),
             Capability("input_control", True, "UInput and X11 required"),
+            Capability("cursor_controller", True, "X11 backend, cursor blur control"),
         ),
     )
     return PlatformServices(
@@ -44,4 +46,5 @@ def create_services() -> PlatformServices:
         input_blocker=LinuxInputBlockingOperations(),
         key_listener=LinuxKeyListenerOperations(),
         input_controller=LinuxInputControllerOperations(),
+        cursor_controller=LinuxCursorOperations(),
     )

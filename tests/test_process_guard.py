@@ -25,6 +25,7 @@ import os
 import subprocess
 import sys
 import threading
+import traceback
 import unittest
 from collections.abc import Sequence
 from contextlib import redirect_stderr, redirect_stdout
@@ -38,8 +39,6 @@ from test_support import add_source_path, run_module, test_modes
 add_source_path()
 
 from agent.contracts import ProcessOperations
-from agent.platform.linux.processes import LinuxProcessOperations
-from agent.platform.windows.processes import WindowsProcessOperations
 from device_controler.process_killer import ProcessKiller
 
 
@@ -331,6 +330,7 @@ def run_real(arguments: Sequence[str]) -> int:
         result = 0
     except Exception as error:
         print(f"Fixture failed: {error}", file=sys.stderr)
+        traceback.print_exc()
     finally:
         if child is None:
             print("Cleanup: child was not started")
@@ -339,6 +339,7 @@ def run_real(arguments: Sequence[str]) -> int:
                 _cleanup_fixture(child)
             except Exception as error:
                 print(f"Cleanup failed: {error}", file=sys.stderr)
+                traceback.print_exc()
                 result = 1
     return result
 
@@ -376,6 +377,7 @@ def _run_named_kill(supplied_name: str) -> int:
         _print_matches("Remaining selected PIDs", remaining)
     except Exception as error:
         print(f"Kill result: failed; {error}")
+        traceback.print_exc()
         if operations is not None:
             _print_matches(
                 "Remaining selected PIDs",
@@ -506,7 +508,10 @@ class ProcessGuardTests(unittest.TestCase):
             killer.raise_if_failed()
 
     @test_modes("fake")
+    @unittest.skipUnless(sys.platform.startswith("linux"), "Linux only")
     def test_linux_list_processes_propagates_command_failure(self) -> None:
+        from agent.platform.linux.processes import LinuxProcessOperations
+
         error = subprocess.CalledProcessError(1, ["ps"])
 
         with patch(
@@ -517,7 +522,10 @@ class ProcessGuardTests(unittest.TestCase):
                 LinuxProcessOperations().list_processes()
 
     @test_modes("fake")
+    @unittest.skipUnless(sys.platform == "win32", "Windows only")
     def test_windows_list_processes_propagates_command_failure(self) -> None:
+        from agent.platform.windows.processes import WindowsProcessOperations
+
         with patch(
             "agent.platform.windows.processes.subprocess.check_output",
             side_effect=OSError("tasklist unavailable"),
@@ -526,7 +534,10 @@ class ProcessGuardTests(unittest.TestCase):
                 WindowsProcessOperations().list_processes()
 
     @test_modes("fake")
+    @unittest.skipUnless(sys.platform == "win32", "Windows only")
     def test_windows_kill_process_propagates_nonzero_exit(self) -> None:
+        from agent.platform.windows.processes import WindowsProcessOperations
+
         error = subprocess.CalledProcessError(1, ["taskkill"])
 
         with patch(
