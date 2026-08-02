@@ -1,28 +1,56 @@
-# Qui uoc lam he thong logging.
-Nen hieu so qua kien truc he thong de hieu duoc so do nay
+# Qui uoc lam he thong logging
+
+Can hieu kien truc he thong de hieu duoc qui uoc nay. Log level khong bi gioi
+han theo file hay layer. `main.py`, feature va adapter deu co the log `DEBUG`,
+`INFO`, `WARNING`, `ERROR`, `CRITICAL` khi y nghia cua su kien phu hop.
+
 ```text
 Adapter
   │
-  +─ Co the khac phuc
-  │      INFO/WARNING
+  +─ Khac phuc duoc: info
   │
-  +─ raise
+  +─ Khong khac phuc duoc: raise
   │
   ▼
 Feature
   │
-  +─ Co the khac phuc
-  │      WARNING/ERROR
+  +─ Khac phuc duoc: warning
   │
-  +─ raise
+  +─ Khong khac phuc duoc: raise
   │
   ▼
 Main
   │
-  +─ Co the khac phuc
-  │      ERROR
+  +─ Khac phuc duoc: error
   │
-  +─ Cannot recover
-          CRITICAL
+  +─ Khong khac phuc duoc: critical log va ket thuc command/process
 ```
 
+## Log level
+
+```text
+DEBUG
+    Chi tiet phuc vu debug, nhu input, output, nhanh xu ly va retry.
+
+INFO
+    Su kien binh thuong can theo doi, nhu start, shutdown, command hoan tat.
+
+WARNING
+    Bat thuong nhung co fallback, retry, skip hoac flow van tiep tuc.
+
+ERROR
+    Operation that bai tai layer da quyet dinh xu ly loi do.
+
+CRITICAL
+    Main khong the tiep tuc process hoac hoan thanh nhiem vu chinh.
+```
+
+## Qui tac
+
+```text
+1. Log tai layer quyet dinh recovery.
+2. Layer khong xu ly duoc loi phai raise len layer tren.
+3. Khong log cung mot loi o nhieu layer, khong vua log vua raise.
+4. Main duoc log INFO cho lifecycle va ket qua command binh thuong.
+5. ERROR khong bat buoc phai ket thuc process; CRITICAL moi la khong the tiep tuc.
+```
