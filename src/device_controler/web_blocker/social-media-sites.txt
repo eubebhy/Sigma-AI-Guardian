@@ -17,3 +17,4 @@ bluesky.com
 mastodon.social
 gab.com
 gettr.com
+discord.com

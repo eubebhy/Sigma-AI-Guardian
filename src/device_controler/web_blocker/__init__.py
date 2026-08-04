@@ -1,21 +1,21 @@
-"""Web blocker API cho phong tin hoc.
+"""Primitive hosts cho WebBlocker.
 
-File path: `src/device_controler/web_blocker/__init__.py`
-Input contract:
-- block(file_path) va unblock(file_path) nhan path toi file domain/url, moi dong mot gia tri.
-Output contract:
-- Them/xoa domain trong khoi hosts nam giua marker cua ung dung.
-- block() tra ve cac domain no da them moi, de cleanup chi xoa phan no so huu.
-- Ghi lai hosts bang atomic write va bo qua ghi file neu noi dung khong doi.
-Operating principle:
-- Khoa sidecar theo hosts trong suot read-modify-write, sau do atomic replace hosts.
+File path: `src/device_controler/web_blocker/__init__.py`.
+Input: domain iterable và tên marker SAG hợp lệ.
+Output: số domain đã thêm hoặc gỡ trong đúng marker SAG được yêu cầu.
+Nguyên lý: đọc hosts và source list theo stream, ghi temporary file rồi atomic replace
+một lần trong mỗi operation; code không giữ toàn bộ category list trong RAM.
 """
 
+from __future__ import annotations
+
 import os
+from collections.abc import Generator, Iterable
 from contextlib import contextmanager
 from pathlib import Path
 from tempfile import NamedTemporaryFile
-from typing import Generator
+from typing import TextIO, cast
+from urllib.parse import urlsplit
 
 from agent.contracts import HostsPathOperations
 from agent.platform import get_default_platform_services
@@ -32,92 +32,95 @@ SOCIAL_MEDIA_SITES_FILE_PATH = MODULE_PATH / "social-media-sites.txt"
 MESSAGING_SITES_FILE_PATH = MODULE_PATH / "messaging-sites.txt"
 ENTERTAINMENT_SITES_FILE_PATH = MODULE_PATH / "entertainment-sites.txt"
 
-DEFAULT_BLOCK_LIST_PATHS = (
-    PORN_SITES_FILE_PATH,
-    GORE_SITES_FILE_PATH,
-    GAME_SITES_FILE_PATH,
-    SOCIAL_MEDIA_SITES_FILE_PATH,
-    MESSAGING_SITES_FILE_PATH,
-    ENTERTAINMENT_SITES_FILE_PATH,
-)
+CATEGORY_PATHS = {
+    "porn": PORN_SITES_FILE_PATH,
+    "gore": GORE_SITES_FILE_PATH,
+    "game": GAME_SITES_FILE_PATH,
+    "social": SOCIAL_MEDIA_SITES_FILE_PATH,
+    "messaging": MESSAGING_SITES_FILE_PATH,
+    "entertainment": ENTERTAINMENT_SITES_FILE_PATH,
+}
 
-START_MARKER = "# SAG - Web block list start"
-END_MARKER = "# SAG - Web block list end"
+MARKER_PREFIX = "# SAG webblock "
 
 
-def _domain_from_line(line: str) -> str | None:
-    # cat comment, lay domain sach
-    value = line.split("#", 1)[0].strip().lower()
-    if not value:
+def _validate_marker(marker: str) -> None:
+    if not marker or not all(
+        character.isascii()
+        and (character.isalnum() or character in {":", "-", "_"})
+        for character in marker
+    ):
+        raise ValueError(f"Invalid web blocker marker: {marker!r}")
+
+
+def normalize_domain(value: str) -> str | None:
+    """Chuẩn hóa một domain hoặc URL thành hostname lowercase."""
+
+    cleaned = value.split("#", 1)[0].strip().lower()
+    if not cleaned or any(character.isspace() or ord(character) < 32 for character in cleaned):
         return None
-    # bo scheme, path, port, giu host
-    domain = value.split("://", 1)[-1].split("/", 1)[0]
-    return domain.split(":", 1)[0] or None
+    parsed = urlsplit(cleaned if "://" in cleaned else f"//{cleaned}")
+    if parsed.username is not None or parsed.password is not None:
+        return None
+    hostname = parsed.hostname
+    if hostname is None:
+        return None
+    normalized = hostname.rstrip(".")
+    labels = normalized.split(".")
+    if len(normalized) > 253 or any(
+        not label
+        or len(label) > 63
+        or label.startswith("-")
+        or label.endswith("-")
+        or not all(character.isascii() and (character.isalnum() or character == "-") for character in label)
+        for label in labels
+    ):
+        return None
+    return normalized
 
 
-def _load_domains(file_path: str | Path) -> list[str]:
-    domains: set[str] = set()
-    # doc list mot lan, dedupe trong ram
-    for line in Path(file_path).read_text(encoding="utf-8").splitlines():
-        domain = _domain_from_line(line)
-        if domain is not None:
-            domains.add(domain)
-    return sorted(domains)
+def _marker_start(marker: str) -> str:
+    _validate_marker(marker)
+    return f"{MARKER_PREFIX}{marker} start"
 
 
-def _parse_block_lines(lines: list[str]) -> list[str]:
-    domains: set[str] = set()
-    # chi nhan dong redirect cua minh
-    for line in lines:
-        parts = line.strip().split(maxsplit=1)
-        if len(parts) == 2 and parts[0] == redirect:
-            domains.add(parts[1].lower())
-    return sorted(domains)
+def _marker_end(marker: str) -> str:
+    _validate_marker(marker)
+    return f"{MARKER_PREFIX}{marker} end"
 
 
-def _split_hosts(hosts_text: str) -> tuple[str, list[str], str]:
-    # tach hosts thanh before/block/after
-    before, marker, rest = hosts_text.partition(START_MARKER)
-    if not marker:
-        return hosts_text.rstrip("\n"), [], ""
-    block_text, end_marker, after = rest.partition(END_MARKER)
-    if not end_marker:
-        raise ValueError("Web blocker marker is broken")
-    return before.rstrip("\n"), _parse_block_lines(block_text.splitlines()), after
+def _marker_name_from_start(line: str) -> str | None:
+    stripped = line.strip()
+    if not stripped.startswith(MARKER_PREFIX) or not stripped.endswith(" start"):
+        return None
+    marker = stripped[len(MARKER_PREFIX) : -len(" start")]
+    return marker or None
 
 
-def _render_hosts(before: str, blocked_domains: list[str], after: str) -> str:
-    # ghep lai block moi vao hosts cu
-    lines = [before, START_MARKER]
-    lines.extend(f"{redirect} {domain}" for domain in blocked_domains)
-    lines.append(END_MARKER)
-    return "\n".join(lines).lstrip("\n") + after
+def _is_marker_end(line: str, marker: str) -> bool:
+    return line.strip() == _marker_end(marker)
 
 
-def _atomic_write(path: Path, content: str) -> None:
-    # ghi temp cung thu muc roi swap
-    with NamedTemporaryFile(
-        mode="w",
-        encoding="utf-8",
-        dir=path.parent,
-        prefix=f".{path.name}.",
-        delete=False,
-    ) as file:
-        file.write(content)
-        temp_path = Path(file.name)
-    try:
-        # giu permission hosts cu
-        os.chmod(temp_path, path.stat().st_mode)
-        os.replace(temp_path, path)
-    finally:
-        temp_path.unlink(missing_ok=True)
+def _domain_from_hosts_line(line: str) -> str | None:
+    parts = line.strip().split(maxsplit=1)
+    if len(parts) != 2 or parts[0] != redirect:
+        return None
+    return parts[1].lower()
+
+
+def _hosts_path(operations: HostsPathOperations | Path | None) -> Path:
+    if isinstance(operations, Path):
+        return operations
+    if operations is not None:
+        return operations.get_hosts_path()
+    return Path(default_hoster)
 
 
 @contextmanager
-def _hosts_lock(hosts_path: Path) -> Generator[None, None, None]:
-    """Khoa sidecar de cac process SAG cung serialize hosts transaction."""
+def file_lock(path: Path) -> Generator[None, None, None]:
+    """Khóa sidecar để serialize transaction file giữa các process SAG."""
 
-    lock_path = hosts_path.with_name(f".{hosts_path.name}.sag.lock")
+    lock_path = path.with_name(f".{path.name}.sag.lock")
     with lock_path.open("a+", encoding="utf-8") as lock_file:
         if os.name == "nt":
             import msvcrt
@@ -144,51 +147,311 @@ def _hosts_lock(hosts_path: Path) -> Generator[None, None, None]:
                 fcntl.flock(lock_file.fileno(), fcntl.LOCK_UN)
 
 
-def _update_hosts(
-    file_path: str | Path,
-    is_blocking: bool,
-    hosts_operations: HostsPathOperations | None = None,
-) -> set[str]:
-    hosts_path = (
-        hosts_operations.get_hosts_path()
-        if hosts_operations is not None
-        else Path(default_hoster)
+@contextmanager
+def _temporary_hosts_file(path: Path) -> Generator[tuple[TextIO, Path], None, None]:
+    file = NamedTemporaryFile(
+        mode="w",
+        encoding="utf-8",
+        dir=path.parent,
+        prefix=f".{path.name}.",
+        delete=False,
     )
-    domains = set(_load_domains(file_path))
-    with _hosts_lock(hosts_path):
-        hosts_text = hosts_path.read_text(encoding="utf-8")
-        before, current_domains, after = _split_hosts(hosts_text)
-        blocked_domains = set(current_domains)
-        added_domains: set[str] = set()
-        if is_blocking:
-            added_domains = domains.difference(blocked_domains)
-            blocked_domains.update(domains)
-        else:
-            blocked_domains.difference_update(domains)
-        new_hosts_text = _render_hosts(before, sorted(blocked_domains), after)
-        if new_hosts_text != hosts_text:
-            _atomic_write(hosts_path, new_hosts_text)
-    return added_domains
+    temp_path = Path(file.name)
+    try:
+        yield cast(TextIO, file), temp_path
+    finally:
+        file.close()
+        temp_path.unlink(missing_ok=True)
 
 
-def block(file_path: str | Path) -> set[str]:
-    # them list vao block state
-    return _update_hosts(file_path, is_blocking=True)
+def _commit_hosts_file(hosts_path: Path, temp_path: Path) -> None:
+    os.chmod(temp_path, hosts_path.stat().st_mode)
+    os.replace(temp_path, hosts_path)
 
 
-def unblock(file_path: str | Path) -> None:
-    # go list khoi block state
-    _update_hosts(file_path, is_blocking=False)
+def _copy_hosts(source: TextIO, target: TextIO, marker: str) -> tuple[bool, bool]:
+    ended_with_newline = True
+    marker_count = 0
+    marker_open = False
+    for line in source:
+        target.write(line)
+        ended_with_newline = line.endswith("\n")
+        if line.strip() == _marker_start(marker):
+            marker_count += 1
+            marker_open = True
+        elif marker_open and _is_marker_end(line, marker):
+            marker_open = False
+    if marker_open or marker_count > 1:
+        raise ValueError(f"Web blocker marker is broken: {marker}")
+    return ended_with_newline, marker_count == 1
+
+
+def _append_marker(
+    hosts_path: Path,
+    marker: str,
+    domains: Iterable[str],
+) -> int:
+    with _temporary_hosts_file(hosts_path) as (target, temp_path):
+        with hosts_path.open(encoding="utf-8") as source:
+            ended_with_newline, marker_exists = _copy_hosts(source, target, marker)
+        if marker_exists:
+            return 0
+        if hosts_path.stat().st_size and not ended_with_newline:
+            target.write("\n")
+        target.write(f"{_marker_start(marker)}\n")
+        count = 0
+        for domain in domains:
+            target.write(f"{redirect} {domain}\n")
+            count += 1
+        target.write(f"{_marker_end(marker)}\n")
+        target.flush()
+        _commit_hosts_file(hosts_path, temp_path)
+    return count
+
+
+def marker_exists(hosts_path: Path, marker: str) -> bool:
+    """Kiểm tra marker tồn tại và nguyên vẹn mà không ghi hosts."""
+
+    with file_lock(hosts_path):
+        marker_count = 0
+        marker_open = False
+        with hosts_path.open(encoding="utf-8") as source:
+            for line in source:
+                if line.strip() == _marker_start(marker):
+                    marker_count += 1
+                    marker_open = True
+                elif marker_open and _is_marker_end(line, marker):
+                    marker_open = False
+        if marker_open or marker_count > 1:
+            raise ValueError(f"Web blocker marker is broken: {marker}")
+        return marker_count == 1
+
+
+def marker_names(hosts_path: Path) -> frozenset[str]:
+    """Trả marker SAG nguyên vẹn; marker lồng hoặc hỏng sẽ raise ValueError."""
+
+    with file_lock(hosts_path):
+        names: set[str] = set()
+        current_marker: str | None = None
+        with hosts_path.open(encoding="utf-8") as source:
+            for line in source:
+                marker = _marker_name_from_start(line)
+                if marker is not None:
+                    if current_marker is not None or marker in names:
+                        raise ValueError("Web blocker markers are broken")
+                    names.add(marker)
+                    current_marker = marker
+                    continue
+                if current_marker is not None and _is_marker_end(line, current_marker):
+                    current_marker = None
+        if current_marker is not None:
+            raise ValueError("Web blocker markers are broken")
+        return frozenset(names)
+
+
+def block(
+    domains: Iterable[str],
+    marker: str,
+    hosts_operations: HostsPathOperations | Path | None = None,
+) -> int:
+    """Thêm domain vào marker mới; marker đã có sẽ không bị ghi lại."""
+
+    hosts_path = _hosts_path(hosts_operations)
+    normalized = {domain for value in domains if (domain := normalize_domain(value))}
+    with file_lock(hosts_path):
+        return _append_marker(hosts_path, marker, sorted(normalized))
+
+
+def block_file(
+    file_path: Path,
+    marker: str,
+    allowed_domains: frozenset[str],
+    hosts_path: Path,
+) -> int:
+    with file_lock(hosts_path):
+        def domains() -> Generator[str, None, None]:
+            with file_path.open(encoding="utf-8") as source:
+                for line in source:
+                    domain = normalize_domain(line)
+                    if domain is not None and domain not in allowed_domains:
+                        yield domain
+
+        return _append_marker(hosts_path, marker, domains())
+
+
+def _remove_marker(hosts_path: Path, marker: str) -> int:
+    with _temporary_hosts_file(hosts_path) as (target, temp_path):
+        removed = 0
+        skipping = False
+        found = False
+        with hosts_path.open(encoding="utf-8") as source:
+            for line in source:
+                if skipping:
+                    if _is_marker_end(line, marker):
+                        skipping = False
+                    else:
+                        removed += int(_domain_from_hosts_line(line) is not None)
+                    continue
+                if line.strip() == _marker_start(marker):
+                    if found:
+                        raise ValueError(f"Web blocker marker is duplicated: {marker}")
+                    skipping = True
+                    found = True
+                    continue
+                target.write(line)
+        if skipping:
+            raise ValueError(f"Web blocker marker is broken: {marker}")
+        if not found:
+            return 0
+        target.flush()
+        _commit_hosts_file(hosts_path, temp_path)
+    return removed
+
+
+def unblock(
+    marker: str,
+    hosts_operations: HostsPathOperations | Path | None = None,
+) -> int:
+    """Xóa toàn bộ marker và domain của một policy/category."""
+
+    hosts_path = _hosts_path(hosts_operations)
+    with file_lock(hosts_path):
+        return _remove_marker(hosts_path, marker)
+
+
+def replace_marker(hosts_path: Path, marker: str, domains: Iterable[str]) -> int:
+    """Thay marker custom trong một hosts transaction được khóa."""
+
+    normalized = sorted(
+        {domain for value in domains if (domain := normalize_domain(value))}
+    )
+    with file_lock(hosts_path):
+        return _replace_marker(hosts_path, marker, normalized)
+
+
+def _replace_marker(hosts_path: Path, marker: str, domains: list[str]) -> int:
+    with _temporary_hosts_file(hosts_path) as (target, temp_path):
+        found = False
+        skipping = False
+        old_count = 0
+        with hosts_path.open(encoding="utf-8") as source:
+            for line in source:
+                if skipping:
+                    if _is_marker_end(line, marker):
+                        skipping = False
+                    else:
+                        old_count += int(_domain_from_hosts_line(line) is not None)
+                    continue
+                if line.strip() == _marker_start(marker):
+                    if found:
+                        raise ValueError(f"Web blocker marker is duplicated: {marker}")
+                    found = True
+                    skipping = True
+                    continue
+                target.write(line)
+        if skipping:
+            raise ValueError(f"Web blocker marker is broken: {marker}")
+        if domains:
+            if found or hosts_path.stat().st_size:
+                target.write("\n")
+            target.write(f"{_marker_start(marker)}\n")
+            for domain in domains:
+                target.write(f"{redirect} {domain}\n")
+            target.write(f"{_marker_end(marker)}\n")
+        if not found and not domains:
+            return 0
+        target.flush()
+        _commit_hosts_file(hosts_path, temp_path)
+    return old_count
+
+
+def remove_domains(hosts_path: Path, domains: frozenset[str]) -> int:
+    """Gỡ domain khỏi mọi marker SAG trong một hosts transaction được khóa."""
+
+    with file_lock(hosts_path):
+        return _remove_domains(hosts_path, domains)
+
+
+def _remove_domains(hosts_path: Path, domains: frozenset[str]) -> int:
+    with _temporary_hosts_file(hosts_path) as (target, temp_path):
+        current_marker: str | None = None
+        removed = 0
+        with hosts_path.open(encoding="utf-8") as source:
+            for line in source:
+                marker = _marker_name_from_start(line)
+                if marker is not None:
+                    if current_marker is not None:
+                        raise ValueError(
+                            f"Web blocker marker is broken: {current_marker}"
+                        )
+                    current_marker = marker
+                    target.write(line)
+                    continue
+                if current_marker is not None and _is_marker_end(line, current_marker):
+                    current_marker = None
+                    target.write(line)
+                    continue
+                domain = _domain_from_hosts_line(line)
+                if current_marker is not None and domain in domains:
+                    removed += 1
+                    continue
+                target.write(line)
+        if current_marker is not None:
+            raise ValueError(f"Web blocker marker is broken: {current_marker}")
+        if not removed:
+            return 0
+        target.flush()
+        _commit_hosts_file(hosts_path, temp_path)
+    return removed
+
+
+def remove_all_markers(hosts_path: Path) -> int:
+    """Gỡ mọi marker SAG trong một hosts transaction được khóa."""
+
+    with file_lock(hosts_path):
+        return _remove_all_markers(hosts_path)
+
+
+def _remove_all_markers(hosts_path: Path) -> int:
+    with _temporary_hosts_file(hosts_path) as (target, temp_path):
+        current_marker: str | None = None
+        removed = 0
+        found = False
+        with hosts_path.open(encoding="utf-8") as source:
+            for line in source:
+                marker = _marker_name_from_start(line)
+                if marker is not None:
+                    if current_marker is not None:
+                        raise ValueError(
+                            f"Web blocker marker is broken: {current_marker}"
+                        )
+                    current_marker = marker
+                    found = True
+                    continue
+                if current_marker is not None:
+                    if _is_marker_end(line, current_marker):
+                        current_marker = None
+                    else:
+                        removed += int(_domain_from_hosts_line(line) is not None)
+                    continue
+                target.write(line)
+        if current_marker is not None:
+            raise ValueError(f"Web blocker marker is broken: {current_marker}")
+        if not found:
+            return 0
+        target.flush()
+        _commit_hosts_file(hosts_path, temp_path)
+    return removed
+
+
+from device_controler.web_blocker.manager import WebBlockResult, WebBlockStatus, WebBlocker
+
+manager = WebBlocker()
 
 
 __all__ = [
-    "block",
-    "unblock",
-    "PORN_SITES_FILE_PATH",
-    "GORE_SITES_FILE_PATH",
-    "GAME_SITES_FILE_PATH",
-    "SOCIAL_MEDIA_SITES_FILE_PATH",
-    "MESSAGING_SITES_FILE_PATH",
-    "ENTERTAINMENT_SITES_FILE_PATH",
-    "DEFAULT_BLOCK_LIST_PATHS",
+    "WebBlocker",
+    "WebBlockResult",
+    "WebBlockStatus",
+    "manager",
 ]
