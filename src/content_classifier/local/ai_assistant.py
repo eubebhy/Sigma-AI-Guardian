@@ -15,6 +15,7 @@ Nguyên lý hoạt động:
 
 import threading
 import time
+import logging
 from pathlib import Path
 from typing import Any, cast
 
@@ -25,15 +26,26 @@ _GB = 1073741824  # 1024 ** 3 bytes
 _DEFAULT_IDLE_TIMEOUT_SECONDS = 167.0
 _model = None
 
+logger = logging.getLogger(__name__)
+
 
 def _idle_timeout_seconds(model_path: Path) -> float:
     """Estimate how long the model can stay idle before it is unloaded."""
     try:
         size_bytes = model_path.stat().st_size
-    except OSError:
+    except OSError as error:
+        logger.warning(
+            "Could not read model size from %s; using default idle timeout: %s",
+            model_path,
+            error,
+        )
         return _DEFAULT_IDLE_TIMEOUT_SECONDS
 
     if size_bytes <= 0:
+        logger.warning(
+            "Model size for %s is not positive; using default idle timeout",
+            model_path,
+        )
         return _DEFAULT_IDLE_TIMEOUT_SECONDS
 
     timeout = _DEFAULT_IDLE_TIMEOUT_SECONDS * (size_bytes / _GB)

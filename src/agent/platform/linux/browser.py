@@ -7,9 +7,13 @@ Nguyên lý: tách process browser khỏi Agent bằng session mới và bỏ ou
 """
 
 import os
+import logging
 import shutil
 import subprocess
 import webbrowser
+
+
+logger = logging.getLogger(__name__)
 
 
 class LinuxBrowserOperations:
@@ -27,7 +31,8 @@ class LinuxBrowserOperations:
                     start_new_session=True,
                 )
             return True
-        except OSError:
+        except OSError as error:
+            logger.info("Linux browser launch failed for %r: %s", command, error)
             return False
 
     def open_default_url(self, url: str) -> bool:

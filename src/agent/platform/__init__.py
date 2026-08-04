@@ -12,7 +12,10 @@ from __future__ import annotations
 import platform
 import threading
 from dataclasses import dataclass
+from collections.abc import Iterator, Sequence
+from typing import NoReturn
 
+import logging
 from agent.capabilities import PlatformCapabilities
 from agent.contracts import (
     BrowserOperations,
@@ -44,10 +47,14 @@ class PlatformServices:
     cursor_controller: CursorOperations
 
 
+logger = logging.getLogger(__name__)
+
+
 def create_platform_services(platform_name: str | None = None) -> PlatformServices:
     """Tao adpter theo moi truong."""
 
     normalized_name = platform_name or platform.system().lower()
+    logger.debug("Detected platform: %s", normalized_name)
 
     if normalized_name in {"linux"}:
         from agent.platform.linux import create_services
@@ -57,6 +64,7 @@ def create_platform_services(platform_name: str | None = None) -> PlatformServic
         from agent.platform.windows import create_services
 
         return create_services()
+
     raise NotImplementedError(f"Unsupported platform: {normalized_name}")
 
 

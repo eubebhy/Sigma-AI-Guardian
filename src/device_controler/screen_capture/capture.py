@@ -17,6 +17,7 @@ Operating principle:
 from __future__ import annotations
 
 import atexit
+import logging
 import threading
 from dataclasses import dataclass
 from typing import Any, TypeAlias
@@ -24,6 +25,9 @@ from typing import Any, TypeAlias
 import numpy as np
 from mss import MSS
 from mss.exception import ScreenShotError
+
+
+logger = logging.getLogger(__name__)
 
 Frame: TypeAlias = Any
 
@@ -114,6 +118,7 @@ def capture(
             sharpness=sharpness,
         )
     except ScreenShotError:
+        logger.warning("Screen capture backend failed; recreating backend and retrying")
         _capture_instance = _create_capture_backend()
         return _capture_instance.capture(
             top=top,

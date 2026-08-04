@@ -6,9 +6,13 @@ Output: `True` nếu subprocess được tạo, `False` nếu hệ điều hành
 Nguyên lý: tạo process group riêng để browser không chặn Agent process.
 """
 
+import logging
 import subprocess
 import shutil
 import webbrowser
+
+
+logger = logging.getLogger(__name__)
 
 
 class WindowsBrowserOperations:
@@ -20,7 +24,8 @@ class WindowsBrowserOperations:
         try:
             subprocess.Popen(command, creationflags=0x00000200)
             return True
-        except OSError:
+        except OSError as error:
+            logger.info("Windows browser launch failed for %r: %s", command, error)
             return False
 
     def open_default_url(self, url: str) -> bool:

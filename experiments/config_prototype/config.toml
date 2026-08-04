@@ -1,0 +1,5 @@
+[webblocker]
+block_porn = true
+block_game = true
+block_gore = true
+block_social = true

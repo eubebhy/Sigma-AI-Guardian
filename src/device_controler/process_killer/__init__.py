@@ -22,10 +22,14 @@ Operating principle:
 
 from __future__ import annotations
 
+import logging
 import threading
 
 from agent.contracts import ProcessOperations
 from agent.platform import get_default_platform_services
+
+
+logger = logging.getLogger(__name__)
 
 
 class ProcessKiller:
@@ -112,7 +116,7 @@ class ProcessKiller:
             try:
                 self._scan_and_kill()
             except ProcessLookupError:
-                pass
+                logger.warning("Process exited while the process guard was scanning")
             except Exception as error:
                 with self._lifecycle_lock:
                     self._failure = error
@@ -129,7 +133,7 @@ class ProcessKiller:
             try:
                 self._process_operations.kill_process(pid)
             except ProcessLookupError:
-                # PID co the da thoat; van quet PID sau.
+                logger.warning("Process %s exited before the process guard could kill it", pid)
                 continue
 
     def _has_same_name(self, pid: int, normalized_name: str) -> bool:

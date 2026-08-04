@@ -10,6 +10,7 @@ Xorg/libinput có thời gian nhận diện. Nếu tạo device, gửi event r�
 event đầu tiên có thể bị mất vì Xorg chưa attach xong.
 """
 
+import logging
 import os
 import time
 from math import ceil
@@ -22,6 +23,9 @@ from Xlib.display import Display
 from agent.contracts import MouseButton
 from agent.platform.linux.input_controller.types import UInputDevice
 from agent.platform.linux.input_controller.utils import UInputManager
+
+
+logger = logging.getLogger(__name__)
 
 # Đổi tên nút public sang BTN_* code mà Linux input subsystem sử dụng.
 _BUTTON_CODES: Final[dict[MouseButton, int]] = {
@@ -109,13 +113,14 @@ def _get_root() -> _Root:
 
     last_error: Exception | None = None
 
-    for _ in range(3):
+    for attempt in range(1, 4):
         try:
             _display = Display()
             _root = cast(_Root, _display.screen().root)
             return _root
         except Exception as error:
             last_error = error
+            logger.debug("X server connection attempt %s of 3 failed: %s", attempt, error)
 
     raise RuntimeError("Cannot connect to X server") from last_error
 

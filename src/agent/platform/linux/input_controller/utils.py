@@ -7,6 +7,7 @@ Nguyên lý: health được cache 5 giây; mỗi lần tạo lại dùng genera
 XInput2 không nhầm device mới với device cũ đang được Xorg loại bỏ.
 """
 
+import logging
 import time
 from typing import Final, cast
 
@@ -19,6 +20,9 @@ from agent.platform.linux.input_controller.types import (
     UInputDevice,
     XInputDisplay,
 )
+
+
+logger = logging.getLogger(__name__)
 
 _XINPUT_READY_TIMEOUT: Final[float] = 2.0
 _XINPUT_POLL_INTERVAL: Final[float] = 0.067
@@ -100,6 +104,7 @@ class UInputManager:
             return self._ui
 
         if self._ui is not None:
+            logger.info("Virtual input device is unavailable; creating a replacement")
             self._ui.close()
 
         # Tên mới ngăn readiness nhận nhầm device cũ chưa biến mất khỏi XInput2.

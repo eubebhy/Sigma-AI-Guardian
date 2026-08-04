@@ -1,0 +1,7 @@
+update_check_interval = 6.7 # Seconds
+
+[webblocker]
+block_game = true
+block_gore = true
+block_porn = true
+block_social = true
