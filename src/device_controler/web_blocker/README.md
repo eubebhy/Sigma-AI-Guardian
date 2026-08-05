@@ -10,17 +10,17 @@ teacher command: bật/tắt category, custom block domain, custom allow domain 
 ```python
 blocker.block_category("porn")
 blocker.unblock_category("porn")
-blocker.block_site("example-game.com")
-blocker.allow_site("youtube.com")
-blocker.remove_allowed_site("youtube.com")
+blocker.block_domain("example-game.com")
+blocker.allow_domain("youtube.com")
+blocker.remove_allowed_domain("youtube.com")
 blocker.get_status()
 blocker.clear_all()
 ```
 
-Module cũng export singleton `manager` để Agent command handler dùng chung policy state.
+Module cũng export singleton `default_web_blocker` để Agent command handler dùng chung policy state.
 
-`allow_site()` có precedence cao nhất: nó gỡ domain khỏi tất cả marker SAG đang có.
-`remove_allowed_site()` không tự block domain lại.
+`allow_domain()` có precedence cao nhất: nó gỡ domain khỏi tất cả marker SAG đang có.
+`remove_allowed_domain()` không tự block domain lại.
 
 Category hợp lệ:
 

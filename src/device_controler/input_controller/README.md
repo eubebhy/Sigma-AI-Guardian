@@ -26,7 +26,7 @@ from device_controler.input_controller.linux import click, moveTo
 
 # Package backend Windows giu ten `window`.
 from device_controler.input_controller import window
-from device_controler.input_controller.window import press, write
+from device_controler.input_controller.windows import press, write
 ```
 
 Import facade Windows khong import `pydirectinput` ngay. Dependency chi duoc nap

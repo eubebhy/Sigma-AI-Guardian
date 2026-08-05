@@ -3,11 +3,11 @@
 
 File path: `src/device_controler/screen_capture/capture.py`
 Input contract:
-- capture(top, left, width, height, sharpness): toa do/vung chup kieu MSS.
-- sharpness trong khoang `(0.0, 1.0]`.
+- capture(top, left, width, height, sample_ratio): toa do/vung chup kieu MSS.
+- sample_ratio trong khoang `(0.0, 1.0]`.
 Output contract:
 - Tra ve frame BGRA, dtype uint8, theo raw buffer cua MSS.
-- Khi sharpness < 1.0, frame nho hon theo ti le lay mau.
+- Khi sample_ratio < 1.0, frame nho hon theo ti le lay mau.
 Operating principle:
 - Giu mot MSS instance dung lai trong process.
 - Moi lan chup lay raw BGRA roi giam mau bang numpy slicing.
@@ -40,7 +40,7 @@ class ScreenRegion:
     left: int
     width: int
     height: int
-    sharpness: float = 1.0
+    sample_ratio: float = 1.0
 
 
 class ScreenCapture:
@@ -56,13 +56,13 @@ class ScreenCapture:
         left: int,
         width: int,
         height: int,
-        sharpness: float = 1.0,
+        sample_ratio: float = 1.0,
     ) -> Frame:
         """Chụp một vùng màn hình và trả về frame BGRA dạng numpy-compatible."""
 
         region = ScreenRegion(top=top, left=left, width=width, height=height)
-        if not 0.0 < sharpness <= 1.0:
-            raise ValueError("sharpness must be in range (0.0, 1.0]")
+        if not 0.0 < sample_ratio <= 1.0:
+            raise ValueError("sample_ratio must be in range (0.0, 1.0]")
 
         monitor = {
             "top": region.top,
@@ -73,7 +73,7 @@ class ScreenCapture:
         with self._lock:
             shot = self._mss.grab(monitor)
         frame = np.asarray(shot, dtype=np.uint8)
-        return _apply_sharpness(frame, sharpness)
+        return _apply_sample_ratio(frame, sample_ratio)
 
     def close(self) -> None:
         """Đóng MSS backend nếu thư viện hiện tại hỗ trợ `close()`."""
@@ -103,7 +103,7 @@ def capture(
     left: int,
     width: int,
     height: int,
-    sharpness: float = 1.0,
+    sample_ratio: float = 1.0,
 ) -> Frame:
     """API tiện ích dùng singleton backend và tự tạo lại một lần khi MSS lỗi."""
 
@@ -115,7 +115,7 @@ def capture(
             left=left,
             width=width,
             height=height,
-            sharpness=sharpness,
+            sample_ratio=sample_ratio,
         )
     except ScreenShotError:
         logger.warning("Screen capture backend failed; recreating backend and retrying")
@@ -125,7 +125,7 @@ def capture(
             left=left,
             width=width,
             height=height,
-            sharpness=sharpness,
+            sample_ratio=sample_ratio,
         )
 
 
@@ -135,10 +135,10 @@ def get_monitors() -> list[ScreenRegion]:
     return _capture_instance.get_monitors()
 
 
-def _apply_sharpness(frame: Frame, sharpness: float) -> Frame:
-    if sharpness == 1.0:
+def _apply_sample_ratio(frame: Frame, sample_ratio: float) -> Frame:
+    if sample_ratio == 1.0:
         return frame
-    step = max(1, round(1.0 / sharpness))
+    step = max(1, round(1.0 / sample_ratio))
     return np.ascontiguousarray(frame[::step, ::step, :])
 
 

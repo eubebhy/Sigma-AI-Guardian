@@ -1,8 +1,8 @@
-"""Kill process theo blacklist don gian.
+"""Guard process theo blacklist don gian.
 
-File path: `src/device_controler/process_killer/__init__.py`
+File path: `src/device_controler/process_guard/__init__.py`
 Input contract:
-- ProcessKiller.blocked: danh sach exact process names can kill.
+- ProcessGuard.blocked: danh sach exact process names can kill.
 - set_blacklist(values): bo sung exact process names can kill.
 - set_whitelist(values): exact process names khong duoc kill.
 - start()/stop(): bat/tat vong quet nen.
@@ -32,7 +32,7 @@ from agent.platform import get_default_platform_services
 logger = logging.getLogger(__name__)
 
 
-class ProcessKiller:
+class ProcessGuard:
     """Quét process nền và kill process nằm trong blacklist exact-name."""
 
     def __init__(self, process_operations: ProcessOperations | None = None) -> None:
@@ -152,4 +152,4 @@ class ProcessKiller:
         return False
 
 
-__all__ = ["ProcessKiller"]
+__all__ = ["ProcessGuard"]

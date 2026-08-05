@@ -1,7 +1,63 @@
-update_check_interval = 6.7 # Seconds
+[system]
+config_update_check_interval_seconds = 6.7
 
+# ================================================================
 [webblocker]
+enabled = true
+
 block_game = true
 block_gore = true
 block_porn = true
 block_social = true
+block_messaging = true
+block_entertainment = true
+
+custom_allowlist = []
+custom_blocklist = []
+
+# ================================================================
+[process_guard]
+enabled = false
+scan_interval_seconds = 1.6767
+blocked_processes = []
+
+# ================================================================
+[window_monitor]
+enabled = true
+scan_interval_seconds = 1.6767
+scope = "active"
+
+# ================================================================
+[classifier]
+enabled = true
+default_strictness = "mid"
+
+# ================================================================
+[screen_monitor]
+
+# fps = clamp(min_fps, max_fps,
+#             max_fps_scale / monitor_count)
+
+max_fps_scale = 67.0
+max_fps = 30.0
+min_fps = 1.0
+
+[screen_lock]
+message = '''Your workstation has been restricted for one of the following reasons:
+
+The administrator has manually locked your machine.
+The system automatically locked it after detecting prohibited or unauthorized
+activity.
+
+Contact your administrator immediately.
+While waiting for unlock, you are strictly required to follow these rules:
+
+    1. Do not turn off the computer. Keep the power supply stable at all times.
+
+    2. Do not attempt to bypass, force-close, restart, or interfere with the
+       locking system in any way.
+
+    3. Remain at the computer and wait for the administrator to unlock it.
+
+Improper shutdown or unauthorized interference with the system may result in
+UNINTENDED CONSEQUENCES.'''

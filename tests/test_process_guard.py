@@ -1,5 +1,5 @@
 # pyright: reportPrivateUsage=false
-"""Kiểm tra ProcessKiller bằng process operations fake và fixture opt-in.
+"""Kiểm tra ProcessGuard bằng process operations fake và fixture opt-in.
 
 File path: ``tests/test_process_guard.py``.
 Input: safe mode ``fake`` hoặc ``smoke``; real nhận ``fixture`` hoặc
@@ -39,7 +39,7 @@ from test_support import add_source_path, run_module, test_modes
 add_source_path()
 
 from agent.contracts import ProcessOperations
-from device_controler.process_killer import ProcessKiller
+from device_controler.process_guard import ProcessGuard as ProcessKiller
 
 
 _FIXTURE_PROCESS_NAME = "sag-process-guard-fixture"
@@ -185,7 +185,7 @@ class _FixtureChild(Protocol):
 
 
 class _FixtureProcessOperations:
-    """Adapter chỉ cấp ProcessKiller quyền trên đúng child fixture đã tạo."""
+    """Adapter chỉ cấp ProcessGuard quyền trên đúng child fixture đã tạo."""
 
     def __init__(self, child: _FixtureChild) -> None:
         self._child = child
@@ -202,7 +202,7 @@ class _FixtureProcessOperations:
 
 
 class _SnapshotProcessOperations:
-    """Chỉ cho ProcessKiller scan và kill các PID đã được preflight chọn."""
+    """Chỉ cho ProcessGuard scan và kill các PID đã được preflight chọn."""
 
     def __init__(
         self,
@@ -565,8 +565,8 @@ class ProcessGuardTests(unittest.TestCase):
             return thread
 
         with (
-            patch("device_controler.process_killer.threading.Event", side_effect=events),
-            patch("device_controler.process_killer.threading.Thread", side_effect=create_thread),
+            patch("device_controler.process_guard.threading.Event", side_effect=events),
+            patch("device_controler.process_guard.threading.Thread", side_effect=create_thread),
         ):
             killer = ProcessKiller(_FakeProcessOperations([]))
             killer.start()
@@ -596,8 +596,8 @@ class ProcessGuardTests(unittest.TestCase):
             return thread
 
         with (
-            patch("device_controler.process_killer.threading.Event", return_value=event),
-            patch("device_controler.process_killer.threading.Thread", side_effect=create_thread),
+            patch("device_controler.process_guard.threading.Event", return_value=event),
+            patch("device_controler.process_guard.threading.Thread", side_effect=create_thread),
         ):
             killer = ProcessKiller(_FakeProcessOperations([]))
             killer.start()

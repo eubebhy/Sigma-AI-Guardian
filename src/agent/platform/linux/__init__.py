@@ -17,7 +17,7 @@ from agent.platform.linux.input_controller_operations import (
 from agent.platform.linux.key_listener import LinuxKeyListenerOperations
 from agent.platform.linux.processes import LinuxProcessOperations
 from agent.platform.linux.windows import LinuxWindowOperations
-from agent.platform.linux.hide_cursor import LinuxCursorOperations
+from agent.platform.linux.cursor import LinuxCursorOperations
 
 
 def create_services() -> PlatformServices:

@@ -146,7 +146,7 @@ class BrowserTests(unittest.TestCase):
         browser_operations = _FakeBrowserOperations(default_open_result=False)
         services = _create_services(browser_operations)
         browser = {
-            "spec": browser_tab.BROWSERS[0],
+            "spec": browser_tab.BROWSER_SPECS[0],
             "executable": "/bin/browser",
             "pid": None,
             "score": 10,
@@ -161,7 +161,7 @@ class BrowserTests(unittest.TestCase):
     @test_modes("mock", "smoke")
     def test_open_tab_uses_running_browser(self) -> None:
         browser = {
-            "spec": browser_tab.BROWSERS[0],
+            "spec": browser_tab.BROWSER_SPECS[0],
             "executable": "/bin/browser",
             "pid": 123,
             "score": 1000,
@@ -193,7 +193,10 @@ class BrowserTests(unittest.TestCase):
 
         browser_tab._browser_states(_FakeProcessOperations(), browser_operations)
 
-        self.assertEqual(len(browser_operations.executable_lookups), len(browser_tab.BROWSERS))
+        self.assertEqual(
+            len(browser_operations.executable_lookups),
+            len(browser_tab.BROWSER_SPECS),
+        )
 
     @test_modes("real")
     def test_open_tab_uses_current_platform_browser(self) -> None:

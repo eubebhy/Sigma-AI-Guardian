@@ -1,6 +1,6 @@
 """Compatibility API cho Windows mouse sender."""
 
-from device_controler.input_controller.window import (
+from device_controler.input_controller.windows import (
     click,
     mouseDown,
     mouseUp,

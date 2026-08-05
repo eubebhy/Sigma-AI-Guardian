@@ -42,7 +42,7 @@ from test_support import add_source_path, run_module, test_modes
 add_source_path()
 
 from device_controler.screen_capture import ScreenRegion
-from device_controler import screenlocker
+from device_controler import screen_locker as screenlocker
 
 
 _TEST_HEADER_TEXT = "TEST SCREEN LOCK"
@@ -215,12 +215,12 @@ class ScreenLockerTests(unittest.TestCase):
 
     @test_modes("smoke")
     def test_compatibility_input_blocker_modules_export_public_api(self) -> None:
-        from utils.input_blocker import linux, window
+        from utils.input_blocker import linux, windows
 
         self.assertTrue(callable(linux.block))
         self.assertTrue(callable(linux.unblock))
-        self.assertTrue(callable(window.block))
-        self.assertTrue(callable(window.unblock))
+        self.assertTrue(callable(windows.block))
+        self.assertTrue(callable(windows.unblock))
 
     @test_modes("fake")
     def test_run_ui_creates_one_overlay_per_monitor(self) -> None:

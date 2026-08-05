@@ -83,26 +83,26 @@ class WebBlockerTests(unittest.TestCase):
         manager.block_category("porn")
         manager.block_category("game")
 
-        result = manager.allow_site("shared.example")
+        result = manager.allow_domain("shared.example")
 
         self.assertTrue(result.changed)
         self.assertEqual(result.unblocked_domains, 2)
         self.assertNotIn("127.0.0.1 shared.example", self._hosts_path.read_text())
         self.assertEqual(
-            self._create_manager().get_status().allowed_sites,
+            self._create_manager().get_status().allowed_domains,
             frozenset({"shared.example"}),
         )
 
     @test_modes("fake")
     def test_custom_block_does_not_add_domain_in_allowlist(self) -> None:
         manager = self._create_manager()
-        manager.allow_site("allowed.example")
+        manager.allow_domain("allowed.example")
 
-        result = manager.block_site("allowed.example")
+        result = manager.block_domain("allowed.example")
 
         self.assertFalse(result.changed)
 
-        result = manager.block_site("blocked.example")
+        result = manager.block_domain("blocked.example")
 
         self.assertTrue(result.changed)
         self.assertEqual(result.blocked_domains, 1)
@@ -113,12 +113,12 @@ class WebBlockerTests(unittest.TestCase):
     @test_modes("fake")
     def test_reset_reports_policy_change_without_blocked_domain(self) -> None:
         manager = self._create_manager()
-        manager.allow_site("allowed.example")
+        manager.allow_domain("allowed.example")
 
         result = manager.clear_all()
 
         self.assertTrue(result.changed)
-        self.assertEqual(manager.get_status().allowed_sites, frozenset())
+        self.assertEqual(manager.get_status().allowed_domains, frozenset())
 
     @test_modes("fake")
     def test_reconcile_restores_category_marker_missing_after_restart(self) -> None:
@@ -135,7 +135,7 @@ class WebBlockerTests(unittest.TestCase):
     def test_invalid_domain_cannot_inject_another_hosts_record(self) -> None:
         manager = self._create_manager()
 
-        result = manager.block_site("safe.example\n0.0.0.0 victim.example")
+        result = manager.block_domain("safe.example\n0.0.0.0 victim.example")
 
         self.assertFalse(result.changed)
         self.assertNotIn("victim.example", self._hosts_path.read_text())

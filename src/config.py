@@ -84,7 +84,9 @@ def _read_toml(path: str | Path) -> dict[str, Any]:
     except OSError as error:
         raise ConfigFileError(f"Cannot read config file {path}: {error}") from error
     except tomllib.TOMLDecodeError as error:
-        raise ConfigFormatError(f"Invalid TOML in config file {path}: {error}") from error
+        raise ConfigFormatError(
+            f"Invalid TOML in config file {path}: {error}"
+        ) from error
 
 
 def _read_section(data: dict[str, Any], name: str) -> dict[str, Any]:
@@ -94,8 +96,11 @@ def _read_section(data: dict[str, Any], name: str) -> dict[str, Any]:
     return cast(dict[str, Any], value)
 
 
+Config = ConfigObject()
+
+__all__ = ["Config"]
+
 if __name__ == "__main__":
     config_path = Path(__file__).resolve().parent / "sag_agent_config.toml"
-    Config = ConfigObject()
     Config.load(config_path)
     print(Config.webblocker.block_porn)

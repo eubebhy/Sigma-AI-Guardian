@@ -38,8 +38,8 @@ add_source_path()
 
 from content_classifier import content_classifier
 from content_classifier.tags import ContentCategory
-from device_controler import screenlocker
-from system_monitor.windows_tracker import get_all_opening_windows
+from device_controler import screen_locker as screenlocker
+from system_monitor.window_tracker import get_all_open_windows
 
 
 LOCK_SECONDS = 10.0
@@ -66,7 +66,7 @@ def _parse_real_arguments(arguments: Sequence[str]) -> argparse.Namespace | None
 
 def _scan_once() -> tuple[str, str, ContentCategory] | None:
     matched_window: tuple[str, str, ContentCategory] | None = None
-    windows = get_all_opening_windows()
+    windows = get_all_open_windows()
     if not windows:
         print("Windows: none")
     for title, process_name in windows.items():
@@ -143,13 +143,13 @@ class _FakeWindowOperations:
 class WindowTrackerTests(unittest.TestCase):
     @test_modes("fake", "smoke")
     def test_uses_injected_window_operations(self) -> None:
-        windows = get_all_opening_windows(_FakeWindowOperations())
+        windows = get_all_open_windows(_FakeWindowOperations())
 
         self.assertEqual(windows, {"Lesson": "teacher-tool.exe"})
 
     @test_modes("real")
     def test_real_window_scan_is_classifiable(self) -> None:
-        windows = get_all_opening_windows()
+        windows = get_all_open_windows()
         categories = [
             content_classifier(f"{process_name} - {title}")
             for title, process_name in windows.items()
@@ -173,7 +173,7 @@ class RealWindowTrackerCommandTests(unittest.TestCase):
     def test_scan_once_reports_when_no_windows_exist(self) -> None:
         output = StringIO()
         with (
-            patch(__name__ + ".get_all_opening_windows", return_value={}),
+            patch(__name__ + ".get_all_open_windows", return_value={}),
             redirect_stdout(output),
         ):
             result = _scan_once()

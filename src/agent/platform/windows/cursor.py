@@ -5,7 +5,7 @@ import ctypes
 _user32 = ctypes.windll.user32
 
 
-class WindowsCursorOperation:
+class WindowsCursorOperations:
     def hide_cursor(self) -> None:
         while _user32.ShowCursor(False) >= 0:
             pass

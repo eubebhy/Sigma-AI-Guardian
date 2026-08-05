@@ -33,8 +33,8 @@ class WebBlockStatus:
     """Trạng thái web policy dành cho Agent, Service và UI giáo viên."""
 
     blocked_categories: frozenset[str]
-    blocked_sites: frozenset[str]
-    allowed_sites: frozenset[str]
+    blocked_domains: frozenset[str]
+    allowed_domains: frozenset[str]
 
 
 @dataclass(frozen=True)
@@ -71,8 +71,8 @@ class WebBlocker:
             self._policy = self._load_policy()
             return WebBlockStatus(
                 blocked_categories=self._policy.blocked_categories,
-                blocked_sites=self._policy.custom_blocked_domains,
-                allowed_sites=self._policy.custom_allowed_domains,
+                blocked_domains=self._policy.custom_blocked_domains,
+                allowed_domains=self._policy.custom_allowed_domains,
             )
 
     def block_category(self, category: str) -> WebBlockResult:
@@ -124,7 +124,7 @@ class WebBlocker:
         )
         return WebBlockResult(changed=True, unblocked_domains=count)
 
-    def block_site(self, domain: str) -> WebBlockResult:
+    def block_domain(self, domain: str) -> WebBlockResult:
         """Thêm một website do giáo viên chọn vào custom block list."""
 
         return self._run_locked(lambda: self._block_domains((domain,)))
@@ -159,7 +159,7 @@ class WebBlocker:
             skipped_domains=len(normalized) - len(additions),
         )
 
-    def allow_site(self, domain: str) -> WebBlockResult:
+    def allow_domain(self, domain: str) -> WebBlockResult:
         """Cho phép một website, kể cả khi category đang block website đó."""
 
         return self._run_locked(lambda: self._allow_domains((domain,)))
@@ -183,7 +183,7 @@ class WebBlocker:
             skipped_domains=len(normalized) - len(additions),
         )
 
-    def remove_allowed_site(self, domain: str) -> WebBlockResult:
+    def remove_allowed_domain(self, domain: str) -> WebBlockResult:
         """Gỡ website khỏi custom allow list mà không tự block lại."""
 
         return self._run_locked(lambda: self._remove_allowed_domains((domain,)))

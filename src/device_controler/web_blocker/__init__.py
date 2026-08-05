@@ -446,12 +446,12 @@ def _remove_all_markers(hosts_path: Path) -> int:
 
 from device_controler.web_blocker.manager import WebBlockResult, WebBlockStatus, WebBlocker
 
-manager = WebBlocker()
+default_web_blocker = WebBlocker()
 
 
 __all__ = [
     "WebBlocker",
     "WebBlockResult",
     "WebBlockStatus",
-    "manager",
+    "default_web_blocker",
 ]

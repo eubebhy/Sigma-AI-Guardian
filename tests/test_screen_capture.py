@@ -3,7 +3,7 @@
 
 File path: ``tests/test_screen_capture.py``.
 Input: safe suite không chụp desktop; manual benchmark nhận ``SECONDS`` dương và
-``SHARPNESS`` trong ``(0.0, 1.0]``.
+``SAMPLE_RATIO`` trong ``(0.0, 1.0]``.
 Output: benchmark in FPS cho từng resolution chuẩn vừa màn hình hiện tại.
 Nguyên lý: chỉ ``real benchmark`` gọi MSS và API capture thật.
 
@@ -65,12 +65,12 @@ def _parse_real_arguments(arguments: Sequence[str]) -> argparse.Namespace | None
     commands = parser.add_subparsers(dest="command", required=True)
     benchmark = commands.add_parser("benchmark", add_help=False)
     benchmark.add_argument("seconds", type=float)
-    benchmark.add_argument("sharpness", type=float)
+    benchmark.add_argument("sample_ratio", type=float)
     try:
         command = parser.parse_args(arguments)
     except (argparse.ArgumentError, ValueError):
         return None
-    if command.seconds <= 0.0 or not 0.0 < command.sharpness <= 1.0:
+    if command.seconds <= 0.0 or not 0.0 < command.sample_ratio <= 1.0:
         return None
     return command
 
@@ -89,19 +89,19 @@ def _valid_cases(screen_size: _BenchmarkCase) -> list[_BenchmarkCase]:
     ]
 
 
-def _benchmark_case(case: _BenchmarkCase, seconds: float, sharpness: float) -> float:
+def _benchmark_case(case: _BenchmarkCase, seconds: float, sample_ratio: float) -> float:
     started_at = time.perf_counter()
     frames = 0
     while time.perf_counter() - started_at < seconds:
-        screen_capture.capture(0, 0, case.width, case.height, sharpness)
+        screen_capture.capture(0, 0, case.width, case.height, sample_ratio)
         frames += 1
     elapsed = time.perf_counter() - started_at
     return frames / elapsed if elapsed > 0.0 else 0.0
 
 
-def _run_benchmark(cases: list[_BenchmarkCase], seconds: float, sharpness: float) -> None:
+def _run_benchmark(cases: list[_BenchmarkCase], seconds: float, sample_ratio: float) -> None:
     for case in cases:
-        frames_per_second = _benchmark_case(case, seconds, sharpness)
+        frames_per_second = _benchmark_case(case, seconds, sample_ratio)
         print(f"{case.width}x{case.height}: {frames_per_second:.2f} FPS")
 
 
@@ -117,7 +117,7 @@ def run_real(arguments: Sequence[str]) -> int:
         if not cases:
             print("No standard resolution is valid for the current screen", file=sys.stderr)
             return 1
-        _run_benchmark(cases, command.seconds, command.sharpness)
+        _run_benchmark(cases, command.seconds, command.sample_ratio)
     except KeyboardInterrupt:
         print("Benchmark interrupted")
         return 130
@@ -145,7 +145,7 @@ class ScreenCaptureTests(unittest.TestCase):
     def test_capture_benchmark(self) -> None:
         cases = _valid_cases(_screen_size())
         self.assertTrue(cases, "No standard resolution is valid for the current screen")
-        _run_benchmark(cases, seconds=3.0, sharpness=1.0)
+        _run_benchmark(cases, seconds=3.0, sample_ratio=1.0)
 
 
 class RealScreenCaptureCommandTests(unittest.TestCase):
@@ -156,7 +156,7 @@ class RealScreenCaptureCommandTests(unittest.TestCase):
         assert command is not None
         self.assertEqual(command.command, "benchmark")
         self.assertEqual(command.seconds, 2.5)
-        self.assertEqual(command.sharpness, 0.75)
+        self.assertEqual(command.sample_ratio, 0.75)
 
     def test_parse_real_benchmark_rejects_invalid_values(self) -> None:
         self.assertIsNone(_parse_real_arguments(("benchmark", "0", "1.0")))

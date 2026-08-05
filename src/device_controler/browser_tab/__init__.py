@@ -33,7 +33,7 @@ class BrowserState(TypedDict):
     score: int
 
 
-BROWSERS: tuple[BrowserSpec, ...] = (
+BROWSER_SPECS: tuple[BrowserSpec, ...] = (
     {
         "name": "chrome",
         "executables": ("google-chrome", "chrome", "chrome.exe"),
@@ -121,7 +121,7 @@ def _browser_states(
         for pid, name in process_operations.list_processes()
     }
     states: list[BrowserState] = []
-    for index, spec in enumerate(BROWSERS):
+    for index, spec in enumerate(BROWSER_SPECS):
         pid = _find_pid(spec, processes)
         executable = browser_operations.find_executable(spec["executables"])
         score = _score_browser(pid, index)

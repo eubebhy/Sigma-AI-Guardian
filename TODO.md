@@ -42,9 +42,9 @@ tool calling mới, UI mới và protocol mạng đều ngoài phạm vi hiện 
 
 ### 3. Feature Agent
 
-- `browser_tab`, `process_killer`, `web_blocker`, `windows_tracker` chỉ nhận
+- `browser_tab`, `process_guard`, `web_blocker`, `window_tracker` chỉ nhận
   contract/runtime chung và giữ API public cũ.
-- `screen_capture` và `screenlocker` giữ nguyên lifecycle hiện có; chỉ sử dụng
+- `screen_capture` và `screen_locker` giữ nguyên lifecycle hiện có; chỉ sử dụng
   qua entry point/runtime khi feature có command Agent riêng.
 - Không thêm command điều khiển mới ngoài `status`; các feature hiện hữu không
   được đổi hành vi chỉ để tái cấu trúc.
@@ -152,7 +152,7 @@ refactor hàng loạt.
 
 ## Đã hoàn thành
 
-1. `screenlocker` cleanup input/overlay có lifecycle test fake, gồm lỗi UI và input
+1. `screen_locker` cleanup input/overlay có lifecycle test fake, gồm lỗi UI và input
    blocker.
 2. `ProcessKiller` stop/start không để daemon cũ chạy song song; health state vẫn là
    backlog riêng.

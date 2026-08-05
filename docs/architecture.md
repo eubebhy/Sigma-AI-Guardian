@@ -44,11 +44,11 @@ agent.runtime.create_runtime()
     v
 AgentRuntime.services
     |
-    +-- process adapter  -> browser_tab, process_killer
+    +-- process adapter  -> browser_tab, process_guard
     +-- browser adapter  -> browser_tab
-    +-- window adapter   -> windows_tracker
+    +-- window adapter   -> window_tracker
     +-- hosts adapter    -> web_blocker
-    +-- input blocker    -> screenlocker
+    +-- input blocker    -> screen_locker
     +-- key listener     -> keylogger
     `-- input controller -> compatibility facade / caller
 ```
@@ -103,10 +103,10 @@ Feature trong `device_controler/` và `system_monitor/` không gọi `ps`,
 
 Runtime sở hữu platform adapter và đóng input blocker, key listener, virtual input
 device cùng X11 resource do input controller cache. `ScreenCapture` và overlay của
-`screenlocker` vẫn giữ lifecycle feature hiện có; caller phải `unlock()` trước khi
+`screen_locker` vẫn giữ lifecycle feature hiện có; caller phải `unlock()` trước khi
 Agent shutdown.
 
-Thread dài hạn của `ProcessKiller` và `screenlocker` phải là daemon thread theo
+Thread dài hạn của `ProcessGuard` và `screen_locker` phải là daemon thread theo
 quy tắc `src/README.md`; command handler tương lai phải gọi `stop()`/`unlock()`
 trước khi Agent shutdown. Các hàm này signal và chờ thread của mình kết thúc; hard
 kill process không thể chạy Python `finally`.

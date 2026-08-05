@@ -9,7 +9,7 @@ Nguyên lý: module ghép adapter capability nhỏ; feature không import packag
 from agent.capabilities import Capability, PlatformCapabilities
 from agent.platform import PlatformServices
 from agent.platform.windows.browser import WindowsBrowserOperations
-from agent.platform.windows.hide_cursor import WindowsCursorOperation
+from agent.platform.windows.cursor import WindowsCursorOperations
 from agent.platform.windows.hosts import WindowsHostsPathOperations
 from agent.platform.windows.input_blocker import WindowsInputBlockingOperations
 from agent.platform.windows.input_controller_operations import (
@@ -46,5 +46,5 @@ def create_services() -> PlatformServices:
         input_blocker=WindowsInputBlockingOperations(),
         key_listener=WindowsKeyListenerOperations(),
         input_controller=WindowsInputControllerOperations(),
-        cursor_controller=WindowsCursorOperation(),
+        cursor_controller=WindowsCursorOperations(),
     )

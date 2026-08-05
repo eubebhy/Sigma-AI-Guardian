@@ -1,6 +1,6 @@
 """API theo dõi cửa sổ desktop cho SAG Agent.
 
-File path: `src/system_monitor/windows_tracker/__init__.py`.
+File path: `src/system_monitor/window_tracker/__init__.py`.
 Input: không nhận tham số; caller có thể truyền adapter `WindowOperations` khi test.
 Output: tiêu đề active hoặc mapping tiêu đề sang process name của cửa sổ đang mở.
 Nguyên lý: feature chỉ gọi contract Agent; PyWinCtl và fallback xdotool nằm trong
@@ -25,7 +25,7 @@ def get_active_window_name(
     return _get_operations(operations).get_active_window()
 
 
-def get_all_opening_windows(
+def get_all_open_windows(
     operations: WindowOperations | None = None,
 ) -> dict[str, str]:
     """Trả mapping title sang process name của cửa sổ đang mở."""
