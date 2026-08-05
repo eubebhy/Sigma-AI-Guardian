@@ -242,7 +242,7 @@ class ScreenLockerTests(unittest.TestCase):
                 "Toplevel",
                 return_value=second_root,
             ) as top_level,
-            patch.object(screenlocker, "App") as app,
+            patch.object(screenlocker, "ScreenLockOverlay") as overlay,
             patch.object(screenlocker, "_create_lock_image", return_value=object()),
             patch.object(screenlocker.input_blocker, "block"),
             patch.object(screenlocker.input_blocker, "unblock"),
@@ -257,7 +257,7 @@ class ScreenLockerTests(unittest.TestCase):
 
         self.assertEqual(tk_root.call_count, 1)
         self.assertEqual(top_level.call_count, 1)
-        self.assertEqual(app.call_count, 2)
+        self.assertEqual(overlay.call_count, 2)
         self.assertTrue(ready_event.is_set())
         self.assertFalse(failed_event.is_set())
 
@@ -292,7 +292,7 @@ class ScreenLockerTests(unittest.TestCase):
 
         with (
             patch.object(screenlocker.tk, "Tk", return_value=_FakeRoot()),
-            patch.object(screenlocker, "App"),
+            patch.object(screenlocker, "ScreenLockOverlay"),
             patch.object(screenlocker, "_create_lock_image", return_value=object()) as image,
         ):
             screenlocker._create_windows(
@@ -428,7 +428,7 @@ class ScreenLockerTests(unittest.TestCase):
         self.assertEqual(wrapped, art)
 
     @test_modes("fake")
-    def test_app_keeps_photo_image_alive_on_its_label(self) -> None:
+    def test_overlay_keeps_photo_image_alive_on_its_label(self) -> None:
         window = _FakeWindow()
         label = _FakeLabel()
         photo = object()
@@ -438,7 +438,11 @@ class ScreenLockerTests(unittest.TestCase):
             patch.object(screenlocker.ImageTk, "PhotoImage", return_value=photo),
             patch.object(screenlocker.tk, "Label", return_value=label),
         ):
-            screenlocker.App(window, Image.new("RGB", (1, 1)), region)
+            screenlocker.ScreenLockOverlay(
+                window,
+                Image.new("RGB", (1, 1)),
+                region,
+            )
 
         self.assertTrue(hasattr(label, "image"))
         self.assertIs(label.image, photo)

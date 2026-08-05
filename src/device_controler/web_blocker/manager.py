@@ -56,7 +56,7 @@ class WebBlocker:
         state_path: Path | None = None,
         category_paths: Mapping[str, Path] | None = None,
     ) -> None:
-        self._hosts_path = hosts_path or Path(web_blocker.default_hoster)
+        self._hosts_path = hosts_path or Path(web_blocker.DEFAULT_HOSTS_PATH)
         self._state_path = state_path or (
             Path(__file__).resolve().parents[3] / "data/webblocker/policy.json"
         )

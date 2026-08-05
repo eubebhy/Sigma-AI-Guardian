@@ -1,7 +1,7 @@
 # pyright: reportUnknownVariableType=false, reportUnknownMemberType=false, reportUnknownArgumentType=false, reportUnknownLambdaType=false
 """Wrapper lazy-load cho model scikit-learn của local classifier.
 
-File path: `src/content_classifier/local/ai_assistant.py`
+File path: `src/content_classifier/local/local_model.py`
 Input: đường dẫn model joblib và text cần dự đoán.
 Output: dict `{label: probability}` đã sắp theo xác suất giảm dần.
 
@@ -52,7 +52,7 @@ def _idle_timeout_seconds(model_path: Path) -> float:
     return max(6.7, timeout)
 
 
-class LocalAI:
+class LocalModel:
     """Quản lý vòng đời model local và cung cấp API dự đoán xác suất."""
 
     def __init__(self, model_path: str | Path) -> None:
@@ -65,7 +65,7 @@ class LocalAI:
         self._idle_timeout: float = _idle_timeout_seconds(self._model_path)
         self._monitor_thread: threading.Thread = threading.Thread(
             target=self._monitor_idle_time,
-            name="LocalAIIdleMonitor",
+            name="LocalModelIdleMonitor",
             daemon=True,
         )
         self._monitor_thread.start()

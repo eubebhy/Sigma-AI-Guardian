@@ -16,7 +16,7 @@ from content_classifier.tags import ContentCategory
 from content_classifier.types import StrictLevel
 
 
-_THRESHOLDS: Final[dict[StrictLevel, float]] = {
+_SIMILARITY_THRESHOLDS: Final[dict[StrictLevel, float]] = {
     "xlow": 0.967,
     "low": 0.9067,
     "mid": 0.8067,
@@ -164,7 +164,7 @@ def rule_based_classifier(
             best_category = category
 
     # Su ly threshold theo strict_level
-    if best_score >= _THRESHOLDS[strict_level]:
+    if best_score >= _SIMILARITY_THRESHOLDS[strict_level]:
         return best_category
 
     return ContentCategory.Unknown

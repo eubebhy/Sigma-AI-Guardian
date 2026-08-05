@@ -135,7 +135,7 @@ _SHIFT_CHARS: Final[dict[str, Key]] = {
 # Tham khảo:
 # - evdev docs: https://python-evdev.readthedocs.io/en/latest/tutorial.html#injecting-input
 # - Linux input event codes: https://www.kernel.org/doc/html/latest/input/event-codes.html
-# - ANIS - ISO layout: https://www.logitech.com/en-us/discover/a/ansi-vs-iso-keyboards
+# - ANSI - ISO layout: https://www.logitech.com/en-us/discover/a/ansi-vs-iso-keyboards
 
 _KEY_CODES: Final[list[int]] = [
     # Letters

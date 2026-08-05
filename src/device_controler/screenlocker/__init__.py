@@ -32,8 +32,8 @@ from utils import input_blocker
 FONT_PATH = Path(__file__).with_name("TempleOS.ttf")
 BACKGROUND_COLOR = "#ab0101"
 TEXT_COLOR = "#FFFFFF"
-HEADER_TEXT = "Oops, system is locked by SIGMA AI GUARDIAN"
-BODY_TEXT = """
+DEFAULT_LOCK_HEADER = "Oops, system is locked by SIGMA AI GUARDIAN"
+DEFAULT_LOCK_MESSAGE = """
 Your workstation has been restricted for one of the following reasons:
 
 The administrator has manually locked your machine.
@@ -63,7 +63,7 @@ _input_operations: InputBlockingOperations | None = None
 _UI_EXIT_TIMEOUT_SECONDS = 5.0
 
 
-class App:
+class ScreenLockOverlay:
     """Tạo một overlay topmost cho một monitor."""
 
     def __init__(
@@ -104,7 +104,7 @@ def _fit_body_font_size(
     region: screen_capture.ScreenRegion,
     header_height: int,
     padding: int,
-    body_text: str = BODY_TEXT,
+    body_text: str = DEFAULT_LOCK_MESSAGE,
 ) -> int:
     """Giảm font body đến khi bounding box nằm trọn trong monitor."""
 
@@ -133,8 +133,8 @@ def _fit_body_font_size(
 
 def _create_lock_image(
     region: screen_capture.ScreenRegion,
-    header_text: str = HEADER_TEXT,
-    body_text: str = BODY_TEXT,
+    header_text: str = DEFAULT_LOCK_HEADER,
+    body_text: str = DEFAULT_LOCK_MESSAGE,
 ) -> Image.Image:
     """Dựng ảnh khóa responsive gồm header và body cho một monitor."""
 
@@ -196,8 +196,8 @@ def _close_when_unlocked(
 
 def _create_windows(
     regions: list[screen_capture.ScreenRegion],
-    header_text: str = HEADER_TEXT,
-    body_text: str = BODY_TEXT,
+    header_text: str = DEFAULT_LOCK_HEADER,
+    body_text: str = DEFAULT_LOCK_MESSAGE,
 ) -> tuple[tk.Tk, list[tk.Tk | tk.Toplevel]]:
     """Tạo một cửa sổ overlay cho từng monitor."""
 
@@ -207,7 +207,11 @@ def _create_windows(
         window = root if index == 0 else tk.Toplevel(root)
         if window is not root:
             windows.append(window)
-        App(window, _create_lock_image(region, header_text, body_text), region)
+        ScreenLockOverlay(
+            window,
+            _create_lock_image(region, header_text, body_text),
+            region,
+        )
     return root, windows
 
 
@@ -217,8 +221,8 @@ def _run_ui(
     failed_event: threading.Event,
     stop_event: threading.Event,
     exited_event: threading.Event,
-    header_text: str = HEADER_TEXT,
-    body_text: str = BODY_TEXT,
+    header_text: str = DEFAULT_LOCK_HEADER,
+    body_text: str = DEFAULT_LOCK_MESSAGE,
     cursor_operations: CursorOperations | None = None,
 ) -> None:
     """Tạo overlay và chạy Tk event loop trên UI thread."""
@@ -321,16 +325,16 @@ def lock(
         _lock_locked(
             input_operations,
             cursor_operations,
-            header_text or HEADER_TEXT,
-            body_text or BODY_TEXT,
+            header_text or DEFAULT_LOCK_HEADER,
+            body_text or DEFAULT_LOCK_MESSAGE,
         )
 
 
 def _lock_locked(
     input_operations: InputBlockingOperations | None = None,
     cursor_operations: CursorOperations | None = None,
-    header_text: str = HEADER_TEXT,
-    body_text: str = BODY_TEXT,
+    header_text: str = DEFAULT_LOCK_HEADER,
+    body_text: str = DEFAULT_LOCK_MESSAGE,
 ) -> None:
     """Tạo và block đúng một locker khi caller đang giữ `_lock`."""
 

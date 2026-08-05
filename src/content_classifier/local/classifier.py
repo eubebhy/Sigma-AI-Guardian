@@ -10,11 +10,11 @@ xác suất cao nhất và rơi về `Unknown` khi kết quả không đủ rõ.
 from pathlib import Path
 from typing import Final
 
-from content_classifier.local.ai_assistant import LocalAI
+from content_classifier.local.local_model import LocalModel
 from content_classifier.tags import ContentCategory
 from content_classifier.types import StrictLevel
 
-UNKNOWN_MARGIN_THRESHOLDS: Final[dict[StrictLevel, float]] = {
+_UNKNOWN_MARGIN_THRESHOLDS: Final[dict[StrictLevel, float]] = {
     "xlow": 0.3,
     "low": 0.167,
     "mid": 0.067,
@@ -40,7 +40,7 @@ def local_ai_classifier(
     """Phân loại text khi chênh lệch dự đoán đạt ngưỡng kiểm duyệt."""
 
     model_path = Path(__file__).resolve().parents[3] / "data" / "models" / "Ritchie.pkl"
-    ai = LocalAI(model_path=model_path)
+    ai = LocalModel(model_path=model_path)
     try:
         predictions = ai.predict(text, k=2)
     finally:
@@ -54,7 +54,7 @@ def local_ai_classifier(
     if len(ranked_predictions) > 1:
         _, second_probability = ranked_predictions[1]
         margin = top_probability - second_probability
-        if margin < UNKNOWN_MARGIN_THRESHOLDS[strict_level]:
+        if margin < _UNKNOWN_MARGIN_THRESHOLDS[strict_level]:
             return ContentCategory.Unknown
 
     category = _map_label_to_category(top_label)

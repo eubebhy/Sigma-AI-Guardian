@@ -45,7 +45,7 @@ add_source_path()
 
 from content_classifier import content_classifier
 from content_classifier.clean_text import clean_text
-from content_classifier.local.ai_assistant import LocalAI
+from content_classifier.local.local_model import LocalModel
 from content_classifier.rule_based import rule_based_classifier
 from content_classifier.tags import ContentCategory
 from content_classifier.types import StrictLevel
@@ -240,8 +240,8 @@ def run_real(arguments: Sequence[str]) -> int:
 
 class ClassifierTests(unittest.TestCase):
     @test_modes("fake")
-    def test_local_ai_close_joins_idle_monitor(self) -> None:
-        ai = LocalAI("missing-model.pkl")
+    def test_local_model_close_joins_idle_monitor(self) -> None:
+        ai = LocalModel("missing-model.pkl")
 
         ai.close()
 

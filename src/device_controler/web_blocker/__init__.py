@@ -21,8 +21,8 @@ from agent.contracts import HostsPathOperations
 from agent.platform import get_default_platform_services
 
 
-redirect = "127.0.0.1"
-default_hoster = str(get_default_platform_services().hosts.get_hosts_path())
+LOOPBACK_ADDRESS = "127.0.0.1"
+DEFAULT_HOSTS_PATH = str(get_default_platform_services().hosts.get_hosts_path())
 
 MODULE_PATH = Path(__file__).resolve().parent
 PORN_SITES_FILE_PATH = MODULE_PATH / "porn-sites.txt"
@@ -103,7 +103,7 @@ def _is_marker_end(line: str, marker: str) -> bool:
 
 def _domain_from_hosts_line(line: str) -> str | None:
     parts = line.strip().split(maxsplit=1)
-    if len(parts) != 2 or parts[0] != redirect:
+    if len(parts) != 2 or parts[0] != LOOPBACK_ADDRESS:
         return None
     return parts[1].lower()
 
@@ -113,7 +113,7 @@ def _hosts_path(operations: HostsPathOperations | Path | None) -> Path:
         return operations
     if operations is not None:
         return operations.get_hosts_path()
-    return Path(default_hoster)
+    return Path(DEFAULT_HOSTS_PATH)
 
 
 @contextmanager
@@ -201,7 +201,7 @@ def _append_marker(
         target.write(f"{_marker_start(marker)}\n")
         count = 0
         for domain in domains:
-            target.write(f"{redirect} {domain}\n")
+            target.write(f"{LOOPBACK_ADDRESS} {domain}\n")
             count += 1
         target.write(f"{_marker_end(marker)}\n")
         target.flush()
@@ -356,7 +356,7 @@ def _replace_marker(hosts_path: Path, marker: str, domains: list[str]) -> int:
                 target.write("\n")
             target.write(f"{_marker_start(marker)}\n")
             for domain in domains:
-                target.write(f"{redirect} {domain}\n")
+                target.write(f"{LOOPBACK_ADDRESS} {domain}\n")
             target.write(f"{_marker_end(marker)}\n")
         if not found and not domains:
             return 0

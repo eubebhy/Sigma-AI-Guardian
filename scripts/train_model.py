@@ -4,7 +4,7 @@ File path: `scripts/train_model.py`
 Input: cac file `.txt` trong `data/training/<category>/`.
 Output: file model da train `data/models/Ritchie.pkl`.
 Nguyen ly: doc ten category tu thu muc chua file train, train pipeline TF-IDF
-ky tu + Logistic Regression, sau do serialize model bang joblib de `LocalAI`
+ky tu + Logistic Regression, sau do serialize model bang joblib de `LocalModel`
 chi load va predict.
 
 Thiet ke ma theo huong sau:

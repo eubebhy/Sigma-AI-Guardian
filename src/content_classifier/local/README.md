@@ -14,7 +14,7 @@ result = local_ai_classifier("example text", "mid")
 
 ## LIFECYCLE
 
-Model được lazy-load khi API được gọi. `ai_assistant.py` giữ monitor daemon và cung cấp
+Model được lazy-load khi API được gọi. `local_model.py` giữ monitor daemon và cung cấp
 `close()` để signal, join monitor và bỏ reference instance khi owner đã dùng xong.
 
 ## TRUST BOUNDARY

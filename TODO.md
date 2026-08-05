@@ -104,7 +104,7 @@ Agent shutdown      -> Runtime stop/close feature theo thứ tự ngược lúc 
 ```
 
 1. Thêm `process_guard.start/stop` sau khi ownership và cleanup có test fake.
-2. Sau đó mới thêm `keylogger.start/stop`, `screen.lock/unlock` và `LocalAI.close`.
+2. Sau đó mới thêm `keylogger.start/stop`, `screen.lock/unlock` và `LocalModel.close`.
 3. Shutdown phải ngừng nhận command mới, dừng feature đang chạy và join worker có
    timeout phù hợp.
 4. Hosts web block là persistent policy; không tự unblock khi Agent shutdown trừ khi

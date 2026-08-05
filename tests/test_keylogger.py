@@ -105,48 +105,48 @@ class KeyLoggerTests(unittest.TestCase):
 
     @test_modes("fake", "smoke")
     def test_collects_letters_and_space(self) -> None:
-        KeyLogger._keylogger(("KEY_A", "down"))
-        KeyLogger._keylogger(("KEY_B", "down"))
-        KeyLogger._keylogger(("KEY_SPACE", "down"))
+        KeyLogger._handle_key_event(("KEY_A", "down"))
+        KeyLogger._handle_key_event(("KEY_B", "down"))
+        KeyLogger._handle_key_event(("KEY_SPACE", "down"))
 
         self.assertEqual(KeyLogger.get_current_buffer(), "ab ")
 
     @test_modes("fake", "smoke")
     def test_repeats_printable_keys_for_hold_events(self) -> None:
-        KeyLogger._keylogger(("KEY_A", "down"))
-        KeyLogger._keylogger(("KEY_A", "hold"))
-        KeyLogger._keylogger(("KEY_SPACE", "down"))
-        KeyLogger._keylogger(("KEY_SPACE", "hold"))
+        KeyLogger._handle_key_event(("KEY_A", "down"))
+        KeyLogger._handle_key_event(("KEY_A", "hold"))
+        KeyLogger._handle_key_event(("KEY_SPACE", "down"))
+        KeyLogger._handle_key_event(("KEY_SPACE", "hold"))
 
         self.assertEqual(KeyLogger.get_current_buffer(), "aa  ")
 
     @test_modes("fake", "smoke")
     def test_collects_punctuation_and_shifted_punctuation(self) -> None:
-        KeyLogger._keylogger(("KEY_COMMA", "down"))
-        KeyLogger._keylogger(("KEY_SLASH", "down"))
-        KeyLogger._keylogger(("KEY_LEFTSHIFT", "down"))
-        KeyLogger._keylogger(("KEY_COMMA", "down"))
-        KeyLogger._keylogger(("KEY_SLASH", "down"))
-        KeyLogger._keylogger(("KEY_LEFTSHIFT", "up"))
+        KeyLogger._handle_key_event(("KEY_COMMA", "down"))
+        KeyLogger._handle_key_event(("KEY_SLASH", "down"))
+        KeyLogger._handle_key_event(("KEY_LEFTSHIFT", "down"))
+        KeyLogger._handle_key_event(("KEY_COMMA", "down"))
+        KeyLogger._handle_key_event(("KEY_SLASH", "down"))
+        KeyLogger._handle_key_event(("KEY_LEFTSHIFT", "up"))
 
         self.assertEqual(KeyLogger.get_current_buffer(), ",/<?")
 
     @test_modes("fake")
     def test_caps_lock_changes_letter_case_without_changing_digits(self) -> None:
-        KeyLogger._keylogger(("KEY_CAPSLOCK", "down"))
-        KeyLogger._keylogger(("KEY_A", "down"))
-        KeyLogger._keylogger(("KEY_1", "down"))
-        KeyLogger._keylogger(("KEY_LEFTSHIFT", "down"))
-        KeyLogger._keylogger(("KEY_B", "down"))
-        KeyLogger._keylogger(("KEY_LEFTSHIFT", "up"))
-        KeyLogger._keylogger(("KEY_CAPSLOCK", "down"))
-        KeyLogger._keylogger(("KEY_C", "down"))
+        KeyLogger._handle_key_event(("KEY_CAPSLOCK", "down"))
+        KeyLogger._handle_key_event(("KEY_A", "down"))
+        KeyLogger._handle_key_event(("KEY_1", "down"))
+        KeyLogger._handle_key_event(("KEY_LEFTSHIFT", "down"))
+        KeyLogger._handle_key_event(("KEY_B", "down"))
+        KeyLogger._handle_key_event(("KEY_LEFTSHIFT", "up"))
+        KeyLogger._handle_key_event(("KEY_CAPSLOCK", "down"))
+        KeyLogger._handle_key_event(("KEY_C", "down"))
 
         self.assertEqual(KeyLogger.get_current_buffer(), "A1bc")
 
     @test_modes("fake")
     def test_current_buffer_returns_full_text_without_resetting(self) -> None:
-        KeyLogger._keylogger(("KEY_A", "down"))
+        KeyLogger._handle_key_event(("KEY_A", "down"))
 
         self.assertEqual(KeyLogger.get_current_buffer(), "a")
         self.assertEqual(KeyLogger.get_current_buffer(), "a")
@@ -155,7 +155,7 @@ class KeyLoggerTests(unittest.TestCase):
     def test_buffer_retains_newest_6767_characters_on_overflow(self) -> None:
         KeyLogger._buffer.extend("a" * 6767)
         KeyLogger._cursor = 1
-        KeyLogger._keylogger(("KEY_B", "down"))
+        KeyLogger._handle_key_event(("KEY_B", "down"))
 
         self.assertEqual(KeyLogger.get_current_buffer(), "b" + "a" * 6766)
         self.assertEqual(KeyLogger._cursor, 1)

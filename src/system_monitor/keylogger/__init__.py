@@ -165,7 +165,7 @@ class KeyLogger:
             for event in events:
                 if stop_event.is_set():
                     break
-                cls._keylogger(event)
+                cls._handle_key_event(event)
         except Exception as error:
             cls._listener_error = error
         finally:
@@ -190,7 +190,7 @@ class KeyLogger:
             raise cls._listener_error
 
     @classmethod
-    def _keylogger(cls, event: KeyEvent) -> None:
+    def _handle_key_event(cls, event: KeyEvent) -> None:
         """Áp dụng một keyboard event vào virtual buffer."""
         key_name, state = event
         if key_name in _MODIFIERS:
