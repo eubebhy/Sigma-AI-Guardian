@@ -25,10 +25,10 @@ class ConfigTypeError(ConfigError):
 
 
 @dataclass(frozen=True)
-class Webblocker:
+class WebBlockerConfig:
     block_game: bool
     block_gore: bool
-    block_porn: bool
+    block_pornography: bool
     block_social: bool
 
     # Ham dat biet cua dataclass
@@ -36,18 +36,18 @@ class Webblocker:
         for var, val in vars(self).items():
             if not isinstance(val, bool):
                 raise ConfigTypeError(
-                    f"webblocker.{var} must contain True or False, not {val!r}"
+                    f"web_blocker.{var} must contain True or False, not {val!r}"
                 )
 
 
-class ConfigObject:
-    __slots__ = ("webblocker",)
+class AgentConfig:
+    __slots__ = ("web_blocker",)
 
     def __init__(self) -> None:
         object.__setattr__(
             self,
-            "webblocker",
-            Webblocker(
+            "web_blocker",
+            WebBlockerConfig(
                 True,
                 True,
                 True,
@@ -56,7 +56,7 @@ class ConfigObject:
         )
 
     def __setattr__(self, name: str, value: object, /) -> None:
-        raise ConfigError("Use ConfigObject.load() to update config")
+        raise ConfigError("Use AgentConfig.load() to update config")
 
     def load(self, path: str | Path) -> None:
         data = _read_toml(path)
@@ -65,7 +65,7 @@ class ConfigObject:
         for attr_name in self.__slots__:
             section = _read_section(data, attr_name)
             current_value = getattr(self, attr_name)
-            config_type = cast(type[Webblocker], type(current_value))
+            config_type = cast(type[WebBlockerConfig], type(current_value))
             try:
                 new_values[attr_name] = config_type(**section)
             except TypeError as error:
@@ -96,11 +96,11 @@ def _read_section(data: dict[str, Any], name: str) -> dict[str, Any]:
     return cast(dict[str, Any], value)
 
 
-Config = ConfigObject()
+config = AgentConfig()
 
-__all__ = ["Config"]
+__all__ = ["AgentConfig", "WebBlockerConfig", "config"]
 
 if __name__ == "__main__":
     config_path = Path(__file__).resolve().parent / "sag_agent_config.toml"
-    Config.load(config_path)
-    print(Config.webblocker.block_porn)
+    config.load(config_path)
+    print(config.web_blocker.block_pornography)

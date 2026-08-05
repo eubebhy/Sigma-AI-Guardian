@@ -1,6 +1,6 @@
 """Quản lý policy web block bền vững của một SAG Agent.
 
-File path: `src/device_controler/web_blocker/manager.py`.
+File path: `src/device_controller/web_blocker/manager.py`.
 Input: category đóng gói, custom block/allow domain và path state JSON.
 Output: `WebBlockResult` và `WebBlockPolicy` immutable cho caller Agent.
 Nguyên lý: category được stream thẳng vào marker hosts một lần; state chỉ lưu policy
@@ -16,7 +16,7 @@ from pathlib import Path
 from tempfile import NamedTemporaryFile
 from typing import ContextManager, cast
 
-from device_controler import web_blocker
+from device_controller import web_blocker
 
 
 @dataclass(frozen=True)

@@ -1,6 +1,6 @@
 """Primitive hosts cho WebBlocker.
 
-File path: `src/device_controler/web_blocker/__init__.py`.
+File path: `src/device_controller/web_blocker/__init__.py`.
 Input: domain iterable và tên marker SAG hợp lệ.
 Output: số domain đã thêm hoặc gỡ trong đúng marker SAG được yêu cầu.
 Nguyên lý: đọc hosts và source list theo stream, ghi temporary file rồi atomic replace
@@ -444,7 +444,7 @@ def _remove_all_markers(hosts_path: Path) -> int:
     return removed
 
 
-from device_controler.web_blocker.manager import WebBlockResult, WebBlockStatus, WebBlocker
+from device_controller.web_blocker.manager import WebBlockResult, WebBlockStatus, WebBlocker
 
 default_web_blocker = WebBlocker()
 

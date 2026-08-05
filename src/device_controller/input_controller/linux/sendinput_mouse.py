@@ -1,6 +1,6 @@
 """Compatibility API cho Linux mouse sender."""
 
-from device_controler.input_controller.linux import (
+from device_controller.input_controller.linux import (
     click,
     mouseDown,
     mouseUp,

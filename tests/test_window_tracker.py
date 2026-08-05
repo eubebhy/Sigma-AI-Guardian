@@ -38,7 +38,7 @@ add_source_path()
 
 from content_classifier import content_classifier
 from content_classifier.tags import ContentCategory
-from device_controler import screen_locker as screenlocker
+from device_controller import screen_locker as screenlocker
 from system_monitor.window_tracker import get_all_open_windows
 
 

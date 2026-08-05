@@ -1,6 +1,6 @@
 # Linux Input Control
 
-File path: `src/device_controler/input_controller/linux/README.md`
+File path: `src/device_controller/input_controller/linux/README.md`
 
 Vai tro: compatibility facade cho Linux input controller. Native implementation nam
 tai `src/agent/platform/linux/input_controller/`: `types.py` mo ta UInput/XInput,

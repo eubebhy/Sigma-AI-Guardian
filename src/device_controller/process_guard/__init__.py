@@ -1,6 +1,6 @@
 """Guard process theo blacklist don gian.
 
-File path: `src/device_controler/process_guard/__init__.py`
+File path: `src/device_controller/process_guard/__init__.py`
 Input contract:
 - ProcessGuard.blocked: danh sach exact process names can kill.
 - set_blacklist(values): bo sung exact process names can kill.

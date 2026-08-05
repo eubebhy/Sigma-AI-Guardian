@@ -1,6 +1,6 @@
 # Input Controller
 
-File path: `src/device_controler/input_controller/README.md`
+File path: `src/device_controller/input_controller/README.md`
 
 Vai tro: gui va dieu khien keyboard/mouse tren Linux hoac Windows. Input la ten
 phim/nut chung, toa do hoac thoi luong; output la event dieu khien native. Package
@@ -8,7 +8,7 @@ nay la compatibility facade qua `PlatformServices.input_controller`; no khong la
 nghe input hoac doc NumLock. Dung `utils.key_listener` cho hai nhu cau do.
 
 ```text
-device_controler/input_controller/
+device_controller/input_controller/
 ├── types.py                 # compatibility type
 ├── linux/                   # compatibility facade Linux
 └── window/                  # compatibility facade Windows
@@ -20,13 +20,13 @@ agent/platform/<os>/input_controller/
 ## Import
 
 ```python
-from device_controler import input_controller
-from device_controler.input_controller import linux
-from device_controler.input_controller.linux import click, moveTo
+from device_controller import input_controller
+from device_controller.input_controller import linux
+from device_controller.input_controller.linux import click, moveTo
 
 # Package backend Windows giu ten `window`.
-from device_controler.input_controller import window
-from device_controler.input_controller.windows import press, write
+from device_controller.input_controller import window
+from device_controller.input_controller.windows import press, write
 ```
 
 Import facade Windows khong import `pydirectinput` ngay. Dependency chi duoc nap
@@ -38,7 +38,7 @@ Linux va Windows cung cung cap cac chu ky sau:
 
 ```python
 from collections.abc import Sequence
-from device_controler.input_controller.types import MouseButton
+from device_controller.input_controller.types import MouseButton
 
 def click(
     x: int | None = None,

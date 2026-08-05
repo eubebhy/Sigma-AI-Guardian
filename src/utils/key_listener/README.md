@@ -6,7 +6,7 @@ Vai tro: compatibility facade lang nghe keyboard/mouse va doc NumLock theo Linux
 hoac Windows qua `PlatformServices.key_listener`. Input la
 `timeout`, `stop_event` tuy chon cho moi lan cho event hoac loi goi doc NumLock;
 output la generator event da chuan hoa va `bool`. Module khong gui input; dung
-`device_controler.input_controller` cho control.
+`device_controller.input_controller` cho control.
 
 ```text
 utils/key_listener/

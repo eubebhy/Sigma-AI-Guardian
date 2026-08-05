@@ -39,7 +39,7 @@ from test_support import add_source_path, run_module, test_modes
 add_source_path()
 
 from agent.contracts import ProcessOperations
-from device_controler.process_guard import ProcessGuard as ProcessKiller
+from device_controller.process_guard import ProcessGuard as ProcessKiller
 
 
 _FIXTURE_PROCESS_NAME = "sag-process-guard-fixture"
@@ -565,8 +565,8 @@ class ProcessGuardTests(unittest.TestCase):
             return thread
 
         with (
-            patch("device_controler.process_guard.threading.Event", side_effect=events),
-            patch("device_controler.process_guard.threading.Thread", side_effect=create_thread),
+            patch("device_controller.process_guard.threading.Event", side_effect=events),
+            patch("device_controller.process_guard.threading.Thread", side_effect=create_thread),
         ):
             killer = ProcessKiller(_FakeProcessOperations([]))
             killer.start()
@@ -596,8 +596,8 @@ class ProcessGuardTests(unittest.TestCase):
             return thread
 
         with (
-            patch("device_controler.process_guard.threading.Event", return_value=event),
-            patch("device_controler.process_guard.threading.Thread", side_effect=create_thread),
+            patch("device_controller.process_guard.threading.Event", return_value=event),
+            patch("device_controller.process_guard.threading.Thread", side_effect=create_thread),
         ):
             killer = ProcessKiller(_FakeProcessOperations([]))
             killer.start()

@@ -1,6 +1,6 @@
 """API điều khiển input độc lập hệ điều hành theo tập con PyAutoGUI.
 
-File path: `src/device_controler/input_controller/__init__.py`.
+File path: `src/device_controller/input_controller/__init__.py`.
 Input: lời gọi gửi keyboard hoặc mouse với tham số theo PyAutoGUI.
 Output: API gửi input qua platform service phù hợp với hệ điều hành đang chạy.
 Nguyên lý: facade giữ public API cũ và lấy adapter mặc định từ Agent. Listener nằm

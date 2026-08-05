@@ -25,7 +25,7 @@ hệ thống.
 
 Đọc theo thứ tự này trước khi viết test mới:
 
-1. Feature cần test, ví dụ `src/device_controler/browser_tab/__init__.py`.
+1. Feature cần test, ví dụ `src/device_controller/browser_tab/__init__.py`.
 2. Contract feature dùng trong `src/agent/contracts.py`.
 3. Adapter được runtime cung cấp trong `src/agent/platform/__init__.py`.
 4. Test feature tương tự, ví dụ `tests/test_browser.py` hoặc

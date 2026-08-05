@@ -71,7 +71,7 @@ agent.platform.<os> -> standard library / dependency native
 Không được import theo chiều ngược lại:
 
 ```text
-agent.platform.<os> -> device_controler hoặc system_monitor  # cấm
+agent.platform.<os> -> device_controller hoặc system_monitor  # cấm
 agent.contracts -> adapter hoặc feature                       # cấm
 feature -> agent.platform.linux hoặc agent.platform.windows  # cấm
 ```
@@ -94,9 +94,9 @@ adapter cho test cũng đơn giản hơn.
 
 Code native process, browser, window, hosts và input nằm tại
 `src/agent/platform/linux/` hoặc `src/agent/platform/windows/`. Các package
-`device_controler/input_controller`, `utils/input_blocker` và `utils/key_listener`
+`device_controller/input_controller`, `utils/input_blocker` và `utils/key_listener`
 chỉ giữ compatibility facade cho public API cũ.
-Feature trong `device_controler/` và `system_monitor/` không gọi `ps`,
+Feature trong `device_controller/` và `system_monitor/` không gọi `ps`,
 `tasklist`, `taskkill`, `xdotool`, `os.name`, `sys.platform` hay đường dẫn hosts.
 
 ## Lifecycle

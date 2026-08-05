@@ -19,8 +19,8 @@ from test_support import add_source_path, run_module, test_modes
 
 add_source_path()
 
-from device_controler import web_blocker
-from device_controler.web_blocker import WebBlocker
+from device_controller import web_blocker
+from device_controller.web_blocker import WebBlocker
 
 
 class WebBlockerTests(unittest.TestCase):

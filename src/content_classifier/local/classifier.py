@@ -12,9 +12,9 @@ from typing import Final
 
 from content_classifier.local.local_model import LocalModel
 from content_classifier.tags import ContentCategory
-from content_classifier.types import StrictLevel
+from content_classifier.types import ModerationLevel
 
-_UNKNOWN_MARGIN_THRESHOLDS: Final[dict[StrictLevel, float]] = {
+_UNKNOWN_MARGIN_THRESHOLDS: Final[dict[ModerationLevel, float]] = {
     "xlow": 0.3,
     "low": 0.167,
     "mid": 0.067,
@@ -35,7 +35,7 @@ def _map_label_to_category(label: str) -> ContentCategory | None:
 
 def local_ai_classifier(
     text: str,
-    strict_level: StrictLevel = "mid",
+    moderation_level: ModerationLevel = "mid",
 ) -> ContentCategory:
     """Phân loại text khi chênh lệch dự đoán đạt ngưỡng kiểm duyệt."""
 
@@ -54,7 +54,7 @@ def local_ai_classifier(
     if len(ranked_predictions) > 1:
         _, second_probability = ranked_predictions[1]
         margin = top_probability - second_probability
-        if margin < _UNKNOWN_MARGIN_THRESHOLDS[strict_level]:
+        if margin < _UNKNOWN_MARGIN_THRESHOLDS[moderation_level]:
             return ContentCategory.Unknown
 
     category = _map_label_to_category(top_label)

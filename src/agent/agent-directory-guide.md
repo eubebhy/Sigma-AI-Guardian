@@ -136,7 +136,7 @@ Vi du nen doc: `browser_tab`.
 
 Doc theo thu tu:
 
-1. `src/device_controler/browser_tab/__init__.py`
+1. `src/device_controller/browser_tab/__init__.py`
 2. `src/agent/contracts.py`
 3. `src/agent/platform/__init__.py`
 4. `src/agent/platform/linux/browser.py`

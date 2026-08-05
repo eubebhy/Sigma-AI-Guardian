@@ -1,6 +1,6 @@
 """Mo tab browser theo browser dang co tren may.
 
-File path: `src/device_controler/browser_tab/__init__.py`
+File path: `src/device_controller/browser_tab/__init__.py`
 Input contract:
 - open_tab(url): nhan url bat dau bang http:// hoac https://.
 Output contract:

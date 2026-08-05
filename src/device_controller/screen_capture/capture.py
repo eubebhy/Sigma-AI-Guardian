@@ -1,7 +1,7 @@
 # pyright: reportMissingImports=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false
 """Wrapper chup man hinh bang MSS.
 
-File path: `src/device_controler/screen_capture/capture.py`
+File path: `src/device_controller/screen_capture/capture.py`
 Input contract:
 - capture(top, left, width, height, sample_ratio): toa do/vung chup kieu MSS.
 - sample_ratio trong khoang `(0.0, 1.0]`.

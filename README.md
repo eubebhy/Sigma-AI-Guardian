@@ -53,7 +53,7 @@ cần quyền device riêng. Xem README của feature trước khi chạy manual
 
 ## INPUT COMPONENTS
 
-- `src/device_controler/input_controller/`: gửi input và lifecycle virtual device.
+- `src/device_controller/input_controller/`: gửi input và lifecycle virtual device.
 - `src/utils/key_listener/`: lắng nghe event và đọc NumLock.
 
 Xem README của từng package để biết API, điều kiện platform và side effect.

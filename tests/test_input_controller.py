@@ -47,10 +47,10 @@ try:
     if not sys.platform.startswith("linux"):
         raise ModuleNotFoundError
     from evdev import ecodes
-    from device_controler.input_controller import linux as linux_api
+    from device_controller.input_controller import linux as linux_api
     from agent.platform.linux.input_controller import sendinput_kb, sendinput_mouse
     from agent.platform.linux.input_controller import utils as linux_utils
-    from device_controler.input_controller.types import MouseButton
+    from device_controller.input_controller.types import MouseButton
     from utils import key_listener
 except ModuleNotFoundError:
     _linux_fake_tests_available = False
@@ -419,7 +419,7 @@ def _load_linux_sender(module_name: str) -> tuple[ModuleType, _FakeUInput]:
 class LinuxFakeTests(unittest.TestCase):
     @test_modes("smoke")
     def test_control_facades_export_control_operations(self) -> None:
-        from device_controler.input_controller import linux
+        from device_controller.input_controller import linux
 
         for name in _BACKEND_API:
             self.assertTrue(callable(getattr(linux, name)))

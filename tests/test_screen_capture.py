@@ -33,7 +33,7 @@ from test_support import add_source_path, run_module, test_modes
 
 add_source_path()
 
-from device_controler import screen_capture
+from device_controller import screen_capture
 
 
 @dataclass(frozen=True)

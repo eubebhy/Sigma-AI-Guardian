@@ -38,7 +38,7 @@ from agent.contracts import (
     KeyListenerOperations,
 )
 from agent.platform import PlatformServices
-from device_controler import browser_tab
+from device_controller import browser_tab
 
 
 class _RealArgumentParser(argparse.ArgumentParser):

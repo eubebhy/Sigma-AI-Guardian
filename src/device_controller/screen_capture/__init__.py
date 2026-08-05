@@ -1,6 +1,6 @@
 """API chụp màn hình hiệu năng cao.
 
-File path: `src/device_controler/screen_capture/__init__.py`
+File path: `src/device_controller/screen_capture/__init__.py`
 Input: `top`, `left`, `width`, `height` giống vùng monitor của MSS và
 `sample_ratio` trong khoảng `(0.0, 1.0]`.
 Output: `numpy.ndarray` dạng BGRA, `dtype=uint8`, tương tự raw frame MSS.
@@ -8,7 +8,7 @@ Nguyên lý: dùng MSS làm backend chụp cross-platform, giữ instance dùng 
 tránh overhead và giảm mẫu khi `sample_ratio < 1.0` để nhẹ dữ liệu hơn.
 """
 
-from device_controler.screen_capture.capture import (
+from device_controller.screen_capture.capture import (
     ScreenCapture,
     ScreenRegion,
     capture,

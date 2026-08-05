@@ -15,5 +15,5 @@
   {"target": "clean_text", "input": "rule 34", "expected": "rule 34"},
   {"target": "clean_text", "input": "g0r3", "expected": "gore"},
   {"target": "clean_text", "input": "g4m3", "expected": "game"},
-  {"target": "rule_based_classifier", "input": "rule 34", "expected": "Pornography", "strict_level": "mid"}
+  {"target": "rule_based_classifier", "input": "rule 34", "expected": "Pornography", "moderation_level": "mid"}
 ]

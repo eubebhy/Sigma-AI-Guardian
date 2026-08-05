@@ -219,7 +219,7 @@ class AgentBackend:
         text = command.args.get("text", "")
         if not text:
             return "error: classify requires TEXT"
-        category = rule_based_classifier(text, strict_level="strict")
+        category = rule_based_classifier(text, moderation_level="strict")
         return f"category: {category.name}"
 
     def _inject(self, command: NetworkCommand) -> str:

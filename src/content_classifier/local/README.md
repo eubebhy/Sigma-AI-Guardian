@@ -3,7 +3,7 @@
 ## DESCRIPTION
 
 Package chạy local scikit-learn model qua `joblib`. Public API là
-`local_ai_classifier(text, strict_level="mid")`; input là text và strict level, output
+`local_ai_classifier(text, moderation_level="mid")`; input là text và moderation level, output
 là `ContentCategory`.
 
 ```python

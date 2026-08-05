@@ -1,7 +1,7 @@
 # pyright: reportMissingImports=false, reportUnknownMemberType=false, reportUnknownVariableType=false, reportUnknownArgumentType=false, reportUnknownParameterType=false, reportAttributeAccessIssue=false
 """Khóa màn hình đa monitor trên Windows và Linux.
 
-File path: `src/device_controler/screen_locker/__init__.py`.
+File path: `src/device_controller/screen_locker/__init__.py`.
 Input: `lock()` và `unlock()` không nhận tham số.
 Output: `lock()` phủ mọi monitor bằng thông báo khóa rồi chặn input; nó raise lỗi nếu
 UI không duy trì trạng thái sẵn sàng. `unlock()` trả `True` khi input và UI cleanup
@@ -25,7 +25,7 @@ from PIL import Image, ImageDraw, ImageFont, ImageTk
 
 from agent.contracts import CursorOperations, InputBlockingOperations
 from agent.platform import get_default_platform_services
-from device_controler import screen_capture
+from device_controller import screen_capture
 from utils import input_blocker
 
 

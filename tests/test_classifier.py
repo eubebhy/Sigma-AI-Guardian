@@ -48,11 +48,11 @@ from content_classifier.clean_text import clean_text
 from content_classifier.local.local_model import LocalModel
 from content_classifier.rule_based import rule_based_classifier
 from content_classifier.tags import ContentCategory
-from content_classifier.types import StrictLevel
+from content_classifier.types import ModerationLevel
 
 
 EngineName: TypeAlias = Literal["main", "rule", "local", "cloud"]
-Classifier: TypeAlias = Callable[[str, StrictLevel], ContentCategory]
+Classifier: TypeAlias = Callable[[str, ModerationLevel], ContentCategory]
 
 
 QUALITY_CASE_FILES = {
@@ -80,11 +80,11 @@ def _create_real_parser() -> argparse.ArgumentParser:
         choices=("main", "rule", "local", "cloud"),
         default="main",
     )
-    text.add_argument("--strict-level", choices=STRICT_LEVELS, default="mid")
+    text.add_argument("--moderation-level", choices=STRICT_LEVELS, default="mid")
     corpus = commands.add_parser("corpus", add_help=False)
     corpus.add_argument("theme", choices=("all", *THEMES))
     corpus.add_argument("count", type=int)
-    corpus.add_argument("strict_level", choices=STRICT_LEVELS)
+    corpus.add_argument("moderation_level", choices=STRICT_LEVELS)
     corpus.add_argument(
         "--engine",
         choices=("main", "rule", "local", "cloud"),
@@ -112,7 +112,7 @@ class ClassifierCase(TypedDict):
     target: str
     input: str
     expected: str
-    strict_level: NotRequired[str]
+    moderation_level: NotRequired[str]
 
 
 def _load_cases(target: str) -> list[ClassifierCase]:
@@ -177,14 +177,14 @@ def _run_corpus(
     engine_name: str,
     classifier: Classifier,
     cases: list[tuple[str, ContentCategory, str]],
-    strict_level: StrictLevel,
+    moderation_level: ModerationLevel,
 ) -> int:
     started = time.monotonic()
     passed = 0
-    print(f"=== {engine_name} | strict={strict_level} ===")
+    print(f"=== {engine_name} | moderation={moderation_level} ===")
     for text, expected, theme in cases:
         try:
-            actual = classifier(text, strict_level)
+            actual = classifier(text, moderation_level)
         except Exception as error:
             print(f"[FAIL][{theme}] {text} | error={error}")
             traceback.print_exc()
@@ -215,16 +215,16 @@ def run_real(arguments: Sequence[str]) -> int:
         print(f"Engine unavailable: {engine}", file=sys.stderr)
         return 2
     engine_name, classifier = selected_engine
-    strict_level = cast(StrictLevel, command.strict_level)
+    moderation_level = cast(ModerationLevel, command.moderation_level)
     if command.command == "text":
         started = time.monotonic()
         try:
-            result = classifier(command.text, strict_level)
+            result = classifier(command.text, moderation_level)
         except Exception as error:
             print(f"Action failed: {error}", file=sys.stderr)
             traceback.print_exc()
             return 1
-        print(f"=== {engine_name} | strict={strict_level} ===")
+        print(f"=== {engine_name} | moderation={moderation_level} ===")
         print(f"Input: {command.text}")
         print(f"Result: {result.name}")
         print(f"Elapsed: {time.monotonic() - started:.3f}s")
@@ -235,7 +235,7 @@ def run_real(arguments: Sequence[str]) -> int:
         print(f"Action failed: {error}", file=sys.stderr)
         traceback.print_exc()
         return 1
-    return _run_corpus(engine_name, classifier, cases, strict_level)
+    return _run_corpus(engine_name, classifier, cases, moderation_level)
 
 
 class ClassifierTests(unittest.TestCase):
@@ -258,10 +258,16 @@ class ClassifierTests(unittest.TestCase):
     @test_modes("fake", "mock", "smoke")
     def test_rule_based_cases(self) -> None:
         for case in _load_cases("rule_based_classifier"):
-            strict_level = cast(StrictLevel, case.get("strict_level", "mid"))
+            moderation_level = cast(
+                ModerationLevel,
+                case.get("moderation_level", "mid"),
+            )
             expected = ContentCategory[case["expected"]]
-            with self.subTest(input=case["input"], strict_level=strict_level):
-                self.assertEqual(rule_based_classifier(case["input"], strict_level), expected)
+            with self.subTest(input=case["input"], moderation_level=moderation_level):
+                self.assertEqual(
+                    rule_based_classifier(case["input"], moderation_level),
+                    expected,
+                )
 
     @test_modes("real")
     def test_main_classifier_quality_gate(self) -> None:
@@ -279,7 +285,7 @@ class RealClassifierCommandTests(unittest.TestCase):
 
     def test_parse_real_text_command(self) -> None:
         command = _parse_real_arguments(
-            ("text", "example text", "--engine", "rule", "--strict-level", "strict"),
+            ("text", "example text", "--engine", "rule", "--moderation-level", "strict"),
         )
 
         self.assertIsNotNone(command)
@@ -287,13 +293,16 @@ class RealClassifierCommandTests(unittest.TestCase):
         self.assertEqual(command.command, "text")
         self.assertEqual(command.text, "example text")
         self.assertEqual(command.engine, "rule")
-        self.assertEqual(command.strict_level, "strict")
+        self.assertEqual(command.moderation_level, "strict")
 
     def test_run_real_text_uses_selected_engine(self) -> None:
-        calls: list[tuple[str, StrictLevel]] = []
+        calls: list[tuple[str, ModerationLevel]] = []
 
-        def fake_classifier(text: str, strict_level: StrictLevel) -> ContentCategory:
-            calls.append((text, strict_level))
+        def fake_classifier(
+            text: str,
+            moderation_level: ModerationLevel,
+        ) -> ContentCategory:
+            calls.append((text, moderation_level))
             return ContentCategory.Unknown
 
         with patch(

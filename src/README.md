@@ -10,7 +10,7 @@ contract và adapter nằm trong [architecture document](../docs/architecture.md
 | Path | Responsibility |
 | --- | --- |
 | `agent/` | Runtime, contracts và adapter process/browser/window/hosts/input Linux hoặc Windows. |
-| `device_controler/` | Browser, process guard, screen, input và web blocker. |
+| `device_controller/` | Browser, process guard, screen, input và web blocker. |
 | `system_monitor/` | Keylogger và window tracker. |
 | `content_classifier/` | Rule classifier và local model classifier. |
 | `utils/` | Compatibility facade cho input blocker/key listener và helper dùng chung. |

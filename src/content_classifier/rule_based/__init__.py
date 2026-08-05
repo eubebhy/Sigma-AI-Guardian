@@ -13,10 +13,10 @@ from pathlib import Path
 from typing import Final
 
 from content_classifier.tags import ContentCategory
-from content_classifier.types import StrictLevel
+from content_classifier.types import ModerationLevel
 
 
-_SIMILARITY_THRESHOLDS: Final[dict[StrictLevel, float]] = {
+_SIMILARITY_THRESHOLDS: Final[dict[ModerationLevel, float]] = {
     "xlow": 0.967,
     "low": 0.9067,
     "mid": 0.8067,
@@ -136,7 +136,7 @@ _KEYWORDS_BY_CATEGORY: Final[tuple[tuple[tuple[str, ...], ContentCategory], ...]
 
 def rule_based_classifier(
     text: str,
-    strict_level: StrictLevel,
+    moderation_level: ModerationLevel,
 ) -> ContentCategory:
     """Trả category có từ khóa giống văn bản nhất và đạt ngưỡng kiểm duyệt."""
 
@@ -163,8 +163,8 @@ def rule_based_classifier(
             best_score = category_score
             best_category = category
 
-    # Su ly threshold theo strict_level
-    if best_score >= _SIMILARITY_THRESHOLDS[strict_level]:
+    # Su ly threshold theo moderation_level
+    if best_score >= _SIMILARITY_THRESHOLDS[moderation_level]:
         return best_category
 
     return ContentCategory.Unknown
