@@ -14,8 +14,6 @@ công trước khi một `lock()` đang khởi tạo hoàn tất. Lỗi UI đư�
 `unlock()` báo cho caller.
 """
 
-from __future__ import annotations
-
 import threading
 import tkinter as tk
 from pathlib import Path
@@ -29,7 +27,7 @@ from device_controller import screen_capture
 from utils import input_blocker
 
 
-FONT_PATH = Path(__file__).with_name("TempleOS.ttf")
+FONT_PATH = Path(__file__).with_name("unscii-8.ttf")
 BACKGROUND_COLOR = "#ab0101"
 TEXT_COLOR = "#FFFFFF"
 DEFAULT_LOCK_HEADER = "Oops, system is locked by SIGMA AI GUARDIAN"

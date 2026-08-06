@@ -20,8 +20,6 @@ Operating principle:
   caller lay qua raise_if_failed().
 """
 
-from __future__ import annotations
-
 import logging
 import threading
 
@@ -44,7 +42,6 @@ class ProcessGuard:
         self._stop_event: threading.Event | None = None
         self._lifecycle_lock = threading.Lock()
         self._failure: Exception | None = None
-        self._extra_exact: set[str] = set()
         self._process_operations = (
             process_operations or get_default_platform_services().processes
         )
@@ -52,12 +49,14 @@ class ProcessGuard:
     def set_whitelist(self, values: list[str] | None) -> None:
         """Đặt danh sách process name không được kill, hoặc xoá whitelist."""
 
-        self.whitelist = {value.strip().lower() for value in values} if values else None
+        self.whitelist = (
+            {value.strip().lower() for value in values} if values else None
+        )
 
     def set_blacklist(self, values: list[str]) -> None:
-        """Đặt blacklist bổ sung ngoài `blocked` mặc định của instance."""
+        """Đặt danh sách process bị chặn."""
 
-        self._extra_exact = {value.strip().lower() for value in values}
+        self.blocked = [value.strip().lower() for value in values]
 
     def start(self) -> None:
         """Bắt đầu daemon thread quét process nếu chưa chạy."""
@@ -133,11 +132,18 @@ class ProcessGuard:
             try:
                 self._process_operations.kill_process(pid)
             except ProcessLookupError:
-                logger.warning("Process %s exited before the process guard could kill it", pid)
+                logger.warning(
+                    "Process %s exited before the process guard could kill it",
+                    pid,
+                )
                 continue
 
     def _has_same_name(self, pid: int, normalized_name: str) -> bool:
-        """Xác minh PID/name ngay trước kill, không chứng minh identity OS bất biến."""
+        """Xác minh PID/name ngay trước kill.
+
+        Việc này giảm race do PID reuse nhưng không chứng minh identity OS bất biến
+        khi process thay thế vẫn dùng cùng tên.
+        """
 
         return any(
             current_pid == pid and name.strip().lower() == normalized_name
@@ -147,7 +153,7 @@ class ProcessGuard:
     def _should_kill(self, name: str) -> bool:
         if self.whitelist and name in self.whitelist:
             return False
-        if name in set(self.blocked) | self._extra_exact:
+        if name in self.blocked:
             return True
         return False
 
