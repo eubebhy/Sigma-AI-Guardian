@@ -7,8 +7,6 @@ Nguyên lý: đọc hosts và source list theo stream, ghi temporary file rồi 
 một lần trong mỗi operation; code không giữ toàn bộ category list trong RAM.
 """
 
-from __future__ import annotations
-
 import os
 from collections.abc import Generator, Iterable
 from contextlib import contextmanager

@@ -7,8 +7,6 @@ Nguyên lý: category được stream thẳng vào marker hosts một lần; sta
 nhỏ nên custom allow/block tra cứu bằng set, không nạp category list vào RAM.
 """
 
-from __future__ import annotations
-
 import json
 from collections.abc import Callable, Iterable, Mapping
 from dataclasses import dataclass
