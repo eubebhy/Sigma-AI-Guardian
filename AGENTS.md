@@ -3,8 +3,8 @@
 Phần mềm quản lý phòng tin học dành cho giáo viên, tích hợp AI Agent để phân tích và thực thi tool calling trong ứng dụng.
 
 ## Đọc trước khi sửa
-* Đọc [`ROI-reports/index.md`](ROI-reports/index.md), module docstring, test liên quan
-  và ADR phù hợp trước khi thay đổi behavior, lifecycle, platform hoặc public API.
+* Đọc module docstring, test liên quan và ADR phù hợp trước khi thay đổi behavior,
+  lifecycle, platform hoặc public API.
 * Repository hiện là **SAG Agent cục bộ**. Server, Teacher Console, LAN, remote
   desktop, remote input và remote shell không thuộc scope hiện tại.
 
@@ -86,7 +86,6 @@ Sau dung workflow mac dinh cua m, sau khi lam xong thi buoc cuoi la chay lenh be
    ```
 
 Script trên nhận một target mỗi lần. Chạy riêng `src`, `tests` và `scripts` khi phạm
-vi thay đổi liên quan. Xem `ROI-reports/testing-strategy.md` trước khi chạy test ngoài
-unit test an toàn.
+vi thay đổi liên quan. Chỉ chạy các test ngoài unit test an toàn khi có chủ đích.
 
 Virtual environment của dự án: `./.pyvenv`.

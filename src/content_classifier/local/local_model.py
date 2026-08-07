@@ -17,10 +17,7 @@ import threading
 import time
 import logging
 from pathlib import Path
-from typing import Any, cast
-
-import joblib  # type: ignore[import-not-found]
-from sklearn.pipeline import Pipeline  # type: ignore[import-not-found]
+from typing import Any
 
 _GB = 1073741824  # 1024 ** 3 bytes
 _DEFAULT_IDLE_TIMEOUT_SECONDS = 167.0
@@ -79,9 +76,9 @@ class LocalModel:
         suất giảm dần theo output của scikit-learn pipeline.
         """
 
-        model = cast(Pipeline, self._load_model())
+        model = self._load_model()
         probabilities = model.predict_proba([text])[0]
-        labels = cast(Any, model).classes_
+        labels = model.classes_
         with self._lock:
             self._last_used_at = time.monotonic()
 
@@ -110,6 +107,9 @@ class LocalModel:
             if _model is not None:
                 self._model = _model
                 return self._model
+
+            # Import lazy để test rule-based không phải nạp thư viện model nặng.
+            import joblib  # type: ignore[import-not-found]
 
             self._model = joblib.load(self._model_path)
             _model = self._model
