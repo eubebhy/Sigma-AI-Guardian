@@ -1,5 +1,10 @@
 # Thiết kế SAG Agent loop
 
+> **Trạng thái:** tài liệu thiết kế cho phần chưa hoàn thiện. Nó không mô tả
+> behavior đầy đủ của source hiện tại. `AgentRuntime`, config, local interface,
+> command dispatch và lifecycle có thể thay đổi; khi triển khai phải đối chiếu
+> `src/agent/runtime.py`, `src/config.py` và `TODO.md`.
+
 ## Phạm vi
 
 Tài liệu này mô tả SAG Agent chạy cục bộ trên máy học sinh. Agent không chạy SAG
@@ -16,12 +21,14 @@ SAG Agent chịu trách nhiệm:
 
 ## Bootstrap config
 
-`main.py` chịu trách nhiệm setup config lần đầu. `ConfigObject` chịu trách nhiệm
+Theo thiết kế mục tiêu, `main.py` sẽ setup config lần đầu. Source hiện tại dùng
+`AgentConfig` trong `src/config.py`, nhưng `main.py` chưa tích hợp config runtime.
+`AgentConfig` chịu trách nhiệm
 đọc, validate và áp dụng nội dung config; `main.py` không tự parse TOML.
 
 ```text
 main.py
-  ├── config = ConfigObject()
+  ├── config = AgentConfig()
   ├── config.set_fallback_config("backup.toml")
   ├── config.load("sag_agent_config.toml")
   ├── tạo AgentRuntime và feature objects
@@ -50,7 +57,7 @@ platform cụ thể và không thay thế logic bên trong feature.
 
 ```text
 AgentRuntime
-  ├── ConfigObject
+  ├── AgentConfig
   ├── PlatformServices
   ├── feature objects
   ├── local interface
@@ -128,7 +135,7 @@ config.process_guard.blocked_processes
 config.screen_lock.message
 ```
 
-Việc reload config tự động là trách nhiệm của `ConfigObject`. Khi reload hợp lệ,
+Việc reload config tự động là trách nhiệm dự kiến của `AgentConfig`. Khi reload hợp lệ,
 feature sử dụng giá trị mới ở lần action hoặc scan kế tiếp; không restart toàn bộ
 Agent loop chỉ vì config thay đổi.
 
@@ -136,7 +143,7 @@ Agent loop chỉ vì config thay đổi.
 
 `main.py` chỉ làm bootstrap và giữ vòng đời process:
 
-- tạo và setup `ConfigObject`;
+- tạo và setup `AgentConfig`;
 - tạo `AgentRuntime`;
 - khởi động Agent loop;
 - bắt shutdown signal;
@@ -148,7 +155,7 @@ của từng feature.
 
 ## Trạng thái triển khai
 
-Repository hiện đã có `AgentRuntime` và `PlatformServices`, nhưng local interface,
+Repository hiện đã có `AgentRuntime` tối giản và `PlatformServices`, nhưng local interface,
 `CommandRequest`, `CommandResult` và command dispatch đầy đủ chưa được triển khai.
 Tài liệu này là thiết kế cho bước hoàn thiện SAG Agent, không mô tả SAG Service hay
 SAG Server.

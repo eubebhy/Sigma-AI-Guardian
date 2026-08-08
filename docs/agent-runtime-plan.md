@@ -1,5 +1,11 @@
 # Kế hoạch kiến trúc Agent Runtime
 
+> **Đây là kế hoạch, không phải mô tả code hiện tại.** Các tên như
+> `ConfigObject`, `AgentPaths`, `LocalAgentApi`, `CommandRequest` và
+> `CommandResult` là API dự kiến hoặc placeholder nếu chưa có file tương ứng.
+> Kế hoạch có thể lỗi thời nhanh khi `AgentRuntime`, config, protocol hoặc
+> lifecycle thay đổi; phải đối chiếu `src/` và `TODO.md` trước khi triển khai.
+
 ## 1. Phạm vi và mục tiêu
 
 Tài liệu này mô tả kiến trúc triển khai tiếp theo của SAG Agent cục bộ. Agent
@@ -136,7 +142,8 @@ Các path cụ thể phải được gom trong `AgentPaths`; feature không đư
 
 ## 4. Config và update runtime
 
-`ConfigObject` là owner của việc đọc, validate và lưu last-good config. Runtime
+`AgentConfig` là owner hiện tại của việc đọc, validate và lưu last-good config.
+Trong kế hoạch tương lai, config object này sẽ được truyền vào runtime. Runtime
 chỉ gọi API config, không parse TOML.
 
 ```text
@@ -282,7 +289,7 @@ Files dự kiến:
 
 - `src/agent/runtime.py`
 - `src/config.py` nếu cần bổ sung API tối thiểu
-- `tests/test_agent.py`
+- test runtime mới phù hợp với lifecycle hiện tại
 
 Truyền config vào runtime/feature, thêm update atomic và test update thất bại không
 làm mất config hiện tại.
@@ -293,7 +300,7 @@ Files dự kiến:
 
 - `src/agent/protocols.py` và `src/agent/platform_protocols.py`
 - module local API mới chỉ khi protocol hiện tại chưa có nơi phù hợp
-- `tests/test_agent_loop.py`
+- test local API/loop mới khi các protocol được triển khai
 
 Chỉ thêm contract fake trước; chưa chọn socket, pipe hoặc dependency transport.
 
@@ -303,7 +310,7 @@ Files dự kiến:
 
 - `src/agent/runtime.py`
 - `src/main.py`
-- `tests/test_agent_loop.py`
+- test local API/loop mới khi các protocol được triển khai
 
 Implement `start()`, `poll_once()`, `run()` với stop event, timeout và xử lý lỗi
 từng request. Verify loop không busy-wait và dừng khi API đóng.
@@ -314,7 +321,7 @@ Files dự kiến:
 
 - `src/agent/runtime.py`
 - feature modules liên quan khi cần hook lifecycle tối thiểu
-- `tests/test_agent.py`, `tests/test_agent_loop.py`
+- test runtime/lifecycle mới phù hợp với các module thực tế
 
 Tích hợp start/stop/unlock/close theo thứ tự shutdown. Verify shutdown idempotent,
 cleanup tiếp tục sau lỗi và không gọi desktop thật trong safe test.

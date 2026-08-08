@@ -2,6 +2,10 @@
 
 > Đây là kiến trúc **code hiện tại**. Kiến trúc đích có SAG Server, SAG Service và
 > SAG Agent nằm tại [`target-architecture.md`](target-architecture.md).
+>
+> Tài liệu này cần được cập nhật cùng mọi thay đổi về module boundary, protocol,
+> factory hoặc lifecycle. Các phần có chữ “tương lai” không phải behavior đã triển
+> khai.
 
 ## Phạm vi
 
@@ -40,8 +44,9 @@ AgentRuntime.services
     `-- input controller -> compatibility facade / caller
 ```
 
-`main.py` chỉ parse CLI, tạo runtime và luôn gọi `runtime.shutdown()` khi thoát.
-Runtime tạo một `PlatformServices` đúng một lần. Compatibility API public cũ dùng
+`main.py` hiện chỉ cấu hình logging, tạo runtime và kết thúc process. Runtime tạo một
+`PlatformServices` đúng một lần. Lifecycle shutdown đầy đủ vẫn là phần kế hoạch,
+chưa được triển khai trong `AgentRuntime` hiện tại. Compatibility API public cũ dùng
 `get_default_platform_services()` được cache theo process. Khi Agent phát triển
 thêm command nội bộ, command handler phải nhận cùng runtime đó thay vì tự phát
 hiện OS.
@@ -86,12 +91,11 @@ chỉ giữ compatibility facade cho public API cũ.
 Feature trong `device_controller/` và `system_monitor/` không gọi `ps`,
 `tasklist`, `taskkill`, `xdotool`, `os.name`, `sys.platform` hay đường dẫn hosts.
 
-## Lifecycle
+## Lifecycle hiện tại và kế hoạch
 
-Runtime sở hữu platform adapter và đóng input blocker, key listener, virtual input
-device cùng X11 resource do input controller cache. `ScreenCapture` và overlay của
-`screen_locker` vẫn giữ lifecycle feature hiện có; caller phải `unlock()` trước khi
-Agent shutdown.
+Runtime hiện sở hữu object `PlatformServices` được tạo trong process. Chưa có runtime
+registry cho service/resource và chưa có `AgentRuntime.shutdown()`. Lifecycle đầy đủ
+dưới đây là boundary mục tiêu cần hoàn thiện, không phải behavior hiện tại.
 
 Thread dài hạn của `ProcessGuard` và `screen_locker` phải là daemon thread theo
 quy tắc `src/README.md`; command handler tương lai phải gọi `stop()`/`unlock()`
@@ -118,8 +122,8 @@ hỗ trợ: factory hiện chỉ có adapter Linux và Windows.
 
 ## Kiểm thử
 
-Test contract nằm trong các file phẳng `tests/test_agent.py`,
-`tests/test_process_guard.py`, `tests/test_input_controller.py`,
+Test contract nằm trong các file phẳng `tests/test_process_guard.py`,
+`tests/test_input_controller.py`,
 `tests/test_key_listener.py` và các feature test
 `test_<feature>.py` khác. Safe mode dùng fake adapter, không đọc process thật, không
 gọi desktop và không sửa hosts. Xem `tests/README.md` trước khi chạy real mode vì nó

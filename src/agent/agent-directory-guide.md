@@ -1,4 +1,8 @@
-# Cach src/agent hoat dong
+# Cách `src/agent/` hoạt động
+
+> **Trạng thái tài liệu:** guide này mô tả cấu trúc hiện tại nhưng các ví dụ có thể
+> lỗi thời nhanh khi `AgentRuntime`, protocol hoặc factory thay đổi. Khi code và guide
+> khác nhau, ưu tiên source hiện tại và cập nhật guide trong cùng change.
 Luu y: tai lieu nay duoc viet o thoi diem **hien tai** cua code.
 Tai lieu nay co the tro nen loi thoi ve mat vi du trong tuong lai.
 
@@ -160,6 +164,8 @@ Khi tu them feature moi, co the dung checklist sau:
 7. Test feature bang fake operation, khong goi OS that trong safe test.
 
 ## Cach de tu build mot service moi
-1. Dau tien, viet contract trong contracts.py qui dinh input, output, apis, cua service do
-2. viet adapter rieng cho tung os trong linux/ & window/
-3. Bo xung service moi vo create_serivce() cua linux/__init__ & window/__init__
+1. Đầu tiên, xác định lifecycle trong `agent/protocols.py` và capability trong
+   `agent/platform_protocols.py`.
+2. Viết adapter riêng cho từng OS trong `linux/` và `windows/`.
+3. Bổ sung adapter vào `create_services()` của `linux/__init__.py` và
+   `windows/__init__.py` nếu service cần platform implementation.

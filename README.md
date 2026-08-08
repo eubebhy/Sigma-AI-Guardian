@@ -3,11 +3,12 @@
 ## DESCRIPTION
 
 Sigma AI Guardian (SAG) hiện là Agent cục bộ trên máy học sinh. Entry point
-`src/main.py` chỉ cung cấp command an toàn `status`; repository không có Server,
-Teacher Console, LAN transport, remote desktop hoặc remote shell.
+`src/main.py` khởi tạo logging và runtime platform; command dispatch, local API,
+SAG Server, Teacher Console, LAN transport, remote desktop và remote shell chưa
+được triển khai.
 
 ```bash
-./.pyvenv/bin/python src/main.py status
+./.pyvenv/bin/python src/main.py
 ```
 
 Agent chọn adapter Linux hoặc Windows một lần khi khởi động. Classifier, browser,
@@ -49,7 +50,17 @@ cần quyền device riêng. Xem README của feature trước khi chạy manual
 - [Kiến trúc Agent](docs/architecture.md)
 - [Vai trò `src/agent/`](docs/agent-directory-guide.md)
 - [Test safety và commands](tests/README.md)
-- [ROI reports, ADR và backlog](ROI-reports/index.md)
+- [Roadmap hiện tại](TODO.md)
+- [Chỉ dẫn cấu trúc `src/agent/`](src/agent/agent-directory-guide.md)
+
+## DOCUMENTATION STATUS
+
+`README.md`, `src/README.md` và `docs/architecture.md` mô tả code hiện tại.
+`docs/target-architecture.md`, `docs/agent-loop.md` và
+`docs/agent-runtime-plan.md` chứa thiết kế hoặc kế hoạch tương lai; chúng có thể
+lỗi thời nhanh khi AgentRuntime, config hoặc lifecycle thay đổi. Khi thay đổi
+boundary, public API, tên module hoặc lifecycle, phải cập nhật các tài liệu liên
+quan trong cùng change.
 
 ## INPUT COMPONENTS
 

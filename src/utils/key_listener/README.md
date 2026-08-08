@@ -12,7 +12,7 @@ output la generator event da chuan hoa va `bool`. Module khong gui input; dung
 utils/key_listener/
 ├── types.py                 # compatibility event type
 ├── linux.py                 # compatibility API Linux
-├── window.py                # compatibility API Windows
+├── windows.py               # compatibility API Windows
 └── __init__.py              # public facade qua Agent platform service
 
 agent/platform/<os>/key_listener_backend.py
