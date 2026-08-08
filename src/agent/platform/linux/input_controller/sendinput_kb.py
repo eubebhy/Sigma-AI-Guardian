@@ -15,7 +15,7 @@ from typing import Final
 
 from evdev import ecodes
 
-from agent.contracts import Key
+from agent.platform_protocols import Key
 from agent.platform.linux.input_controller.types import UInputDevice
 from agent.platform.linux.input_controller.utils import UInputManager
 

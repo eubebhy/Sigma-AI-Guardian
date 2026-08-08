@@ -20,7 +20,7 @@ import subprocess
 from evdev import ecodes
 from Xlib.display import Display
 
-from agent.contracts import MouseButton
+from agent.platform_protocols import MouseButton
 from agent.platform.linux.input_controller.types import UInputDevice
 from agent.platform.linux.input_controller.utils import UInputManager
 

@@ -17,7 +17,7 @@ from __future__ import annotations
 
 from typing import TypedDict
 
-from agent.contracts import BrowserOperations, ProcessOperations
+from agent.platform_protocols import BrowserOperations, ProcessOperations
 from agent.platform import PlatformServices, get_default_platform_services
 
 class BrowserSpec(TypedDict):

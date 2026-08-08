@@ -38,7 +38,7 @@ from test_support import add_source_path, run_module, test_modes
 
 add_source_path()
 
-from agent.contracts import ProcessOperations
+from agent.platform_protocols import ProcessOperations
 from device_controller.process_guard import ProcessGuard as ProcessKiller
 
 

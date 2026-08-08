@@ -18,7 +18,7 @@ import evdev
 from evdev import InputDevice, ecodes
 from Xlib.display import Display
 
-from agent.contracts import KeyEvent, KeyState, MouseEvent, MouseState
+from agent.platform_protocols import KeyEvent, KeyState, MouseEvent, MouseState
 
 # InputDevice truyen path vao duoi dang str thay vi Pat
 # It nhat quyet dinh tren chi la tam thoi

@@ -10,7 +10,7 @@ native chỉ được nạp khi listener bắt đầu hoặc NumLock được đ
 from collections.abc import Iterator
 import threading
 
-from agent.contracts import KeyListenerOperations
+from agent.platform_protocols import KeyListenerOperations
 from agent.platform import get_default_platform_services
 from utils.key_listener.types import KeyEvent, KeyState, MouseEvent, MouseState
 

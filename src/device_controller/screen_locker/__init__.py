@@ -21,7 +21,7 @@ from typing import NoReturn, cast
 
 from PIL import Image, ImageDraw, ImageFont, ImageTk
 
-from agent.contracts import CursorOperations, InputBlockingOperations
+from agent.platform_protocols import CursorOperations, InputBlockingOperations
 from agent.platform import get_default_platform_services
 from device_controller import screen_capture
 from utils import input_blocker

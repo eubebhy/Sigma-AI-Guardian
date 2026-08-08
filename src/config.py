@@ -307,7 +307,7 @@ def _save_last_good(primary_path: str | Path, last_good_path: str | Path) -> Non
     temporary_path.replace(destination)
 
 
-config = AgentConfig()
+Config = AgentConfig()
 
 
 __all__ = [
@@ -324,5 +324,5 @@ __all__ = [
     "SystemConfig",
     "WebBlockerConfig",
     "WindowMonitorConfig",
-    "config",
+    "Config",
 ]

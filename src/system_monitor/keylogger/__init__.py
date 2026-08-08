@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import threading
 
-from agent.contracts import KeyListenerOperations
+from agent.platform_protocols import KeyListenerOperations
 from utils.key_listener import KeyEvent, get_num_lock_state, listen_keys
 
 

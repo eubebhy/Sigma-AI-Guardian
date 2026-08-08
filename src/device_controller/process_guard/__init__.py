@@ -23,7 +23,7 @@ Operating principle:
 import logging
 import threading
 
-from agent.contracts import ProcessOperations
+from agent.platform_protocols import ProcessOperations
 from agent.platform import get_default_platform_services
 
 

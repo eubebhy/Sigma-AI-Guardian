@@ -7,7 +7,7 @@ Nguyên lý: feature chỉ gọi contract Agent; PyWinCtl và fallback xdotool n
 adapter Windows/Linux tương ứng.
 """
 
-from agent.contracts import WindowOperations
+from agent.platform_protocols import WindowOperations
 from agent.platform import get_default_platform_services
 
 

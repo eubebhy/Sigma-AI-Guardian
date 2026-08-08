@@ -12,7 +12,7 @@ from __future__ import annotations
 import importlib
 from typing import Any, cast
 
-from agent.contracts import MouseButton
+from agent.platform_protocols import MouseButton
 
 
 _BUTTON_NAMES = {

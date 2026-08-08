@@ -8,7 +8,7 @@ Nguyên lý: adapter cung cấp contract Agent; evdev/X11 vẫn nằm sau bounda
 from collections.abc import Iterator
 import threading
 
-from agent.contracts import KeyEvent, MouseEvent
+from agent.platform_protocols import KeyEvent, MouseEvent
 
 
 _lifecycle_lock = threading.Lock()

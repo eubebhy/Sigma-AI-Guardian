@@ -6,27 +6,14 @@
 ## Phạm vi
 
 Repository hiện tại là ứng dụng cục bộ tiền thân của **SAG Agent** trên máy học sinh.
-Nó phát hiện platform và cung cấp adapter/capability cho feature desktop có sẵn; CLI
-hiện chỉ chạy `status`, chưa dispatch feature desktop. SAG Server, SAG Service,
+Nó phát hiện platform và cung cấp adapter cho feature desktop có sẵn; CLI
+chưa dispatch feature desktop. SAG Server, SAG Service,
 Teacher Console và cơ chế giao tiếp giữa chúng chưa tồn tại.
 
 ## Chạy Agent
 
-Từ thư mục gốc dự án:
-
-```bash
-./.pyvenv/bin/python src/main.py status
-```
-
-Windows dùng:
-
-```powershell
-.\.pyvenv\Scripts\python.exe src\main.py status
-```
-
-`status` không thay đổi desktop, input, process hoặc hosts. Nó chỉ in platform
-được chọn và những adapter Agent có thể tạo. Quyền truy cập desktop, hosts và
-input vẫn được kiểm tra tại thời điểm feature sử dụng chúng.
+`main.py` hiện chỉ bootstrap runtime. Command dispatch sẽ được bổ sung cùng Agent
+Runtime về sau.
 
 ## Thành phần và luồng chạy
 
@@ -63,7 +50,7 @@ hiện OS.
 
 ```text
 main.py -> agent.runtime -> agent.platform -> agent.platform.<os>
-feature -> agent.contracts
+feature -> agent.platform_protocols
 feature -> agent.platform (chỉ khi không được runtime truyền dependency)
 agent.platform.<os> -> standard library / dependency native
 ```
@@ -72,11 +59,11 @@ Không được import theo chiều ngược lại:
 
 ```text
 agent.platform.<os> -> device_controller hoặc system_monitor  # cấm
-agent.contracts -> adapter hoặc feature                       # cấm
+agent.platform_protocols -> adapter hoặc feature              # cấm
 feature -> agent.platform.linux hoặc agent.platform.windows  # cấm
 ```
 
-`agent.contracts` gồm các protocol nhỏ theo capability: process, browser, window,
+`agent.platform_protocols` gồm các protocol nhỏ theo capability: process, browser, window,
 hosts, input blocking, key listener và input controller. Không có một
 `PlatformBackend` lớn vì mỗi capability có lifecycle/permission khác nhau; fake
 adapter cho test cũng đơn giản hơn.
@@ -120,12 +107,9 @@ kill process không thể chạy Python `finally`.
 | Wayland | Không hỗ trợ đầy đủ | không quảng bá là tương thích |
 | macOS/OS khác | Không hỗ trợ | runtime ném `NotImplementedError`, không fallback Linux |
 
-`status` mô tả adapter có thể chọn. Nó không khẳng định thao tác đặc quyền sẽ
-thành công: ghi hosts, grab `/dev/input`, `BlockInput` và desktop Xorg vẫn có thể
-thất bại do quyền hoặc session. `ProcessLookupError` được bỏ qua khi process đã tự
-thoát. Lỗi scan/kill khác được ProcessKiller lưu lại và caller gọi
-`raise_if_failed()` để nhận exception; caller vẫn không được suy ra kill thành công
-chỉ từ việc gọi feature.
+`ProcessLookupError` được bỏ qua khi process đã tự thoát. Lỗi scan/kill khác được
+ProcessKiller lưu lại và caller gọi `raise_if_failed()` để nhận exception; caller
+vẫn không được suy ra kill thành công chỉ từ việc gọi feature.
 
 Core Python và protocol adapter không giả định Ubuntu, Debian, `apt` hoặc `systemd`.
 Các dependency native, desktop backend và cách khởi động tiến trình là deployment

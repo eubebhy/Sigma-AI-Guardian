@@ -13,7 +13,7 @@ import importlib
 from collections.abc import Sequence
 from typing import Any, cast
 
-from agent.contracts import Key
+from agent.platform_protocols import Key
 
 
 _KEY_NAMES = {

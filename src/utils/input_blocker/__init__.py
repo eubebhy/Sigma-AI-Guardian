@@ -8,7 +8,7 @@ Nguyên lý hoạt động: facade giữ public API cũ và lấy adapter mặc 
 Linux dùng evdev; Windows dùng `BlockInput` từ user32 sau platform boundary.
 """
 
-from agent.contracts import InputBlockingOperations
+from agent.platform_protocols import InputBlockingOperations
 from agent.platform import get_default_platform_services
 
 

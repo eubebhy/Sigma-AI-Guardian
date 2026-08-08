@@ -8,7 +8,7 @@ Nguyên lý: pynput/Win32 nằm trong backend; feature chỉ nhận event chuẩ
 from collections.abc import Iterator
 import threading
 
-from agent.contracts import KeyEvent, MouseEvent
+from agent.platform_protocols import KeyEvent, MouseEvent
 
 
 _lifecycle_lock = threading.Lock()

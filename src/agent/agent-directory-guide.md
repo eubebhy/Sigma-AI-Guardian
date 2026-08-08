@@ -10,20 +10,11 @@ do:
 
 ```python
 # src/main.py
-from agent.runtime import create_runtime
+from agent import create_runtime
 
-def main(argv: Sequence[str] | None = None) -> int:
-    """Chạy command Agent an toàn hiện có."""
-
-    arguments = _build_parser().parse_args(argv) # su ly args
-    runtime = create_runtime() # tao object agent runtime
-    try:
-        if arguments.command == "status":
-            print(runtime.status()) # goi api on dinh
-            return 0
-        return 1
-    finally:
-        runtime.shutdown()
+def main() -> int:
+    create_runtime()
+    return 0
 ```
 
 ham create runtime chiu trach nhiem tao object agent runtime on dinh theo platform
@@ -44,7 +35,7 @@ class AgentRuntime:
     """Obj Agent su dung trong runtime, cung cap cac main API on dinh khong phan biet
     platform dang chay la gi.
 
-    vi du: Agent.status()
+vi du: AgentRuntime(services=services)
 
     services: PlatformServices la obj cung cap adapter operations the feature su
     dung, no khong cung cap truc tiep logic cua feature.
@@ -52,15 +43,6 @@ class AgentRuntime:
     """
 
     services: PlatformServices
-
-    def status(self) -> str:
-        """Trả capability status của Agent mà không đụng desktop thật."""
-
-        return self.services.capabilities.format_status()
-
-    def shutdown(self) -> None:
-        """Kết thúc runtime; feature hiện có tự quản lý lifecycle của chúng."""
-
 
 def create_runtime(platform_name: str | None = None) -> AgentRuntime:
     """Tạo runtime Agent với adapter platform được chọn một lần."""
@@ -137,7 +119,7 @@ Vi du nen doc: `browser_tab`.
 Doc theo thu tu:
 
 1. `src/device_controller/browser_tab/__init__.py`
-2. `src/agent/contracts.py`
+2. `src/agent/platform_protocols.py`
 3. `src/agent/platform/__init__.py`
 4. `src/agent/platform/linux/browser.py`
 5. `src/agent/platform/windows/browser.py`
@@ -169,7 +151,7 @@ nam trong `src/agent/platform/linux/browser.py` va
 Khi tu them feature moi, co the dung checklist sau:
 
 1. Viet logic chung cua feature trong package feature.
-2. Xac dinh operation ma feature can trong `src/agent/contracts.py`.
+2. Xac dinh operation ma feature can trong `src/agent/platform_protocols.py`.
 3. Them operation vao `PlatformServices` neu day la capability cua OS.
 4. Tao adapter cho Linux va Windows trong package platform tuong ung.
 5. Cho feature nhan `PlatformServices` tu caller; fallback default chi dung khi can

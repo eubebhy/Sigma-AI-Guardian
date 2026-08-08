@@ -6,7 +6,7 @@ Output: type alias event cho caller của listener.
 Nguyên lý: event không phụ thuộc backend để system monitor dùng cùng một contract.
 """
 
-from agent.contracts import (
+from agent.platform_protocols import (
     KeyEvent,
     KeyState,
     MouseButtonEvent,

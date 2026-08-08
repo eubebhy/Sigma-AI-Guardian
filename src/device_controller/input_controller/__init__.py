@@ -9,7 +9,7 @@ Nguyên lý: facade giữ public API cũ và lấy adapter mặc định từ Ag
 
 from collections.abc import Sequence
 
-from agent.contracts import InputControllerOperations, MouseButton
+from agent.platform_protocols import InputControllerOperations, MouseButton
 from agent.platform import get_default_platform_services
 
 

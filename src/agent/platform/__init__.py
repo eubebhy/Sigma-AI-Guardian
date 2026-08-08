@@ -16,8 +16,7 @@ from collections.abc import Iterator, Sequence
 from typing import NoReturn
 
 import logging
-from agent.capabilities import PlatformCapabilities
-from agent.contracts import (
+from agent.platform_protocols import (
     BrowserOperations,
     HostsPathOperations,
     InputBlockingOperations,
@@ -36,7 +35,6 @@ class PlatformServices:
     """Các adapter OS được tạo một lần cho một Agent runtime."""
 
     name: str
-    capabilities: PlatformCapabilities
     processes: ProcessOperations
     browser: BrowserOperations
     windows: WindowOperations

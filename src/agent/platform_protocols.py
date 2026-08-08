@@ -1,6 +1,6 @@
-"""Contract giữa feature SAG Agent và adapter hệ điều hành.
+"""Protocol platform giữa feature SAG Agent và adapter hệ điều hành.
 
-File path: `src/agent/contracts.py`.
+File path: `src/agent/platform_protocols.py`.
 Input: adapter cung cấp process, browser, window, hosts và input theo protocol ở đây.
 Output: feature nhận dữ liệu chuẩn hóa, không phụ thuộc lệnh native từng OS.
 Nguyên lý: contract chỉ mô tả capability nhỏ; nó không import adapter hay feature.

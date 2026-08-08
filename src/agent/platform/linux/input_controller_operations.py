@@ -9,7 +9,7 @@ from collections.abc import Sequence
 import threading
 from typing import cast
 
-from agent.contracts import InputControllerOperations, MouseButton
+from agent.platform_protocols import InputControllerOperations, MouseButton
 
 
 _lock = threading.RLock()

@@ -54,6 +54,6 @@ tool và feature đã có, quản lý lifecycle tài nguyên của chúng, rồi
 
 ## Trạng thái hiện tại
 
-Repository hiện chỉ có Agent cục bộ với `status` và platform runtime. SAG Server, SAG
+Repository hiện chỉ có Agent cục bộ với platform runtime. SAG Server, SAG
 Service, cơ chế Service–Agent và Teacher Console chưa tồn tại. Xem
 [`architecture.md`](architecture.md) để biết code đang có.

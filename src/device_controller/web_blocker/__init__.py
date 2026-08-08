@@ -15,7 +15,7 @@ from tempfile import NamedTemporaryFile
 from typing import TextIO, cast
 from urllib.parse import urlsplit
 
-from agent.contracts import HostsPathOperations
+from agent.platform_protocols import HostsPathOperations
 from agent.platform import get_default_platform_services
 
 

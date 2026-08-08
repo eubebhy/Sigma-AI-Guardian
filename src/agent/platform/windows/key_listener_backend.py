@@ -17,7 +17,7 @@ import threading
 from queue import Empty, Queue
 from typing import Final, Protocol, cast
 
-from agent.contracts import KeyEvent, KeyState, MouseEvent, MouseState
+from agent.platform_protocols import KeyEvent, KeyState, MouseEvent, MouseState
 
 
 class _PynputListener(Protocol):

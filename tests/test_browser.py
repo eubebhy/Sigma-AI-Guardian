@@ -30,8 +30,7 @@ from test_support import add_source_path, run_module, test_modes
 
 add_source_path()
 
-from agent.capabilities import PlatformCapabilities
-from agent.contracts import (
+from agent.platform_protocols import (
     CursorOperations,
     InputBlockingOperations,
     InputControllerOperations,
@@ -123,7 +122,6 @@ class _FakeBrowserOperations:
 def _create_services(browser: _FakeBrowserOperations) -> PlatformServices:
     return PlatformServices(
         name="Test",
-        capabilities=PlatformCapabilities(platform_name="Test", items=()),
         processes=_FakeProcessOperations(),
         browser=browser,
         windows=_FakeWindowOperations(),
