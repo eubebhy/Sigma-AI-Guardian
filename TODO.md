@@ -1,172 +1,152 @@
 # SAG Agent roadmap
 
-Repository này hiện chỉ xây dựng **SAG Agent** chạy trên máy học sinh. Agent là
-tiến trình cục bộ có entry point, phát hiện Windows/Linux một lần và tạo adapter
-platform. CLI hiện chỉ có `status` an toàn; các feature desktop là public API độc
-lập, chưa có command dispatcher gọi chúng. Server, Teacher Console, mạng LAN, AI
-tool calling mới, UI mới và protocol mạng đều ngoài phạm vi hiện tại.
+## Phạm vi hiện tại
 
-## Output xác định cuối cùng
+Repository này xây dựng **SAG Agent cục bộ** chạy trên Windows/Linux.
 
-1. `src/main.py` là entry point duy nhất của SAG Agent và có lệnh `status` an
-   toàn để in platform/capability hiện tại.
-2. `src/agent/` là nơi duy nhất giữ runtime, contract, factory và lifecycle của
-   Agent.
-3. Code riêng Windows/Linux nằm trong `src/agent/platform/linux/` và
-   `src/agent/platform/windows/`. Feature không tự kiểm tra OS hoặc gọi binary
-   OS trực tiếp.
-4. Các public API hiện có (`open_tab`, `ProcessKiller`, `block`, `unblock`,
-   `lock`, `unlock`, input facade, classifier) vẫn dùng được.
-5. `docs/architecture.md` mô tả đầy đủ entry point, lớp kiến trúc, import,
-   lifecycle, capability, giới hạn nền tảng và lộ trình sau Agent.
-6. Test tự động dùng fake/mock, không đụng desktop, input device hay hosts thật
-   mặc định; Pyright strict đạt cho mã Python đã sửa.
+Đã có:
 
-## Platform foundation đã hoàn thành
+- `main.py` làm process entry point.
+- `AgentRuntime` tạo platform adapter đúng một lần.
+- Platform protocol cho process, browser, window, hosts và input.
+- Public feature API chạy độc lập với fake/mock test.
+- `Service` protocol với `start()` / `stop()`.
+- `Resource` protocol với `close()`.
 
-### 1. Runtime Agent
+Chưa có command dispatcher, local API, poll loop hoặc transport mạng.
+SAG Server, Teacher Console, LAN, remote desktop và remote shell nằm ngoài scope
+hiện tại.
 
-- Tạo model capability và contract nhỏ theo từng trách nhiệm: process, browser,
-  window và hosts path.
-- Tạo factory chọn platform đúng một lần và trả lỗi rõ cho OS không hỗ trợ.
-- Tạo lifecycle khởi tạo/dừng Agent; chỉ runtime được quyền tạo adapter OS.
-- Không tạo `PlatformBackend` khổng lồ, registry động hay dependency mới.
-
-### 2. Adapter Windows/Linux
-
-- Di chuyển `ps`/`os.kill` và `tasklist`/`taskkill` ra adapter process.
-- Di chuyển khác biệt `subprocess.Popen` mở browser ra adapter browser.
-- Di chuyển đường dẫn hosts và fallback window tracker (`xdotool`) ra adapter.
-- Giữ `utils/input_blocker` là facade compatibility;
-  chỉ sửa để runtime có thể dùng chúng rõ ràng hơn nếu thật sự cần.
-
-### 3. Feature Agent
-
-- `browser_tab`, `process_guard`, `web_blocker`, `window_tracker` chỉ nhận
-  contract/runtime chung và giữ API public cũ.
-- `screen_capture` và `screen_locker` giữ nguyên lifecycle hiện có; chỉ sử dụng
-  qua entry point/runtime khi feature có command Agent riêng.
-- Không thêm command điều khiển mới ngoài `status`; các feature hiện hữu không
-  được đổi hành vi chỉ để tái cấu trúc.
-
-Runtime, contracts và adapter Linux/Windows đã được tách. Public API feature giữ
-compatibility fallback; command dispatcher chưa tồn tại.
-
-## Next: SAG Agent Core
-
-Repository hiện có **platform foundation**, chưa có Agent nhận command: `main.py`
-tạo `AgentRuntime`, runtime chọn `PlatformServices` Linux/Windows một lần, rồi CLI
-chỉ in `status`. `AgentRuntime` không phải Server, không giao tiếp mạng và chưa sở
-hữu feature chạy lâu.
+## Nguyên tắc kiến trúc
 
 ```text
 main.py
   -> AgentRuntime
       -> PlatformServices
-          -> adapter Linux/Windows
-          -> feature local
+          -> Linux/Windows adapter
+      -> Service objects
+      -> Resource objects
+      -> Feature objects
 ```
 
-`PlatformServices` là túi adapter process/browser/window/hosts cho đúng OS. Các
-feature mới phải nhận `runtime.services` trực tiếp. `get_default_platform_services()`
-chỉ là compatibility fallback cho API cũ; xóa nó sau khi mọi feature đang dùng đã
-được migration sang dependency injection.
+- `main.py` chỉ bootstrap process và điều phối runtime.
+- `agent/platform_protocols.py` chứa protocol capability của platform.
+- `agent/protocols.py` chứa lifecycle protocol chung.
+- Feature không tự chọn OS hoặc gọi native command trực tiếp.
+- `get_default_platform_services()` chỉ giữ cho compatibility/test độc lập.
+- Không tạo registry động, global queue hoặc abstraction chưa có use case.
 
-## Phase 1: Command Core
+## Now: hoàn thiện AgentRuntime lifecycle
+
+### Service
+
+Service bắt buộc có:
+
+```python
+start() -> None
+stop() -> None
+```
+
+Tích hợp trước:
+
+- `ProcessGuard`.
+- `KeyLogger`.
+
+### Resource
+
+Resource bắt buộc có:
+
+```python
+close() -> None
+```
+
+Tích hợp các resource có native state hoặc resource dài hạn:
+
+- `ScreenCapture`.
+- Input controller.
+- Input blocker.
+- Key listener backend.
+- Screen locker, với `close()` giải phóng trạng thái lock.
+
+### AgentRuntime
+
+Thêm các trách nhiệm:
+
+1. `start_service(service)`: start thành công mới thêm vào danh sách started.
+2. `register_resource(resource)`: đăng ký resource do runtime sở hữu.
+3. `shutdown()`: stop service theo thứ tự ngược, sau đó close resource theo thứ tự
+   ngược.
+4. Cleanup tiếp tục khi một component lỗi.
+5. Shutdown idempotent.
+6. Đăng ký `atexit` làm fallback cho cleanup chính.
+
+**Xong khi:** fake test chứng minh start failure rollback, shutdown reverse order,
+cleanup tiếp tục sau lỗi và gọi shutdown nhiều lần an toàn.
+
+## Next: command core
 
 ```text
-CLI hiện tại / fake transport tương lai / TCP LAN tương lai
+CLI/local API tương lai
   -> CommandRequest
   -> AgentRuntime.execute()
-  -> validate action và args
+  -> validate action và arguments
   -> feature
   -> CommandResult
 ```
 
-Không tạo `AgentLoop`, Poll, queue global, registry động hoặc abstraction mới chưa
-cần. Transport không gọi feature trực tiếp và không tự chọn OS.
+1. Tạo `CommandRequest` và `CommandResult` tối giản.
+2. Thêm allowlist command tĩnh trong `AgentRuntime`.
+3. Route command tới feature qua dependency của runtime.
+4. Test command hợp lệ, command không tồn tại và lỗi feature.
 
-1. Thêm `CommandRequest` và `CommandResult` tối giản vào `agent.runtime`.
-2. Thêm `AgentRuntime.execute(command)` với allowlist tĩnh.
-3. Chỉ hỗ trợ `agent.status` trước; test action hợp lệ và action không tồn tại.
-4. Thêm `classifier.rule_based` sau khi flow `status` ổn định.
+**Xong khi:** transport không gọi feature trực tiếp và request lỗi không làm chết
+Agent runtime.
 
-**Xong khi:** CLI gọi `AgentRuntime.execute()` thay vì gọi `status()` trực tiếp; test
-fake chứng minh request được validate, route và trả result mà không đụng desktop.
+## Next: local API và poll loop
 
-## Phase 2: Lifecycle feature
+1. Định nghĩa local API contract `receive()`, `send()` và `close()`.
+2. Dùng fake local API trước khi chọn socket, pipe hoặc dependency transport.
+3. Implement `runtime.poll_once()` và `runtime.run()`.
+4. Poll loop phải có timeout, stop event và không busy-wait.
+5. Shutdown phải unblock local API và dừng loop sạch.
 
-Feature tự quản lý worker thread; Runtime chỉ là owner của feature mà nó đã start.
+## Next: config runtime
 
-```text
-process_guard.start -> Runtime giữ ProcessKiller -> feature tạo worker
-Agent shutdown      -> Runtime stop/close feature theo thứ tự ngược lúc start
-```
+1. Bootstrap path theo OS và path override cho dev/test.
+2. Load config theo `primary -> last-good -> fallback`.
+3. `AgentRuntime.update_config()` áp dụng config mới atomically.
+4. Config lỗi không làm mất config đang chạy.
+5. Feature nhận section config qua runtime, không đọc TOML global.
 
-1. Thêm `process_guard.start/stop` sau khi ownership và cleanup có test fake.
-2. Sau đó mới thêm `keylogger.start/stop`, `screen.lock/unlock` và `LocalModel.close`.
-3. Shutdown phải ngừng nhận command mới, dừng feature đang chạy và join worker có
-   timeout phù hợp.
-4. Hosts web block là persistent policy; không tự unblock khi Agent shutdown trừ khi
-   có command policy riêng.
+## Future: tối ưu WebBlocker
 
-**Xong khi:** shutdown hợp lệ không để worker/thread của feature do Runtime sở hữu
-chạy tiếp hoặc giữ input/UI state dở dang.
+1. Dùng binary AdGuard làm cơ chế block domain chính.
+2. Dùng hosts file làm fallback khi AdGuard không khả dụng.
+3. Hosts fallback ghi tối đa 9 domain trên một dòng.
+4. Cập nhật parser, marker transaction, remove/unblock và count tương ứng.
+5. Benchmark kích thước file, thời gian rewrite và độ trễ resolver trên Windows/Linux.
 
-## Phase 3: Transport LAN
+## Future: transport và deployment
 
-Chỉ bắt đầu sau khi Command Core và lifecycle ổn định:
+Chỉ bắt đầu sau khi command core, lifecycle và local API ổn định:
 
-```text
-network packet -> CommandRequest -> AgentRuntime.execute() -> CommandResult -> packet
-```
+- Transport LAN được xác thực.
+- SAG Server và Teacher Console.
+- Windows Service/systemd hoặc deployment tương ứng.
+- Reconnect và session management.
 
-Transport chỉ encode/decode và giao tiếp mạng. Nó không biết feature, Linux/Windows
-hay policy desktop. Không thêm polling hoặc persistent connection nếu chưa có yêu cầu
-nghiệp vụ.
+Không làm trước khi Agent Core ổn định:
 
-## Phase 4: Server và deployment
+- Remote desktop streaming.
+- Remote input qua mạng.
+- Remote shell.
+- Auto-elevation hoặc bypass quyền OS.
 
-```text
-Teacher Server <-> authenticated transport <-> Agent Core <-> Feature
-```
+## Verification bắt buộc
 
-Sau Agent Core mới quyết định TLS/authentication, systemd/OpenRC/Windows Service,
-reconnect, session helper, remote input và screen streaming. Remote desktop realtime
-là dự án riêng sau cùng.
+Mỗi phase phải có:
 
-## Không làm trước Phase 3
-
-- Server, Teacher Console, database, WebSocket, HTTP API hoặc LAN discovery.
-- Remote desktop streaming, remote input qua mạng, WebRTC hay screen relay.
-- Shell command từ xa, auto-elevation hoặc bypass quyền OS.
-
----
-
-# Backlog bảo trì từ ROI audit
-
-Chi tiết bằng chứng, phạm vi và cách kiểm chứng nằm trong
-[`ROI-reports/technical-debt.md`](ROI-reports/technical-debt.md) và
-[`ROI-reports/roadmap.md`](ROI-reports/roadmap.md). Không làm các mục này bằng
-refactor hàng loạt.
-
-## Đã hoàn thành
-
-1. `screen_locker` cleanup input/overlay có lifecycle test fake, gồm lỗi UI và input
-   blocker.
-2. `ProcessKiller` stop/start không để daemon cũ chạy song song; health state vẫn là
-   backlog riêng.
-3. Web blocker dùng sidecar lock liên-process và có concurrent-worker coverage.
-
-## P2
-
-1. Chuẩn hóa collection/gate test, đặc biệt classifier runner phải fail khi quality
-   expectation fail.
-2. Tách capability tĩnh và readiness runtime trước command đặc quyền.
-3. Đặt budget input/token cho classifier bằng benchmark và corpus cố định.
-
-## P3
-
-1. Model training deterministic, artifact manifest/hash và atomic write.
-2. Bounded queue Windows input, lock state UInput Linux, và xử lý window fallback/title collision.
-3. Chốt strategy dependency pin/lock và CI sau khi test gate xanh trên môi trường sạch.
+- Safe tests dùng fake/mock/temp path.
+- Không mở browser, khóa desktop, đọc input thật hoặc ghi hosts thật trong unit test.
+- `scripts/clean_pyright_check.sh` cho target Python đã sửa.
+- Cập nhật docs khi thay đổi boundary hoặc lifecycle.
