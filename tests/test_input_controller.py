@@ -417,6 +417,21 @@ def _load_linux_sender(module_name: str) -> tuple[ModuleType, _FakeUInput]:
     "Linux fake tests require Linux input dependencies",
 )
 class LinuxFakeTests(unittest.TestCase):
+    @test_modes("fake", "mock", "smoke")
+    def test_linux_operations_close_active_backend_once(self) -> None:
+        from agent.platform.linux import input_controller
+        from agent.platform.linux import input_controller_operations
+
+        operations = input_controller_operations.LinuxInputControllerOperations()
+        operations._active = True
+        input_controller_operations._active_operations = 1
+        with patch.object(input_controller, "close") as close:
+            operations.close()
+            operations.close()
+
+        self.assertEqual(input_controller_operations._active_operations, 0)
+        close.assert_called_once_with()
+
     @test_modes("smoke")
     def test_control_facades_export_control_operations(self) -> None:
         from device_controller.input_controller import linux
@@ -564,6 +579,14 @@ class WindowFakeTests(unittest.TestCase):
 
     def tearDown(self) -> None:
         sys.modules.pop("pydirectinput", None)
+
+    @test_modes("fake", "mock", "smoke")
+    def test_operations_close_is_noop(self) -> None:
+        from agent.platform.windows.input_controller_operations import (
+            WindowsInputControllerOperations,
+        )
+
+        WindowsInputControllerOperations().close()
 
     def test_exports_match_linux_and_are_lazy(self) -> None:
         package_name = "agent.platform.windows.input_controller"

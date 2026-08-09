@@ -33,18 +33,38 @@ def _map_label_to_category(label: str) -> ContentCategory | None:
     return MODEL_LABEL_TO_CATEGORY.get(label.lower())
 
 
-def local_ai_classifier(
-    text: str,
-    moderation_level: ModerationLevel = "mid",
-) -> ContentCategory:
-    """Phân loại text khi chênh lệch dự đoán đạt ngưỡng kiểm duyệt."""
+class LocalClassifier:
+    """Phân loại text và sở hữu model local cần được giải phóng."""
 
-    model_path = Path(__file__).resolve().parents[3] / "data" / "models" / "Ritchie.pkl"
-    ai = LocalModel(model_path=model_path)
-    try:
-        predictions = ai.predict(text, k=2)
-    finally:
-        ai.close()
+    def __init__(self, model_path: str | Path | None = None) -> None:
+        default_path = Path(__file__).resolve().parents[3] / "data" / "models" / "Ritchie.pkl"
+        self._model: LocalModel | None = LocalModel(model_path or default_path)
+
+    def classify(
+        self,
+        text: str,
+        moderation_level: ModerationLevel = "mid",
+    ) -> ContentCategory:
+        """Phân loại text khi chênh lệch dự đoán đạt ngưỡng kiểm duyệt."""
+
+        if self._model is None:
+            raise RuntimeError("LocalClassifier is closed")
+        predictions = self._model.predict(text, k=2)
+        return _select_category(predictions, moderation_level)
+
+    def close(self) -> None:
+        """Đóng model local do classifier này sở hữu."""
+
+        if self._model is not None:
+            self._model.close()
+            self._model = None
+
+
+def _select_category(
+    predictions: dict[str, float],
+    moderation_level: ModerationLevel,
+) -> ContentCategory:
+    """Chọn category từ các dự đoán đã xếp hạng giảm dần."""
 
     ranked_predictions = list(predictions.items())
     if not ranked_predictions:
@@ -62,3 +82,16 @@ def local_ai_classifier(
         return category
 
     return ContentCategory.Unknown
+
+
+def local_ai_classifier(
+    text: str,
+    moderation_level: ModerationLevel = "mid",
+) -> ContentCategory:
+    """Compatibility API phân loại text bằng một classifier ngắn hạn."""
+
+    classifier = LocalClassifier()
+    try:
+        return classifier.classify(text, moderation_level)
+    finally:
+        classifier.close()

@@ -8,6 +8,6 @@ Nguyên lý hoạt động: package này chỉ re-export API ổn định từ `
 caller không cần biết file nào đang chứa implementation chi tiết.
 """
 
-from content_classifier.local.classifier import local_ai_classifier
+from content_classifier.local.classifier import LocalClassifier, local_ai_classifier
 
-__all__ = ["local_ai_classifier"]
+__all__ = ["LocalClassifier", "local_ai_classifier"]

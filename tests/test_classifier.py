@@ -45,6 +45,7 @@ add_source_path()
 
 from content_classifier import content_classifier
 from content_classifier.clean_text import clean_text
+from content_classifier.local.classifier import LocalClassifier
 from content_classifier.local.local_model import LocalModel
 from content_classifier.rule_based import rule_based_classifier
 from content_classifier.tags import ContentCategory
@@ -246,6 +247,28 @@ class ClassifierTests(unittest.TestCase):
         ai.close()
 
         self.assertFalse(ai._monitor_thread.is_alive())
+
+    @test_modes("fake")
+    def test_local_model_close_removes_model_reference(self) -> None:
+        ai = LocalModel("missing-model.pkl")
+        cached_model = object()
+        ai._model = cached_model
+
+        ai.close()
+
+        self.assertIsNone(ai._model)
+
+    @test_modes("fake")
+    def test_local_classifier_closes_owned_model_once(self) -> None:
+        classifier = LocalClassifier()
+        model = classifier._model
+        assert model is not None
+
+        classifier.close()
+        classifier.close()
+
+        self.assertIsNone(classifier._model)
+        self.assertFalse(model._monitor_thread.is_alive())
 
     """Hồi quy an toàn cho các thành phần classifier không gọi model."""
 
