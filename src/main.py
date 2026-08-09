@@ -21,7 +21,7 @@ def main() -> int:
         return 0
 
     except KeyboardInterrupt:
-        logger.info("Agent bị interrupt; bắt đầu shutdown")
+        logger.info("Agent interrupted; starting shutdown")
         if agent is not None:
             agent.shutdown()
         return 0

@@ -26,7 +26,7 @@ class WindowsBrowserOperations:
             return True
         except OSError as error:
             logger.warning(
-                "Windows browser không thể khởi chạy bằng command %s; trả về False: %s",
+                "Windows browser could not launch command %s; returning False: %s",
                 command,
                 error,
             )

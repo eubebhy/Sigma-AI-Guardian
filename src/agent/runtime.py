@@ -33,22 +33,18 @@ class AgentRuntime:
     """
 
     services: PlatformServices
-    _active_services: list[Service] = field(
-        default_factory=lambda: cast(list[Service], [])
-    )
-    _resources: list[Resource] = field(
-        default_factory=lambda: cast(list[Resource], [])
-    )
+    _active_services: list[Service]
+    _resources: list[Resource]
 
     def shutdown(self):
         logger.info("Shutting down")
         for service in self._active_services:
             service.stop()
-            logger.info("Service %s đã dừng", type(service).__name__)
+            logger.info("Service %s stopped", type(service).__name__)
 
         for resource in self._resources:
             resource.close()
-            logger.info("Resource %s đã đóng", type(resource).__name__)
+            logger.info("Resource %s closed", type(resource).__name__)
 
 
 def create_runtime(platform_name: str | None = None) -> AgentRuntime:

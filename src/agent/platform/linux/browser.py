@@ -33,7 +33,7 @@ class LinuxBrowserOperations:
             return True
         except OSError as error:
             logger.warning(
-                "Linux browser không thể khởi chạy bằng command %s; trả về False: %s",
+                "Linux browser could not launch command %s; returning False: %s",
                 command,
                 error,
             )

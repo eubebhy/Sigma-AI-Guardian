@@ -69,7 +69,7 @@ def parse_modes(
 
     parser = _create_parser(
         "tests/tester.py [fake|mock|smoke ...]",
-        help_description or "Chạy real qua: tests/test_<feature>.py real [feature arguments ...]",
+        help_description or "Run real mode with: tests/test_<feature>.py real [feature arguments ...]",
     )
     values = tuple(arguments) if arguments is not None else tuple(sys.argv[1:])
     if values == ("--help",):
@@ -211,7 +211,7 @@ def run_suite(suite: unittest.TestSuite, modes: tuple[str, ...]) -> int:
 def run_module(module: ModuleType, arguments: Sequence[str] | None = None) -> int:
     """Chạy trực tiếp một file test feature."""
 
-    help_description = inspect.getdoc(module) or "Test feature không có mô tả."
+    help_description = inspect.getdoc(module) or "Test feature has no description."
     command = _parse_feature_command(arguments, help_description)
     if isinstance(command, _RealCommand):
         return _run_real(module, command.arguments)
@@ -284,7 +284,7 @@ def validate_test_file(file_path: Path) -> str | None:
     except SyntaxError as error:
         return f"syntax error: {error.msg}"
     if ast.get_docstring(tree) is None:
-        return "thiếu module docstring mô tả vai trò test"
+        return "missing module docstring describing the test role"
     imports_run_module = any(
         isinstance(node, ast.ImportFrom)
         and node.module == "test_support"
@@ -292,16 +292,16 @@ def validate_test_file(file_path: Path) -> str | None:
         for node in tree.body
     )
     if not imports_run_module:
-        return "không dùng run_module của test_support"
+        return "does not use run_module from test_support"
     shadows_run_module = any(_shadows_run_module(node) for node in tree.body)
     if shadows_run_module:
-        return "không được ghi đè run_module của test_support"
+        return "must not shadow run_module from test_support"
     for node in tree.body:
         if not isinstance(node, ast.If) or ast.unparse(node.test) != "__name__ == '__main__'":
             continue
         if _is_standard_entry_point(node):
             return None
-    return "entry point phải là SystemExit(run_module(sys.modules[__name__]))"
+    return "entry point must be SystemExit(run_module(sys.modules[__name__]))"
 
 
 def _is_standard_entry_point(node: ast.If) -> bool:

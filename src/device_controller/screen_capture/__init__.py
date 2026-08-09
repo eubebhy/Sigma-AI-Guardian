@@ -114,7 +114,7 @@ def capture(
         )
     except ScreenShotError as error:
         logger.warning(
-            "Screen capture backend thất bại với lỗi %s; tạo lại backend và retry",
+            "Screen capture backend failed with %s; recreating backend and retrying",
             error,
         )
         _capture_instance = _create_capture_backend()

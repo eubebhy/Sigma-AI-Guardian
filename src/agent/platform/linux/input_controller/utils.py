@@ -105,7 +105,7 @@ class UInputManager:
 
         if self._ui is not None:
             logger.warning(
-                "Virtual input device %s không khả dụng; đang tạo device thay thế",
+                "Virtual input device %s is unavailable; creating a replacement",
                 self._name,
             )
             self._ui.close()
