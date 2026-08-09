@@ -23,7 +23,6 @@ class LinuxWindowOperations:
     def _run_xdotool(self, *arguments: str) -> str:
         executable = shutil.which("xdotool")
         if executable is None:
-            logger.info("xdotool is unavailable; returning no window data")
             return ""
         try:
             result = subprocess.run(
@@ -32,11 +31,9 @@ class LinuxWindowOperations:
                 check=False,
                 text=True,
             )
-        except OSError as error:
-            logger.info("xdotool command failed: %s", error)
+        except OSError:
             return ""
         if result.returncode != 0:
-            logger.info("xdotool command returned exit code %s", result.returncode)
             return ""
         return result.stdout.strip()
 
@@ -57,7 +54,6 @@ class LinuxWindowOperations:
             active = window.title, window.getAppName()
             if any(active):
                 return active
-        logger.info("PyWinCtl did not return an active window; using xdotool fallback")
         return self._active_with_xdotool()
 
     def get_open_windows(self) -> dict[str, str]:
@@ -69,7 +65,6 @@ class LinuxWindowOperations:
         }
         if any(title or process for title, process in windows.items()):
             return windows
-        logger.info("PyWinCtl did not return visible windows; using xdotool fallback")
         return self._all_with_xdotool()
 
     def _all_with_xdotool(self) -> dict[str, str]:

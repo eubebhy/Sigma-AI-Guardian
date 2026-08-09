@@ -25,7 +25,11 @@ class WindowsBrowserOperations:
             subprocess.Popen(command, creationflags=0x00000200)
             return True
         except OSError as error:
-            logger.info("Windows browser launch failed for %r: %s", command, error)
+            logger.warning(
+                "Windows browser không thể khởi chạy bằng command %s; trả về False: %s",
+                command,
+                error,
+            )
             return False
 
     def open_default_url(self, url: str) -> bool:

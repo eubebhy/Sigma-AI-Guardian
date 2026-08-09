@@ -6,10 +6,14 @@ Output: `AgentRuntime` cung cấp service OS cho entry point.
 Nguyên lý: runtime tạo adapter đúng một lần và là owner của tài nguyên shutdown.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import cast
 
 from agent.platform import PlatformServices, create_platform_services
+from agent.protocols import Service, Resource
+from logging import getLogger
 
+logger = getLogger(__name__)
 """
 Khong nen de AgentRuntime tu su ly PlatformServices va dependencies cho cac tinh nang.
 Muc dinh la de de test, dependencies dong se de test hon.
@@ -29,6 +33,23 @@ class AgentRuntime:
     """
 
     services: PlatformServices
+    _active_services: list[Service] = field(
+        default_factory=lambda: cast(list[Service], [])
+    )
+    _resources: list[Resource] = field(
+        default_factory=lambda: cast(list[Resource], [])
+    )
+
+    def shutdown(self):
+        logger.info("Shutting down")
+        for service in self._active_services:
+            service.stop()
+            logger.info("Service %s đã dừng", type(service).__name__)
+
+        for resource in self._resources:
+            resource.close()
+            logger.info("Resource %s đã đóng", type(resource).__name__)
+
 
 def create_runtime(platform_name: str | None = None) -> AgentRuntime:
     """Tạo runtime Agent với adapter platform được chọn một lần."""

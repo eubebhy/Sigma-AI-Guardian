@@ -112,9 +112,10 @@ def capture(
             height=height,
             sample_ratio=sample_ratio,
         )
-    except ScreenShotError:
+    except ScreenShotError as error:
         logger.warning(
-            "Screen capture backend failed; recreating backend and retrying"
+            "Screen capture backend thất bại với lỗi %s; tạo lại backend và retry",
+            error,
         )
         _capture_instance = _create_capture_backend()
         return _capture_instance.capture(

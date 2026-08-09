@@ -32,7 +32,11 @@ class LinuxBrowserOperations:
                 )
             return True
         except OSError as error:
-            logger.info("Linux browser launch failed for %r: %s", command, error)
+            logger.warning(
+                "Linux browser không thể khởi chạy bằng command %s; trả về False: %s",
+                command,
+                error,
+            )
             return False
 
     def open_default_url(self, url: str) -> bool:
