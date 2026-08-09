@@ -25,6 +25,11 @@ Phần mềm quản lý phòng tin học dành cho giáo viên, tích hợp AI A
 * **Tính nhất quán:** Không thay đổi tên các Public API hiện có.
 * **Tài liệu hóa (Bằng tiếng Việt):** 
   * Tại mỗi package/module phức tạp, phải ghi chú rõ: Đường dẫn file (`file path`), chuẩn `input`, chuẩn `output` và nguyên lý hoạt động đi kèm với các chuẩn đó.
+* **Ngôn ngữ output:** Runtime logs, CLI output, test output và error messages phải
+  viết bằng English để thống nhất khi debug, tìm kiếm và tích hợp tooling.
+* **Ngôn ngữ code nội bộ (tạm thời):** Docstring, comment và ghi chú dành cho dev
+  trong source code viết bằng tiếng Việt. Quy tắc này chỉ áp dụng cho nội bộ code,
+  không áp dụng cho output người dùng.
 * **Tính di động (Portable):** Mã nguồn phải đảm bảo tính độc lập, sao chép sang thư mục khác vẫn hoạt động bình thường.
 * **Side effect:** Test tự động không được ghi hosts thật, kill process thật, mở
   browser, đọc/phát input thật, khóa desktop hoặc đọc dữ liệu người dùng. Dùng fake,

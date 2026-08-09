@@ -2,39 +2,28 @@
 
 File path: `src/main.py`.
 Input: không có command.
-Output: khởi tạo Agent và trả exit code.
+Output: khởi tạo Agent.
 """
 
-from agent import AgentRuntime, create_runtime
+from agent import create_runtime
 from logger import configure_logging
 from logging import getLogger
 
 
-def main() -> int:
+def main() -> None:
     """Khởi tạo Agent."""
-    logger = getLogger(__name__)
-    agent: AgentRuntime | None = None
-
-    try:
-        configure_logging()
-        agent = create_runtime()
-        return 0
-
-    except KeyboardInterrupt:
-        logger.info("Agent interrupted; starting shutdown")
-        if agent is not None:
-            agent.shutdown()
-        return 0
-
-    except Exception:
-        logger.critical(
-            "Agent gặp lỗi không thể khắc phục; process sẽ kết thúc",
-            exc_info=True,
-        )
-        if agent is not None:
-            agent.shutdown()
-        return 1
+    configure_logging()
+    create_runtime()
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    logger = getLogger(__name__)
+    try:
+        main()
+    except KeyboardInterrupt:
+        logger.info("Agent interrupted; stopping process")
+    except Exception:
+        logger.critical(
+            "Agent failed with an unrecoverable error; stopping process",
+            exc_info=True,
+        )
