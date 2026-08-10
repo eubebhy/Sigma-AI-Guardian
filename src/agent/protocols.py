@@ -11,9 +11,10 @@ Nguyên lý:
 - Owner cấp cao gọi lifecycle; object tự dọn resource nội bộ của nó.
 """
 
-from typing import Protocol
+from typing import Protocol, runtime_checkable
 
 
+@runtime_checkable
 class Service(Protocol):
     """Đối tượng vận hành chủ động, do AgentRuntime quyết định lúc start và stop.
 
@@ -21,13 +22,12 @@ class Service(Protocol):
     nhưng không thay thế `close()` khi service còn giữ resource cần giải phóng.
     """
 
-    def start(self) -> None:
-        ...
+    def start(self) -> None: ...
 
-    def stop(self) -> None:
-        ...
+    def stop(self) -> None: ...
 
 
+@runtime_checkable
 class Resource(Protocol):
     """Đối tượng giữ resource cần được owner đóng khi không còn dùng.
 
@@ -36,8 +36,7 @@ class Resource(Protocol):
     controller không giữ resource vẫn triển khai `close()` no-op để giữ contract.
     """
 
-    def close(self) -> None:
-        ...
+    def close(self) -> None: ...
 
 
 __all__ = ["Resource", "Service"]

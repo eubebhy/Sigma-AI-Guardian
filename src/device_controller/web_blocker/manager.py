@@ -62,6 +62,11 @@ class WebBlocker:
         self._policy = self._load_policy()
         self._is_reconciled = False
 
+    def close(self) -> None:
+        """Gỡ toàn bộ policy WebBlocker do object này quản lý."""
+
+        self.clear_all()
+
     def get_status(self) -> WebBlockStatus:
         """Trả trạng thái policy hiện tại để UI hiển thị."""
 

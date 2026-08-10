@@ -410,4 +410,33 @@ def _unlock_locked() -> bool:
     return True
 
 
-__all__ = ["lock", "unlock"]
+class ScreenLocker:
+    """Owner của trạng thái screen lock và cleanup khi Runtime shutdown."""
+
+    def __init__(
+        self,
+        input_operations: InputBlockingOperations | None = None,
+        cursor_operations: CursorOperations | None = None,
+    ) -> None:
+        self._input_operations = input_operations
+        self._cursor_operations = cursor_operations
+
+    def lock(
+        self,
+        header_text: str | None = None,
+        body_text: str | None = None,
+    ) -> None:
+        lock(
+            self._input_operations,
+            cursor_operations=self._cursor_operations,
+            header_text=header_text,
+            body_text=body_text,
+        )
+
+    def close(self) -> None:
+        """Mở khóa và dọn toàn bộ trạng thái screen lock."""
+
+        unlock()
+
+
+__all__ = ["ScreenLocker"]

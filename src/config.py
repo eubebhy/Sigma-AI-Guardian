@@ -131,7 +131,23 @@ _SECTION_FIELD_TYPES: dict[str, dict[str, object]] = {
 class AgentConfig:
     """Giữ config hiện tại; section là `None` trước lần load đầu tiên."""
 
-    __slots__ = tuple(_SECTION_TYPES)
+    system: SystemConfig
+    web_blocker: WebBlockerConfig
+    process_guard: ProcessGuardConfig
+    window_monitor: WindowMonitorConfig
+    classifier: ClassifierConfig
+    screen_monitor: ScreenMonitorConfig
+    screen_lock: ScreenLockConfig
+
+    __slots__ = (
+        "system",
+        "web_blocker",
+        "process_guard",
+        "window_monitor",
+        "classifier",
+        "screen_monitor",
+        "screen_lock",
+    )
 
     def __init__(self) -> None:
         for section_name in _SECTION_TYPES:

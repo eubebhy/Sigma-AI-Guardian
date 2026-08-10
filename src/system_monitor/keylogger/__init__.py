@@ -152,11 +152,16 @@ class KeyLogger:
                 stop_event.set()
         if listener is not None and listener is not threading.current_thread():
             listener.join()
+        with cls._listener_lock:
+            cls._buffer.clear()
+            cls._cursor = 0
+            cls._modifiers.clear()
+            cls._caps_lock = False
 
     @classmethod
     def _listen(cls, stop_event: threading.Event) -> None:
+        operations = cls._key_listener_operations
         try:
-            operations = cls._key_listener_operations
             events = (
                 listen_keys(timeout=0.1, stop_event=stop_event)
                 if operations is None
@@ -169,6 +174,8 @@ class KeyLogger:
         except Exception as error:
             cls._listener_error = error
         finally:
+            if operations is not None:
+                operations.close()
             with cls._listener_lock:
                 cls._listening = False
                 if cls._listener_stop_event is stop_event:
@@ -181,6 +188,7 @@ class KeyLogger:
         """Trả lỗi backend listener để caller manual có thể báo rõ."""
 
         return cls._listener_error
+
 
     @classmethod
     def raise_if_listener_failed(cls) -> None:
@@ -332,3 +340,6 @@ class KeyLogger:
         """Trả toàn bộ virtual buffer dưới dạng chuỗi, không xóa state."""
 
         return "".join(cls._buffer)
+
+
+__all__ = ["KeyLogger"]
