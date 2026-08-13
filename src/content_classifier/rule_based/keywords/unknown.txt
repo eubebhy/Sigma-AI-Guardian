@@ -303,3 +303,6 @@ uvicorn
 gunicorn
 celery
 redis
+Vietnam
+beat
+learning

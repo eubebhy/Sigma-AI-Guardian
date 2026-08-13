@@ -19,12 +19,15 @@ import logging
 from pathlib import Path
 from typing import Any
 
+
+# Cấu hình idle cleanup
 _GB = 1073741824  # 1024 ** 3 bytes
 _DEFAULT_IDLE_TIMEOUT_SECONDS = 167.0
 
 logger = logging.getLogger(__name__)
 
 
+# Tính thời gian giữ model trong bộ nhớ
 def _idle_timeout_seconds(model_path: Path) -> float:
     """Estimate how long the model can stay idle before it is unloaded."""
     try:
@@ -48,6 +51,7 @@ def _idle_timeout_seconds(model_path: Path) -> float:
     return max(6.7, timeout)
 
 
+# Resource của local model
 class LocalModel:
     """Quản lý vòng đời model local và cung cấp API dự đoán xác suất."""
 

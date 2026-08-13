@@ -11,9 +11,10 @@ from pathlib import Path
 from typing import Final
 
 from content_classifier.local.local_model import LocalModel
-from content_classifier.tags import ContentCategory
-from content_classifier.types import ModerationLevel
+from content_classifier.types import ContentCategory, ModerationLevel
 
+
+# Cấu hình kết quả dự đoán
 _UNKNOWN_MARGIN_THRESHOLDS: Final[dict[ModerationLevel, float]] = {
     "xlow": 0.3,
     "low": 0.167,
@@ -33,6 +34,7 @@ def _map_label_to_category(label: str) -> ContentCategory | None:
     return MODEL_LABEL_TO_CATEGORY.get(label.lower())
 
 
+# Resource của local classifier
 class LocalClassifier:
     """Phân loại text và sở hữu model local cần được giải phóng."""
 
@@ -60,6 +62,7 @@ class LocalClassifier:
             self._model = None
 
 
+# Chọn kết quả dự đoán
 def _select_category(
     predictions: dict[str, float],
     moderation_level: ModerationLevel,
@@ -84,6 +87,7 @@ def _select_category(
     return ContentCategory.Unknown
 
 
+# Compatibility API
 def local_ai_classifier(
     text: str,
     moderation_level: ModerationLevel = "mid",

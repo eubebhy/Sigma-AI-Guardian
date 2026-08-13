@@ -24,7 +24,7 @@ rule_result = rule_based_classifier("example text", "strict")
 ## COMPONENTS
 
 - `clean_text.py`: chuẩn hóa text.
-- `tags.py`, `types.py`: kiểu public.
+- `types.py`: kiểu public.
 - `rule_based/`: luật và keyword.
 - `local/`: local scikit-learn model qua `joblib`.
 

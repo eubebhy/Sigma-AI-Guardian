@@ -1,0 +1,764 @@
+# Cloudflare
+# Discord
+# Dropbox
+# Google Drive
+# MEGA
+# Reddit
+# Steam
+# Telegram
+# X / Twitter
+# YouTube
+$ clear
+$ ls -la *.py
+$ pwd
+-1
+-2
+-3.5
+0
+1
+1.67
+10
+10 20 30
+100
+100 25
+101
+12.5
+15
+2
+2 + 3
+2.5
+2023
+2024
+25
+3
+3.1. Trưng bày
+3.1. Xây dựng
+3.1. Ý tưởng
+3.14
+4
+42
+48 18
+5
+5 in numbers
+5.0
+5.3. Vật chất:
+7
+7-Zip
+7zFM.exe
+86461
+90061
+99
+<class 'int'>
+<class 'str'>
+>>> "Hi " * 3
+>>> 10 - 4
+>>> 10 > 3
+>>> 100 / 5
+>>> 12 +* 5
+>>> 17 % 5
+>>> 17 // 5
+>>> 2 ** 10
+>>> 2 + 3
+>>> 2 < 1
+>>> 5 != 4
+>>> 5 == 5
+>>> 7 * 8
+>>> bool(1)
+>>> class = 5
+>>> int("2.5")
+>>> int("25")
+>>> int("hai")
+>>> not True
+>>> print(42)
+>>> type("15")
+>>> type(15)
+>>> type(3.14)
+>>> x
+>>> x = 10
+>>> x = 25
+>>> _score = 9
+a = 17
+a, b = 0, 1
+a-b
+ABC
+accdb
+Access
+Access denied
+Acrobat Reader
+Address bar
+Alt Tab
+Animations
+App launcher
+append method
+Arduino
+Arduino IDE
+Assigned
+Assignments
+Assistant
+Attachment
+Audacity
+Audacity Cut
+AutoSave off
+b = 5
+backend error
+Backspace
+Bai tap Excel
+Bai tap Python
+Bai tap ve nha
+Bai van mau
+bai16.py
+bai20.py
+Bam F5 de chay
+Bang diem lop
+Bang tinh diem
+biến điểm
+Blender
+Blender lần 2
+Breakout room
+browser URL
+Brushes
+Bài luyện tập
+bài Tin học
+bảng điểm lớp
+C:\Python
+Calc
+calc.exe
+Calendar
+Camera
+Camera off
+cancel
+Canva
+Canva homework
+canva.com
+cd ~/python
+Chat
+Chrome
+chrome.exe
+chỉnh căn lề
+Chọn ảnh.
+Class code
+Class Notebook
+Classroom
+Classroom code
+Classwork
+clear
+Clear terminal
+Clipboard
+Clipchamp
+Close
+Close editor
+Close terminal
+cls
+cmd.exe
+Code copied
+code main.py
+Code pasted
+code.exe
+Code::Blocks
+command output
+Command Prompt
+Compile & Run
+Compiler log
+Compose
+conhost.exe
+continue
+Copied
+Copy
+Copy code
+Copying files
+count += 1
+count += 2
+count = 1
+count = 2
+Create new
+Ctrl A
+Ctrl C
+Ctrl D
+Ctrl F
+Ctrl H
+Ctrl L
+Ctrl S
+Ctrl Shift N
+Ctrl Shift P
+Ctrl Shift Z
+Ctrl V
+Ctrl Z
+cube_sum = 0
+Cài OS Di Động
+Cái gì đây
+Cắt các hình
+Date modified
+DCIM
+Debugging
+Design
+Desktop
+Desktop folder
+Desmos
+Dev-C++
+Dev-C++ lần 2
+dir
+Docs
+Dolphin
+Dong thu hai
+Down Arrow
+Download file
+Download XLSX
+Downloaded
+Downloads
+Drive
+Drive insert
+Drive link
+Dropbox là gì
+due date
+Due today
+dự án cuối kỳ.
+Edge
+Edit image
+Editing
+element
+else:
+empty string
+Enter
+Error copied
+error message
+Escape
+Euclid GCD
+even sum
+EVKey
+Excel
+Excel điểm
+Exit code zero
+Expected colon
+Explore
+Explorer
+explorer.exe
+export 1080p
+export PDF
+Exporting PDF
+Extract Here
+Extract To
+F5
+False
+Fibonacci
+fibonacci = []
+File created
+File deleted
+File Explorer
+File modified
+file nhóm
+file not found
+File renamed
+File saved
+filename
+Files
+Fill & Sign
+Filter views
+Find
+find method
+firefox
+firefox.exe
+Folder created
+folder path
+Forms
+Forms homework
+Formula bar
+Foxit Reader
+fps counter
+function call
+Game PIN
+GeoGebra
+Get-ChildItem
+Get-Location
+Ghép các hình
+ghép thuật ngữ
+GIMP
+git.exe
+GitHub Desktop
+Giới thiệu
+Gmail
+Gmail homework
+Gmail Inbox
+Gmail Spam
+Google
+Google Chrome
+Google Docs
+Google Drive
+Google Forms
+Google Meet
+Google Search
+Google Sheets
+Google Slides
+Grade posted
+Graded
+Graphing
+green flag
+Gợi ý cách làm
+Hello Python
+hello world
+Heron formula
+Hi Hi Hi
+Hidden items
+History
+Home tab
+Hải đăng Kê Gà
+hệ mặt trời
+i += 1
+i = 1
+idle
+IDLE editor
+IDLE homework
+IDLE Shell
+idle.exe
+if weight < 5:
+if x > 0:
+Image selected
+import math
+Impress
+Inbox
+Inbox - Gmail
+Infobox
+Inkscape
+Inkscape SVG
+input function
+Insert image
+Insert Table
+Install Now
+Installing pip
+iwd tren Linux
+java.exe
+Join
+Join - Kahoot
+Join class
+Join code
+Join meeting
+Join now
+Joined
+Kahoot
+Kahoot bài tập
+kahoot.it
+Keep anyway
+Keep text only
+kernel error
+Kernel is busy
+Kernel is idle
+Khan Academy
+Kimi AI là gì
+Latest release
+Launch Thonny
+Layers
+leap year
+Left Arrow
+libreoffice
+list example
+list maximum
+List methods
+list values
+Live mode
+Loading
+Local Disk C
+loop example
+Lop hoc Zoom
+Lop10A1
+lop7_zalo.docx
+Low disk space
+ls
+Lưu gì vậy
+Lưu tệp SVG
+main.py
+main.py - Vim
+main.py - VimR
+main.py - Xed
+Mark as done
+matched += 1
+matched = 0
+Math Assistant
+max_index = 0
+mBlock
+mBlock bài tập
+mBot
+Media Player
+Meet
+Meeting ID
+Message sent
+Microsoft 365
+Microsoft Edge
+Microsoft Word
+min_index = 0
+Missing
+Missing work
+mkdir Python
+More info
+mot,hai,ba
+motion block
+MS Forms
+MS OneDrive
+MS Photos
+MS Teams
+msedge.exe
+msiexec.exe
+MTP Device
+muoi
+Mute
+My Drive
+máy chiếu
+mô hình 3D
+mạng Internet
+mạng máy tính.
+mở file Excel
+mở file pptx
+mở Gmail
+mở PowerShell
+n
+Nautilus
+Network error
+New chat
+New File
+New folder
+New Form
+New mail
+New project
+New Slide
+New snip
+New Tab
+New terminal
+Nguyen Minh An
+Nguyen Van An
+ngày hội STEM
+ngày hội STEM.
+Ngã 3 Tân Minh
+Nhap canh a: 3
+Nhap canh b: 4
+Nhap canh c: 5
+Nhap n: 10
+Nhap n: 5
+Nhap nam: 2023
+Nhap nam: 2024
+Nhap ten: An
+Nhap tuoi: 15
+Nhap x: -2
+Nhap x: 10
+Nhom Teams lop
+No
+node.exe
+Noi dung sach
+Notebook saved
+notepad++.exe
+notepad.exe
+Nước mắm tĩn
+nộp Classroom
+OBS
+OBS Studio
+OCR text
+Office.com
+OLM
+OLM bài tập
+OLM Lớp học
+one two three
+OneDrive
+OneDrive link
+OneNote
+Open File
+Open folder
+Open IDLE
+Open PDF
+orange price
+OS cho máy yếu
+Outlook
+Outlook email
+package name
+Padlet
+Padlet bài tập
+Page Number
+Paint
+Paint homework
+Paint.NET
+Participants
+Paste
+Paste options
+Path not found
+Percent
+Phieu nhan xet
+phiếu khảo sát
+photoshop Cc
+PictoBlox
+Pictures
+pip list
+pip.exe
+plain text
+Play
+Playlist
+PowerPoint
+PowerShell
+powershell.exe
+Present screen
+Presenter View
+Preview
+Print Preview
+print("So am")
+print()
+print(a % b)
+print(a ** b)
+print(a // b)
+print(i)
+print(matched)
+print(name)
+print(product)
+print(result)
+print(text[0])
+print(tong)
+print(total)
+print(value)
+print(x + y)
+print(x)
+product *= i
+product = 1
+Publisher
+pwd
+py --version
+py.exe
+pycharm
+PyCharm Edu
+pycharm64.exe
+Python
+Python class
+Python docs
+Python error
+Python File
+Python folder
+Python IDLE
+python install
+python main.py
+Python notes
+Python PATH
+Python Setup
+Python Shell
+python.exe
+Python123
+pythonw.exe
+Questions
+Quick access
+Quizizz
+quizizz.com
+Quizlet
+Raise hand
+range function
+Read-only
+Ready
+Recent
+Recent files
+Record
+Record screen
+Recycle Bin
+Redo
+Rename file
+Render
+Replace
+Replit bài tập
+Required
+Restore window
+retry
+Returned work
+Right Arrow
+RSA và Mã Hóa
+Run
+Run anyway
+Run Module
+Running
+runtime input
+runtime result
+SafeSearch
+Save
+Save a copy
+Save all
+Save As
+save py file
+Saved
+Scene
+Scratch
+Scratch 3.0
+Scratch game
+Scratch Junior
+ScratchJr
+screen capture
+Search
+Search box
+search Gmail
+search query
+Search results
+Search the web
+Search this PC
+search video
+SearchHost.exe
+Select all
+Send file
+Serial Monitor
+Settings
+Setup Progress
+Shapes
+Share
+Share Screen
+Shared
+shared file
+Shared folder
+Sheets
+Shell
+Shift Tab
+Show in folder
+Slide Master
+Slide Pane
+Slide Sorter
+slider
+Slides
+Snip & Sketch
+So do tu duy
+soffice.bin
+Speaker Notes
+Spellcheck
+split method
+sprite Mèo
+spyder.exe
+Stack Overflow
+stage 480x360
+Standard
+Sticky notes
+stop
+Storage
+string digits
+string example
+String methods
+string value
+Student07
+Styles
+Submit
+Suggesting
+SUM
+SVG
+Sync complete
+Sync pending
+SyntaxError
+Sông Cà Ty
+sơ đồ tư duy
+sơ đồ tư duy.
+Sửa lỗi Kadane
+Tab
+Tab trong st
+Table Design
+Table open
+Team mode
+Teams
+Teams message
+telegram
+Telex
+Temp folder
+Template
+Templates
+Terminal
+Terminal open
+Test
+Test Student
+Text Document
+Text tool
+text.split()
+Theme
+Theme builder
+This PC
+Thonny
+Thonny bài tập
+Thonny Setup
+thonny.exe
+Thunar
+thuật toán.
+Timeline
+Tin hoc
+Tinkercad
+To Do tag
+tong = x + y
+total += count
+total += i
+total = 0
+Toán
+TP. Phan Thiết
+traceback
+traceback text
+Tran Thi Huong
+transition
+True
+trường em
+Turbo mode
+TurboWarp
+Turn in
+Turned in
+Tuấn khỉ là ai
+Tìm kiếm
+Tóm tắt KHTN 9
+Tư duy tỉ phú
+Tỷ lệ trúng xe
+Undo
+Unicode
+UniKey
+UniKeyNT
+Untitled
+Up Arrow
+Upload
+upload failed
+Upload folder
+URL copied
+UTF-8
+ValueError
+Variables
+Verify
+vertical tabs
+VioEdu
+VioEdu bài tập
+VioEdu lần 2
+Viêm da do nấm
+VLOOKUP
+VS Code
+VS Code Python
+Văn hóa Champa
+văn hóa đọc.
+Vẽ bông hoa
+Vẽ chùm bóng
+Vẽ lá cờ Lào
+Watch later
+where py
+where python
+where thonny
+while b != 0:
+Whiteboard
+Wi-Fi
+Wikipedia
+Window mode
+Windows Photos
+WinRAR
+WinRAR archive
+winword.exe
+Word
+Word căn lề
+Word paragraph
+Wordwall
+WPS Writer
+Writer
+x = 10
+x = 50
+Xoay đối tượng
+y
+y = 20
+Yes
+YouTube
+youtube.com
+Zalo
+Zalo bài tập
+Zalo homework
+Zalo on Ubuntu
+Zalo PC
+Zalo PC - Zalo
+zero
+ZIP - WinRAR
+Zoom
+Zoom bài tập
+Zoom Meeting
+Đồi cát Mũi Né
+Đổi màu tô
+created
+murdered

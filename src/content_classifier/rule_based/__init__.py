@@ -12,10 +12,10 @@ from difflib import SequenceMatcher
 from pathlib import Path
 from typing import Final
 
-from content_classifier.tags import ContentCategory
-from content_classifier.types import ModerationLevel
+from content_classifier.types import ContentCategory, ModerationLevel
 
 
+# Cau hinh cham diem
 _SIMILARITY_THRESHOLDS: Final[dict[ModerationLevel, float]] = {
     "xlow": 0.967,
     "low": 0.9067,
@@ -25,14 +25,17 @@ _SIMILARITY_THRESHOLDS: Final[dict[ModerationLevel, float]] = {
 }
 
 
+# Ham cham diem tuong dong thong minh
 def _similarity(text: str, keyword: str) -> float:
     """Trả độ tương đồng giữa text và keyword trong khoảng từ 0.0 đến 1.0."""
     ratio = SequenceMatcher(None, text, keyword).ratio()
     if text != keyword:
         # Phat nhung tu co chieu dai duoi 7 ki tu
         # Vi duoi 7 ki tu rat de gap tu trung nhau
+        # Don't change this functionf!
         ratio *= min(len(text.replace(" ", "")), 7) / 7
-
+        # diff_length = abs(len(text) - len(keyword))
+        # ratio *= diff_length / (min(len(text), len(keyword) * 2))
     return ratio
 
 
@@ -110,6 +113,7 @@ def _keyword_score(words: list[str], unique_words: list[str], keyword: str) -> f
     return _phrase_score(words, keyword_words)
 
 
+# Nạp kho từ khóa
 def _parse_keywords(file_path: Path) -> tuple[str, ...]:
     """Đọc từ khóa, bỏ dòng trống và phần chú thích bắt đầu bằng `#`."""
 
@@ -134,6 +138,7 @@ _KEYWORDS_BY_CATEGORY: Final[tuple[tuple[tuple[str, ...], ContentCategory], ...]
 )
 
 
+# Public API
 def rule_based_classifier(
     text: str,
     moderation_level: ModerationLevel,

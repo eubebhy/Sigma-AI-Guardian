@@ -37,6 +37,7 @@ import re
 import unicodedata
 
 
+# Bảng chuẩn hóa ký tự
 # Các ký tự vô hình thường được chèn vào giữa từ để né bộ lọc.
 ZERO_WIDTH_CHARS = {
     "\u200b": "",
@@ -88,6 +89,7 @@ LEET_CHARS = {
 SEP_CHARS = r"._/\\-"
 
 
+# Kho phrase chuẩn
 # Các phrase cung cấp từ chuẩn cho bước fuzzy matching. Chúng không trực tiếp
 # quyết định category; category vẫn do rule-based hoặc local AI xử lý.
 GAME_PHRASES = {
@@ -211,6 +213,7 @@ OBFUSCATED_WORDS = {
 }
 
 
+# Hàm chuẩn hóa ký tự
 def _translate_chars(text: str, table: dict[str, str]) -> str:
     """Thay từng ký tự theo bảng và giữ nguyên ký tự không có trong bảng."""
     return "".join(table.get(ch, ch) for ch in text)
@@ -244,6 +247,7 @@ def _leet_normalize_token(token: str) -> str:
     return "".join(LEET_CHARS.get(ch, ch) for ch in token)
 
 
+# Dữ liệu và hàm fuzzy matching
 # Chuẩn bị dữ liệu một lần khi import: tách mọi phrase thành từ đơn, chuẩn hoá,
 # loại trùng và sắp xếp để fuzzy matching có thứ tự ổn định.
 _PHRASE_WORDS = tuple(
@@ -290,6 +294,7 @@ def _closest_phrase_word(token: str) -> str:
     return closest_word
 
 
+# Hàm khôi phục token bị chia nhỏ
 def _join_separator_split_words(text: str) -> str:
     """Ghép token bị chèn dấu như `h-e-n-t-a-i` thành `hentai`.
 
@@ -398,6 +403,7 @@ def _collapse_spaces(text: str) -> str:
     return re.sub(r"\s+", " ", text).strip()
 
 
+# Public API
 def clean_text(text: str) -> str:
     """Chạy toàn bộ pipeline giảm obfuscation và trả text đã chuẩn hoá.
 

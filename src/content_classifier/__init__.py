@@ -9,23 +9,11 @@ thì ưu tiên rule-based vì match theo luật thường rõ ràng hơn AI.
 """
 
 from content_classifier.clean_text import clean_text
-from content_classifier.tags import ContentCategory
-from content_classifier.types import ModerationLevel
-
-_CLASSIFIER_CACHE: list[tuple[str, ModerationLevel, ContentCategory]] = []
+from content_classifier.local.classifier import LocalClassifier
+from content_classifier.types import ContentCategory, ModerationLevel
 
 
-def _get_cached_result(
-    text: str,
-    moderation_level: ModerationLevel,
-) -> ContentCategory | None:
-    """Trả kết quả đã cache của cùng text và mức kiểm duyệt."""
-    for cached_text, cached_level, result in _CLASSIFIER_CACHE:
-        if cached_text == text and cached_level == moderation_level:
-            return result
-    return None
-
-
+# Engine APIs
 def rule_based_classifier(
     text: str,
     moderation_level: ModerationLevel = "mid",
@@ -44,37 +32,70 @@ def local_ai_classifier(
     return _classifier(text, moderation_level)
 
 
+# Classifier chính
+class _Classifier:
+    """Classifier chính, sở hữu local AI và cache runtime."""
+
+    def __init__(self) -> None:
+        self._local_ai = LocalClassifier()
+        self._cache: list[tuple[str, ModerationLevel, ContentCategory]] = []
+
+    def get_cache(
+        self, text: str, moderation_level: ModerationLevel
+    ) -> None | ContentCategory:
+        for cached_text, cached_level, result in self._cache:
+            if cached_text == text and cached_level == moderation_level:
+                return result
+        return None
+
+    def classify(
+        self,
+        text: str,
+        moderation_level: ModerationLevel = "mid",
+    ) -> ContentCategory:
+
+        text = clean_text(text)
+        # Tim cache phu hop
+        cached_result = self.get_cache(text, moderation_level)
+        if cached_result:
+            return cached_result
+
+        # Neu tu qua ngan, rac -> Unknown
+        if len(text.replace(" ", "")) <= 2:
+            return ContentCategory.Unknown
+
+        result = rule_based_classifier(text, moderation_level)
+
+        # Neu van chua bat duoc boi rule_based_classifier va tu du dai thi cho localAI
+        if len(text.replace(" ", "")) > 3 and result == ContentCategory.Unknown:
+            result = self._local_ai.classify(text, moderation_level)
+
+        if len(self._cache) >= 256:
+            self._cache.pop(0)
+
+        self._cache.append((text, moderation_level, result))
+
+        return result
+
+    def close(self) -> None:
+        """Đóng local AI và xóa cache runtime."""
+
+        self._local_ai.close()
+        self._cache.clear()
+
+
+classifier = _Classifier()
+
+
+# Compatibility API
 def content_classifier(
     text: str,
     moderation_level: ModerationLevel = "mid",
 ) -> ContentCategory:
+    """Compatibility API gọi object classifier chính."""
 
-    text = clean_text(text)
+    return classifier.classify(text, moderation_level)
 
-    # Lay cache neu co
-    cached_result = _get_cached_result(text, moderation_level)
-    if cached_result is not None:
-        return cached_result
 
-    letter_count = len(text.replace(" ", ""))
-
-    # Neu qua ngan
-    if letter_count <= 2:
-        return ContentCategory.Unknown
-
-    # Neu co 3 ki tu thi de rule eng
-    if letter_count == 3:
-        result = rule_based_classifier(text, moderation_level)
-
-    else:
-        # Rule engine duoc uu tien; local AI chi xu ly khi rule khong match.
-        # Giai thich: Rule engine don gian, neu da match thi thuong dung
-        result = rule_based_classifier(text, moderation_level)
-        if result == ContentCategory.Unknown:
-            result = local_ai_classifier(text, moderation_level)
-
-    if len(_CLASSIFIER_CACHE) >= 256:
-        _CLASSIFIER_CACHE.pop(0)
-
-    _CLASSIFIER_CACHE.append((text, moderation_level, result))
-    return result
+# Public exports
+__all__ = ["classifier"]
