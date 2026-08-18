@@ -12,6 +12,10 @@ from content_classifier.clean_text import clean_text
 from content_classifier.local.classifier import LocalClassifier
 from content_classifier.types import ContentCategory, ModerationLevel
 
+# TODO: Them he thong timeout
+# TODO: Them he thong multi threading noi bo de tang toc
+# TODO: Su ly cac truong hop van ban can phan loai qua dai
+
 
 # Engine APIs
 def rule_based_classifier(

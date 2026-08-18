@@ -48,10 +48,10 @@ from content_classifier.clean_text import clean_text
 from content_classifier.local.classifier import LocalClassifier
 from content_classifier.local.local_model import LocalModel
 from content_classifier.rule_based import rule_based_classifier
-from content_classifier.tags import ContentCategory
-from content_classifier.types import ModerationLevel
+from content_classifier.types import ModerationLevel, ContentCategory
 
 
+# Kiểu dữ liệu và nguồn test cases
 EngineName: TypeAlias = Literal["main", "rule", "local", "cloud"]
 Classifier: TypeAlias = Callable[[str, ModerationLevel], ContentCategory]
 
@@ -64,6 +64,7 @@ QUALITY_CASE_FILES = {
 }
 
 
+# Parser cho real commands
 class _RealArgumentParser(argparse.ArgumentParser):
     """Parser real trả lỗi cho caller thay vì kết thúc safe test process."""
 
@@ -91,7 +92,9 @@ def _create_real_parser() -> argparse.ArgumentParser:
         choices=("main", "rule", "local", "cloud"),
         default="main",
     )
-    corpus.add_argument("--order", choices=("sequential", "random"), default="sequential")
+    corpus.add_argument(
+        "--order", choices=("sequential", "random"), default="sequential"
+    )
     return parser
 
 
@@ -107,6 +110,7 @@ def _parse_real_arguments(arguments: Sequence[str]) -> argparse.Namespace | None
     return command
 
 
+# Đọc test cases
 class ClassifierCase(TypedDict):
     """Một case phẳng cho một target classifier."""
 
@@ -132,6 +136,7 @@ def _load_quality_cases(case_file: Path) -> list[str]:
     ]
 
 
+# Chọn classifier engine
 def _get_engine(engine: EngineName) -> tuple[str, Classifier] | None:
     """Trả classifier được yêu cầu, hoặc ``None`` khi backend chưa có."""
 
@@ -155,6 +160,7 @@ def _get_engine(engine: EngineName) -> tuple[str, Classifier] | None:
     return "cloud", cast(Classifier, cloud_classifier)
 
 
+# Chạy corpus
 def _selected_quality_cases(
     theme: str,
     count: int,
@@ -189,20 +195,24 @@ def _run_corpus(
         except Exception as error:
             print(f"[FAIL][{theme}] {text} | error={error}")
             traceback.print_exc()
-            print(f"Summary: {passed}/{len(cases)} passed, {len(cases) - passed} failed")
+            print(
+                f"Summary: {passed}/{len(cases)} passed, {len(cases) - passed} failed"
+            )
             print(f"Elapsed: {time.monotonic() - started:.3f}s")
             return 1
         is_passed = actual == expected
         if is_passed:
             passed += 1
-        status = "PASS" if is_passed else "FAIL"
-        print(f"[{status}][{theme}] {text} | expected={expected.name} got={actual.name}")
+            print(f"[PASS][{theme}] {text}")
+        else:
+            print(f"[FAIL][{theme}] {text} | got={actual.name}")
     failed = len(cases) - passed
     print(f"Summary: {passed}/{len(cases)} passed, {failed} failed")
     print(f"Elapsed: {time.monotonic() - started:.3f}s")
     return 0 if failed == 0 else 1
 
 
+# Real command entry point
 def run_real(arguments: Sequence[str]) -> int:
     """Chạy CLI classifier có chủ đích, không được gọi bởi safe suite."""
 
@@ -239,6 +249,7 @@ def run_real(arguments: Sequence[str]) -> int:
     return _run_corpus(engine_name, classifier, cases, moderation_level)
 
 
+# Automated tests
 class ClassifierTests(unittest.TestCase):
     @test_modes("fake")
     def test_local_model_close_joins_idle_monitor(self) -> None:
@@ -308,7 +319,14 @@ class RealClassifierCommandTests(unittest.TestCase):
 
     def test_parse_real_text_command(self) -> None:
         command = _parse_real_arguments(
-            ("text", "example text", "--engine", "rule", "--moderation-level", "strict"),
+            (
+                "text",
+                "example text",
+                "--engine",
+                "rule",
+                "--moderation-level",
+                "strict",
+            ),
         )
 
         self.assertIsNotNone(command)
@@ -328,10 +346,13 @@ class RealClassifierCommandTests(unittest.TestCase):
             calls.append((text, moderation_level))
             return ContentCategory.Unknown
 
-        with patch(
-            __name__ + "._get_engine",
-            return_value=("rule", fake_classifier),
-        ), redirect_stdout(StringIO()):
+        with (
+            patch(
+                __name__ + "._get_engine",
+                return_value=("rule", fake_classifier),
+            ),
+            redirect_stdout(StringIO()),
+        ):
             result = run_real(("text", "safe text", "--engine", "rule"))
 
         self.assertEqual(result, 0)

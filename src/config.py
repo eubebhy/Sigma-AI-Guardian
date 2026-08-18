@@ -108,6 +108,8 @@ class ScreenMonitorConfig(_ConfigSection):
 
 @dataclass(frozen=True)
 class ScreenLockConfig(_ConfigSection):
+    enabled: bool
+    timeout: int
     message: str
 
 

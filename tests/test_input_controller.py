@@ -24,45 +24,33 @@ thật, nên không chạy hai lệnh này trong automated test.
 
 from __future__ import annotations
 
-import argparse
-import contextlib
-import io
+import code
 import importlib
 import os
 import shutil
 import sys
-import time
 import traceback
 import unittest
 from collections.abc import Callable, Sequence
 from types import ModuleType
-from typing import Any, ClassVar, TypeAlias, cast
-from unittest.mock import patch
+from typing import Any, ClassVar, cast
+from unittest.mock import Mock, patch
 
 from test_support import add_source_path, run_module, test_modes
 
 add_source_path()
 
-try:
-    if not sys.platform.startswith("linux"):
-        raise ModuleNotFoundError
-    from evdev import ecodes
-    from device_controller.input_controller import linux as linux_api
-    from agent.platform.linux.input_controller import sendinput_kb, sendinput_mouse
-    from agent.platform.linux.input_controller import utils as linux_utils
-    from device_controller.input_controller.types import MouseButton
-    from utils import key_listener
-except ModuleNotFoundError:
-    _linux_fake_tests_available = False
-    ecodes = cast(Any, None)
-    linux_api = cast(Any, None)
-    sendinput_kb = cast(Any, None)
-    sendinput_mouse = cast(Any, None)
-    linux_utils = cast(Any, None)
-    MouseButton = cast(Any, None)
-    key_listener = cast(Any, None)
-else:
-    _linux_fake_tests_available = True
+if not sys.platform.startswith("linux"):
+    raise ModuleNotFoundError
+from evdev import ecodes
+from agent.platform.linux.input_controller import LinuxInput
+from agent.platform.linux.input_controller import sendinput_mouse
+from agent.platform.linux.input_controller import utils as linux_utils
+from device_controller.input_controller import Input
+from utils import key_listener
+
+_linux_fake_tests_available = True
+linux_api = LinuxInput()
 
 _BACKEND_API = (
     "click",
@@ -81,26 +69,6 @@ _BACKEND_API = (
     "write",
 )
 
-Command: TypeAlias = tuple[str, tuple[str, ...]]
-_ACTION_ARGUMENTS = {
-    "--key-down": 1,
-    "--key-up": 1,
-    "--press": 1,
-    "--write": 1,
-    "--mouse-down": 1,
-    "--mouse-up": 1,
-    "--click": 1,
-    "--spam-click": 2,
-    "--move-to": 2,
-    "--move-rel": 2,
-    "--scroll": 1,
-    "--side-scroll": 1,
-    "--position": 0,
-    "--delay": 1,
-    "--list-keys": 0,
-}
-_MOUSE_BUTTONS = {"left", "right", "middle", "forward", "back"}
-
 
 class _InvalidCommandError(Exception):
     """Báo input CLI không hợp lệ trước khi thực hiện side effect."""
@@ -108,79 +76,6 @@ class _InvalidCommandError(Exception):
 
 class _PrerequisiteError(Exception):
     """Báo Linux, quyền hoặc desktop session chưa sẵn sàng."""
-
-
-def _build_control_parser() -> argparse.ArgumentParser:
-    parser = argparse.ArgumentParser(
-        description="Run Linux keyboard/mouse actions in flag order.",
-    )
-    parser.add_argument("--key-down", metavar="KEY")
-    parser.add_argument("--key-up", metavar="KEY")
-    parser.add_argument("--press", metavar="KEY")
-    parser.add_argument("--write", metavar="TEXT")
-    parser.add_argument("--mouse-down", metavar="BUTTON")
-    parser.add_argument("--mouse-up", metavar="BUTTON")
-    parser.add_argument("--click", metavar="BUTTON")
-    parser.add_argument("--spam-click", nargs=2, metavar=("BUTTON", "COUNT"))
-    parser.add_argument("--move-to", nargs=2, metavar=("X", "Y"))
-    parser.add_argument("--move-rel", nargs=2, metavar=("X", "Y"))
-    parser.add_argument("--scroll", metavar="AMOUNT")
-    parser.add_argument("--side-scroll", metavar="AMOUNT")
-    parser.add_argument("--position", action="store_true")
-    parser.add_argument("--delay", metavar="SECONDS")
-    parser.add_argument("--list-keys", action="store_true")
-    return parser
-
-
-def _parse_control_commands(arguments: Sequence[str]) -> list[Command]:
-    commands: list[Command] = []
-    index = 0
-    while index < len(arguments):
-        action = arguments[index]
-        count = _ACTION_ARGUMENTS.get(action)
-        if count is None:
-            raise _InvalidCommandError(f"unknown action: {action}")
-        values = tuple(arguments[index + 1:index + count + 1])
-        if len(values) != count:
-            raise _InvalidCommandError(f"{action} requires {count} value(s)")
-        commands.append((action, values))
-        index += count + 1
-    if not commands:
-        raise _InvalidCommandError("control requires at least one action")
-    return commands
-
-
-def _validate_control_commands(commands: Sequence[Command]) -> None:
-    for action, values in commands:
-        if action in {"--key-down", "--key-up", "--press"}:
-            if values[0] not in linux_api.supportedKeys():
-                raise _InvalidCommandError(f"unsupported key: {values[0]}")
-        elif action in {"--mouse-down", "--mouse-up", "--click", "--spam-click"}:
-            if values[0] not in _MOUSE_BUTTONS:
-                raise _InvalidCommandError(f"unsupported mouse button: {values[0]}")
-            if action == "--spam-click" and _parse_int(values[1], action) < 1:
-                raise _InvalidCommandError("--spam-click COUNT must be greater than zero")
-        elif action in {"--move-to", "--move-rel"}:
-            _parse_int(values[0], action)
-            _parse_int(values[1], action)
-        elif action in {"--scroll", "--side-scroll"}:
-            _parse_int(values[0], action)
-        elif action == "--delay" and _parse_float(values[0], action) < 0:
-            raise _InvalidCommandError("--delay SECONDS must not be negative")
-
-
-def _parse_int(value: str, action: str) -> int:
-    try:
-        return int(value)
-    except ValueError as error:
-        raise _InvalidCommandError(f"{action} requires an integer") from error
-
-
-def _parse_float(value: str, action: str) -> float:
-    try:
-        return float(value)
-    except ValueError as error:
-        raise _InvalidCommandError(f"{action} requires a number") from error
 
 
 def _preflight_control() -> None:
@@ -195,8 +90,8 @@ def _preflight_control() -> None:
         raise _PrerequisiteError("missing required binary: xinput")
     try:
         key_listener.get_num_lock_state()
-    except Exception as error:
-        raise _PrerequisiteError("cannot connect to the X11 display") from error
+    except Exception as e:
+        raise _PrerequisiteError(f"cannot connect to the X11 display: {e}") from e
 
 
 def _require_linux() -> None:
@@ -204,52 +99,111 @@ def _require_linux() -> None:
         raise _PrerequisiteError("real input commands require Linux")
 
 
-def _prepare_devices() -> None:
-    sendinput_kb._get_ui()
-    sendinput_mouse._get_ui()
+def _run_control_shell() -> None:
+    """Mở Python shell với một Input resource và các method đã preload."""
+
+    input_resource = Input()
+    namespace: dict[str, object] = {
+        "input": input_resource,
+        "input_help": _print_input_help,
+    }
+    for name in _BACKEND_API:
+        namespace[name] = getattr(input_resource, name)
+    try:
+        code.interact(
+            banner=(
+                "Input control shell is ready.\n"
+                "Call input_help() to view available test APIs.\n"
+                "Run multiple calls with ';', for example: "
+                "moveTo(500, 300); click().\n"
+                "Use exit(), quit(), or Ctrl+D to close Input and leave."
+            ),
+            local=namespace,
+        )
+    finally:
+        input_resource.close()
 
 
-def _execute_control(command: Command) -> None:
-    action, values = command
-    print(action, *values, flush=True)
-    if action == "--write":
-        linux_api.write(values[0])
-    elif action == "--key-down":
-        linux_api.keyDown(values[0])
-    elif action == "--key-up":
-        linux_api.keyUp(values[0])
-    elif action == "--press":
-        linux_api.press(values[0])
-    elif action == "--mouse-down":
-        linux_api.mouseDown(cast(MouseButton, values[0]))
-    elif action == "--mouse-up":
-        linux_api.mouseUp(cast(MouseButton, values[0]))
-    elif action == "--click":
-        linux_api.click(button=cast(MouseButton, values[0]))
-    elif action == "--spam-click":
-        _spam_click(cast(MouseButton, values[0]), _parse_int(values[1], action))
-    elif action == "--move-to":
-        linux_api.moveTo(_parse_int(values[0], action), _parse_int(values[1], action))
-    elif action == "--move-rel":
-        linux_api.moveRel(_parse_int(values[0], action), _parse_int(values[1], action))
-    elif action == "--scroll":
-        linux_api.scroll(_parse_int(values[0], action))
-    elif action == "--side-scroll":
-        linux_api.sideScroll(_parse_int(values[0], action))
-    elif action == "--position":
-        print("position:", linux_api.position(), flush=True)
-    elif action == "--delay":
-        time.sleep(_parse_float(values[0], action))
-    else:
-        print("keys:", " ".join(linux_api.supportedKeys()), flush=True)
+def _print_input_help() -> None:
+    """In hướng dẫn API điều khiển đã preload trong manual shell."""
 
+    print(
+        """# position(take_new: bool = False) -> tuple[int, int]
+Return the current cursor position as (x, y). The take_new argument is retained
+for API compatibility and does not change the current behavior.
+Example: position()
 
-def _spam_click(button: MouseButton, count: int) -> None:
-    started = time.perf_counter()
-    for _ in range(count):
-        linux_api.click(button=button)
-    elapsed = time.perf_counter() - started
-    print(f"spam-click: {count / elapsed:.2f} CPS", flush=True)
+# moveTo(x: int | None, y: int | None, duration: float = 0.0) -> None
+Move the cursor to an absolute screen position. Use None to keep one axis at its
+current value. Duration is the movement time in seconds.
+Examples: moveTo(500, 300); moveTo(None, 400, duration=1.0)
+
+# moveRel(x: int | None, y: int | None, duration: float = 0.0) -> None
+Move the cursor relative to its current position. Positive x moves right,
+positive y moves down, and None means zero movement on that axis.
+Examples: moveRel(100, -50); moveRel(None, 200, duration=0.5)
+
+# click(x: int | None = None, y: int | None = None,
+#       button: Literal['primary', 'secondary', 'middle', 'forward', 'back']
+#       = 'primary') -> None
+Click at (x, y), or click at the current position when both coordinates are
+None. primary is left click and secondary is right click.
+Examples: click(); click(500, 300); click(button='secondary')
+
+# mouseDown(button: Literal['primary', 'secondary', 'middle', 'forward',
+#           'back']) -> None
+Press and hold a mouse button. Call mouseUp with the same button to release it.
+Example: mouseDown('primary')
+
+# mouseUp(button: Literal['primary', 'secondary', 'middle', 'forward',
+#         'back']) -> None
+Release a mouse button previously held with mouseDown.
+Example: mouseUp('primary')
+
+# scroll(amount: int) -> None
+Scroll vertically. A positive amount scrolls up; a negative amount scrolls down.
+Examples: scroll(3); scroll(-3)
+
+# sideScroll(amount: int) -> None
+Scroll horizontally. A positive amount scrolls right; a negative amount scrolls
+left.
+Examples: sideScroll(3); sideScroll(-3)
+
+# keyDown(key: str) -> None
+Press and hold one supported keyboard key. Use supportedKeys() to inspect valid
+key names. Call keyUp with the same key to release it.
+Example: keyDown('leftctrl')
+
+# keyUp(key: str) -> None
+Release one keyboard key previously held with keyDown.
+Example: keyUp('leftctrl')
+
+# press(keys: str | Sequence[str]) -> None
+Press and release one key or each key in a sequence. A sequence is processed in
+order; it does not hold the keys as a chord.
+Examples: press('enter'); press(['a', 'b', 'enter'])
+
+# write(message: str, interval: float = 0.0) -> None
+Type text. Interval is the delay in seconds after each character. Use
+supportedWriteCharacters() to inspect characters accepted by the active backend.
+Examples: write('Hello'); write('Slow text', interval=0.1)
+
+# supportedKeys() -> tuple[str, ...]
+Return all key names accepted by keyDown, keyUp, and press.
+Example: supportedKeys()
+
+# supportedWriteCharacters() -> str
+Return all characters accepted by write on the active backend.
+Example: supportedWriteCharacters()
+
+# input.close() -> None
+Close all resources owned by this Input. The shell closes it automatically on
+exit. Do not call another input API after closing it.
+
+Multiple calls can be executed on one line:
+moveTo(500, 300); click(); write('Hello'); press('enter')
+mouseDown('primary'); moveRel(100, 0); mouseUp('primary')"""
+    )
 
 
 def run_real(arguments: Sequence[str]) -> int:
@@ -260,16 +214,10 @@ def run_real(arguments: Sequence[str]) -> int:
         if not values:
             raise _InvalidCommandError("real requires control or logger")
         if values[0] == "control":
-            if values[1:] in {("--help",), ("-h",)}:
-                _build_control_parser().print_help()
-                return 0
-            commands = _parse_control_commands(values[1:])
-            _validate_control_commands(commands)
+            if len(values) != 1:
+                raise _InvalidCommandError("control does not accept arguments")
             _preflight_control()
-            print("Preparing virtual devices", flush=True)
-            _prepare_devices()
-            for command in commands:
-                _execute_control(command)
+            _run_control_shell()
             return 0
         if values[0] == "logger":
             from test_key_listener import run_real as run_listener_real
@@ -292,75 +240,27 @@ def run_real(arguments: Sequence[str]) -> int:
 
 
 class RealCommandFakeTests(unittest.TestCase):
-    def test_control_parser_accepts_legacy_flags_without_dependencies(self) -> None:
-        values = _build_control_parser().parse_args([
-            "--key-down", "a", "--move-to", "5", "6", "--position",
-        ])
+    def test_control_shell_preloads_api_and_closes_input(self) -> None:
+        input_resource = Mock()
+        shell_namespace: dict[str, object] = {}
 
-        self.assertEqual(values.key_down, "a")
-        self.assertEqual(values.move_to, ["5", "6"])
-        self.assertTrue(values.position)
+        def capture_shell(banner: str, local: dict[str, object]) -> None:
+            del banner
+            shell_namespace.update(local)
 
-    def test_control_preserves_action_order_and_reports_results(self) -> None:
-        calls: list[tuple[object, ...]] = []
-
-        def record(name: str) -> Callable[..., object]:
-            def _record(*values: object, **options: object) -> object:
-                calls.append((name, *values, *options.values()))
-                if name == "position":
-                    return 10, 20
-                return None
-
-            return _record
-
-        output = io.StringIO()
         with (
+            patch(__name__ + ".Input", return_value=input_resource),
             patch(__name__ + "._preflight_control"),
-            patch(__name__ + "._prepare_devices"),
-            patch.object(linux_api, "keyDown", record("keyDown")),
-            patch.object(linux_api, "click", record("click")),
-            patch.object(linux_api, "moveTo", record("moveTo")),
-            patch.object(linux_api, "position", record("position")),
-            patch.object(linux_api, "supportedKeys", return_value=["a"]),
-            contextlib.redirect_stdout(output),
+            patch.object(code, "interact", side_effect=capture_shell),
         ):
-            result = run_real(
-                ("control", "--key-down", "a", "--move-to", "5", "6",
-                 "--click", "left", "--position")
-            )
+            result = run_real(("control",))
 
         self.assertEqual(result, 0)
-        self.assertEqual(calls, [
-            ("keyDown", "a"), ("moveTo", 5, 6), ("click", "left"),
-            ("position",),
-        ])
-        self.assertEqual(output.getvalue().splitlines(), [
-            "Preparing virtual devices", "--key-down a", "--move-to 5 6",
-            "--click left", "--position", "position: (10, 20)",
-        ])
-
-    def test_control_rejects_invalid_commands_before_preparing_devices(self) -> None:
-        output = io.StringIO()
-        with (
-            patch(__name__ + "._prepare_devices") as prepare,
-            contextlib.redirect_stderr(output),
-        ):
-            result = run_real(("control", "--spam-click", "left", "zero"))
-
-        self.assertEqual(result, 2)
-        prepare.assert_not_called()
-        self.assertIn("requires an integer", output.getvalue())
-
-    def test_control_reports_unavailable_linux_prerequisite(self) -> None:
-        output = io.StringIO()
-        with (
-            patch(__name__ + "._preflight_control", side_effect=_PrerequisiteError("no X11")),
-            contextlib.redirect_stderr(output),
-        ):
-            result = run_real(("control", "--position"))
-
-        self.assertEqual(result, 2)
-        self.assertIn("no X11", output.getvalue())
+        self.assertIs(shell_namespace["input"], input_resource)
+        self.assertIs(shell_namespace["input_help"], _print_input_help)
+        for name in _BACKEND_API:
+            self.assertIs(shell_namespace[name], getattr(input_resource, name))
+        input_resource.close.assert_called_once_with()
 
     def test_legacy_logger_command_delegates_to_key_listener(self) -> None:
         with patch("test_key_listener.run_real", return_value=0) as logger:
@@ -371,6 +271,7 @@ class RealCommandFakeTests(unittest.TestCase):
             ("logger", "--kb"),
             error_prefix="input_controller",
         )
+
 
 class _FakeUInput:
     last_instance: ClassVar[_FakeUInput | None] = None
@@ -395,7 +296,7 @@ class _FakeUInput:
         self.closed = True
 
 
-def _load_linux_sender(module_name: str) -> tuple[ModuleType, _FakeUInput]:
+def _load_linux_sender(module_name: str, class_name: str) -> tuple[object, _FakeUInput]:
     sys.modules.pop(module_name, None)
     _FakeUInput.last_instance = None
     with (
@@ -405,11 +306,12 @@ def _load_linux_sender(module_name: str) -> tuple[ModuleType, _FakeUInput]:
     ):
         module = importlib.import_module(module_name)
         assert _FakeUInput.last_instance is None
-        cast(Callable[[], object], getattr(module, "_get_ui"))()
+        sender = cast(Callable[[], object], getattr(module, class_name))()
+        cast(Callable[[], object], getattr(sender, "get_ui"))()
     fake = _FakeUInput.last_instance
     assert fake is not None
     wait.assert_called_once_with(fake.name)
-    return module, fake
+    return sender, fake
 
 
 @unittest.skipUnless(
@@ -418,42 +320,93 @@ def _load_linux_sender(module_name: str) -> tuple[ModuleType, _FakeUInput]:
 )
 class LinuxFakeTests(unittest.TestCase):
     @test_modes("fake", "mock", "smoke")
-    def test_linux_operations_close_active_backend_once(self) -> None:
+    def test_input_object_owns_and_closes_backend(self) -> None:
         from agent.platform.linux import input_controller
-        from agent.platform.linux import input_controller_operations
 
-        operations = input_controller_operations.LinuxInputControllerOperations()
-        operations._active = True
-        input_controller_operations._active_operations = 1
-        with patch.object(input_controller, "close") as close:
-            operations.close()
-            operations.close()
+        input_resource = input_controller.LinuxInput()
+        with (
+            patch.object(input_resource._keyboard, "close") as close_keyboard,
+            patch.object(input_resource._mouse, "close") as close_mouse,
+        ):
+            self.assertTrue(callable(input_resource.click))
+            input_resource.close()
+            input_resource.close()
+            with self.assertRaisesRegex(RuntimeError, "Input is closed"):
+                input_resource.position()
 
-        self.assertEqual(input_controller_operations._active_operations, 0)
-        close.assert_called_once_with()
+        close_keyboard.assert_called_once_with()
+        close_mouse.assert_called_once_with()
+        self.assertIsNone(input_resource._keyboard)
+        self.assertIsNone(input_resource._mouse)
 
     @test_modes("smoke")
-    def test_control_facades_export_control_operations(self) -> None:
-        from device_controller.input_controller import linux
+    def test_public_package_exports_only_input_class(self) -> None:
+        import device_controller.input_controller as input_package
 
+        self.assertEqual(input_package.__all__, ["Input"])
         for name in _BACKEND_API:
-            self.assertTrue(callable(getattr(linux, name)))
+            self.assertFalse(hasattr(input_package, name))
+
+    @test_modes("fake", "mock", "smoke")
+    def test_public_input_uses_supplied_backend(self) -> None:
+        backend = Mock()
+        first = Input(backend)
+        second = Input(backend)
+        self.assertIsNot(first, second)
+        self.assertIs(cast(Any, first)._backend, backend)
+        self.assertIs(cast(Any, second)._backend, backend)
+
+    @test_modes("fake", "mock", "smoke")
+    def test_public_input_delegates_and_releases_backend(self) -> None:
+        backend = Mock()
+        backend.position.return_value = (10, 20)
+        input_resource = Input(backend)
+
+        input_resource.click(1, 2, "secondary")
+        self.assertEqual(input_resource.position(), (10, 20))
+        input_resource.close()
+        input_resource.close()
+
+        backend.click.assert_called_once_with(1, 2, "secondary")
+        self.assertEqual(backend.close.call_count, 2)
+
+    @test_modes("fake", "mock", "smoke")
+    def test_public_input_uses_default_backend(self) -> None:
+        backend = Mock()
+        with patch("agent.platform.get_default_platform_services") as get_services:
+            get_services.return_value.input_controller = backend
+            input_resource = Input()
+
+        self.assertIs(cast(Any, input_resource)._backend, backend)
+        input_resource.close()
+        backend.close.assert_called_once_with()
+
+    @test_modes("fake", "mock", "smoke")
+    def test_public_input_retains_backend_when_cleanup_fails(self) -> None:
+        backend = Mock()
+        backend.close.side_effect = [RuntimeError("cleanup failed"), None]
+        input_resource = Input(backend)
+
+        with self.assertRaisesRegex(RuntimeError, "cleanup failed"):
+            input_resource.close()
+        input_resource.close()
+
+        self.assertEqual(backend.close.call_count, 2)
 
     def test_keyboard_capabilities_and_events(self) -> None:
-        module, fake = _load_linux_sender(
-            "agent.platform.linux.input_controller.sendinput_kb"
+        keyboard, fake = _load_linux_sender(
+            "agent.platform.linux.input_controller.sendinput_kb", "KeyboardInput"
         )
         self.assertTrue(fake.name.startswith("Sigma Virtual Keyboard "))
         self.assertEqual(fake.capabilities[ecodes.EV_REP], [])
         for code in (ecodes.KEY_A, ecodes.KEY_Z, ecodes.KEY_F1, ecodes.KEY_KPENTER):
             self.assertIn(code, fake.capabilities[ecodes.EV_KEY])
-        module.keyDown("a")
-        module.keyUp("a")
-        module.press("a")
+        cast(Any, keyboard).keyDown("a")
+        cast(Any, keyboard).keyUp("a")
+        cast(Any, keyboard).press("a")
         self.assertEqual(
             fake.writes,
-            [(ecodes.EV_KEY, ecodes.KEY_A, 1), (ecodes.EV_KEY, ecodes.KEY_A, 0)]
-            * 2,
+            [(ecodes.EV_KEY, ecodes.KEY_A, 1), (ecodes.EV_KEY, ecodes.KEY_A, 0)] * 2,
         )
         self.assertEqual(fake.synced, 4)
 
@@ -476,23 +429,34 @@ class LinuxFakeTests(unittest.TestCase):
 
     def test_linux_exports_all_public_operations(self) -> None:
         for name in (
-            "keyDown", "keyUp", "press", "write", "click", "moveTo", "moveRel"
+            "keyDown",
+            "keyUp",
+            "press",
+            "write",
+            "click",
+            "moveTo",
+            "moveRel",
         ):
             self.assertTrue(callable(getattr(linux_api, name)))
 
     def test_mouse_capabilities_motion_and_scrolling(self) -> None:
-        module, fake = _load_linux_sender(
-            "agent.platform.linux.input_controller.sendinput_mouse"
+        mouse, fake = _load_linux_sender(
+            "agent.platform.linux.input_controller.sendinput_mouse", "MouseInput"
         )
         self.assertEqual(
             fake.capabilities[ecodes.EV_KEY],
-            [ecodes.BTN_LEFT, ecodes.BTN_RIGHT, ecodes.BTN_MIDDLE,
-             ecodes.BTN_EXTRA, ecodes.BTN_SIDE],
+            [
+                ecodes.BTN_LEFT,
+                ecodes.BTN_RIGHT,
+                ecodes.BTN_MIDDLE,
+                ecodes.BTN_EXTRA,
+                ecodes.BTN_SIDE,
+            ],
         )
-        with patch.object(module, "position", return_value=(10, 20)):
-            module.moveTo(15, 17)
-        module.scroll(-2)
-        module.sideScroll(3)
+        with patch.object(mouse, "position", return_value=(10, 20)):
+            cast(Any, mouse).moveTo(15, 17)
+        cast(Any, mouse).scroll(-2)
+        cast(Any, mouse).sideScroll(3)
         self.assertEqual(
             fake.writes,
             [
@@ -504,19 +468,23 @@ class LinuxFakeTests(unittest.TestCase):
         )
 
     def test_mouse_relative_duration_and_none_axis(self) -> None:
-        module, fake = _load_linux_sender(
-            "agent.platform.linux.input_controller.sendinput_mouse"
+        mouse, fake = _load_linux_sender(
+            "agent.platform.linux.input_controller.sendinput_mouse", "MouseInput"
         )
-        with patch.object(module.time, "sleep") as sleep:
-            module.moveRel(10, 0, duration=0.2)
-            module.moveRel(None, 1)
-        self.assertEqual(fake.writes[:4], [
-            (ecodes.EV_REL, ecodes.REL_X, 5),
-            (ecodes.EV_REL, ecodes.REL_Y, 0),
-            (ecodes.EV_REL, ecodes.REL_X, 5),
-            (ecodes.EV_REL, ecodes.REL_Y, 0),
-        ])
+        with patch.object(sendinput_mouse.time, "sleep") as sleep:
+            cast(Any, mouse).moveRel(10, 0, duration=0.2)
+            cast(Any, mouse).moveRel(None, 1)
+        self.assertEqual(
+            fake.writes[:4],
+            [
+                (ecodes.EV_REL, ecodes.REL_X, 5),
+                (ecodes.EV_REL, ecodes.REL_Y, 0),
+                (ecodes.EV_REL, ecodes.REL_X, 5),
+                (ecodes.EV_REL, ecodes.REL_Y, 0),
+            ],
+        )
         self.assertEqual(sleep.call_args_list, [((0.1,),), ((0.1,),)])
+
 
 class _FakeDirectInput(ModuleType):
     def __init__(self) -> None:
@@ -539,7 +507,9 @@ class _FakeDirectInput(ModuleType):
     def write(self, text: str, **options: object) -> None:
         self.calls.append(("write", text, options.get("_pause")))
 
-    def click(self, x: int | None = None, y: int | None = None, **options: object) -> None:
+    def click(
+        self, x: int | None = None, y: int | None = None, **options: object
+    ) -> None:
         self.calls.append(("click", x, y, options.get("button"), options.get("_pause")))
 
     def mouseDown(self, **options: object) -> None:
@@ -553,10 +523,14 @@ class _FakeDirectInput(ModuleType):
         return 10, 20
 
     def moveTo(self, x: int, y: int, **options: object) -> None:
-        self.calls.append(("moveTo", x, y, options.get("duration"), options.get("_pause")))
+        self.calls.append(
+            ("moveTo", x, y, options.get("duration"), options.get("_pause"))
+        )
 
     def moveRel(self, x: int, y: int, **options: object) -> None:
-        self.calls.append(("moveRel", x, y, options.get("duration"), options.get("_pause")))
+        self.calls.append(
+            ("moveRel", x, y, options.get("duration"), options.get("_pause"))
+        )
 
     def scroll(self, amount: int, **options: object) -> None:
         self.calls.append(("scroll", amount, options.get("_pause")))
@@ -581,21 +555,22 @@ class WindowFakeTests(unittest.TestCase):
         sys.modules.pop("pydirectinput", None)
 
     @test_modes("fake", "mock", "smoke")
-    def test_operations_close_is_noop(self) -> None:
-        from agent.platform.windows.input_controller_operations import (
-            WindowsInputControllerOperations,
-        )
+    def test_input_object_can_be_closed(self) -> None:
+        from agent.platform.windows import input_controller
 
-        WindowsInputControllerOperations().close()
+        input_resource = input_controller.WindowsInput()
+        self.assertTrue(callable(input_resource.click))
+        input_resource.close()
+        input_resource.close()
+        with self.assertRaisesRegex(RuntimeError, "Input is closed"):
+            input_resource.position()
 
-    def test_exports_match_linux_and_are_lazy(self) -> None:
+    def test_backend_is_internal_and_lazy(self) -> None:
         package_name = "agent.platform.windows.input_controller"
         for name in ("pydirectinput",):
             sys.modules.pop(name, None)
         window = importlib.import_module(package_name)
-        self.assertEqual(window.__all__, list(_BACKEND_API))
-        for name in _BACKEND_API:
-            self.assertTrue(hasattr(window, name))
+        self.assertEqual(window.__all__, [])
 
     def test_keyboard_delegates_and_normalizes_names(self) -> None:
         keyboard = importlib.import_module(
@@ -605,10 +580,15 @@ class WindowFakeTests(unittest.TestCase):
         keyboard.keyUp("leftctrl")
         keyboard.press(["a", "enter"])
         keyboard.write("A!")
-        self.assertEqual(self.fake.calls, [
-            ("down", "ctrlleft", False), ("up", "ctrlleft", False),
-            ("press", ("a", "enter"), False), ("write", "A!", False),
-        ])
+        self.assertEqual(
+            self.fake.calls,
+            [
+                ("down", "ctrlleft", False),
+                ("up", "ctrlleft", False),
+                ("press", ("a", "enter"), False),
+                ("write", "A!", False),
+            ],
+        )
         self.assertIn("leftctrl", keyboard.supportedKeys())
         self.assertIn("A", keyboard.supportedWriteCharacters())
 
@@ -624,12 +604,19 @@ class WindowFakeTests(unittest.TestCase):
         mouse.moveRel(0, 0, duration=0.9)
         mouse.scroll(-3)
         mouse.sideScroll(2)
-        self.assertEqual(self.fake.calls, [
-            ("click", None, None, "x1", False), ("down", "x2", False),
-            ("up", "middle", False), ("position",),
-            ("moveTo", 15, 13, 0.6, False), ("moveRel", 0, 0, 0.9, False),
-            ("scroll", -3, False), ("hscroll", 2, False),
-        ])
+        self.assertEqual(
+            self.fake.calls,
+            [
+                ("click", None, None, "x1", False),
+                ("down", "x2", False),
+                ("up", "middle", False),
+                ("position",),
+                ("moveTo", 15, 13, 0.6, False),
+                ("moveRel", 0, 0, 0.9, False),
+                ("scroll", -3, False),
+                ("hscroll", 2, False),
+            ],
+        )
 
 
 if __name__ == "__main__":

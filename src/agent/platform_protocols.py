@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections.abc import Iterator, Sequence
 from pathlib import Path
 import threading
-from typing import Literal, Protocol, TypeAlias
+from typing import Callable, Literal, Protocol, TypeAlias
 
 
 Key: TypeAlias = str
@@ -143,6 +143,8 @@ class KeyListenerOperations(Protocol):
 class InputControllerOperations(Protocol):
     """Gửi keyboard và mouse event theo public API chung."""
 
+    _closed: bool
+
     def click(
         self,
         x: int | None = None,
@@ -177,5 +179,10 @@ class InputControllerOperations(Protocol):
     def write(self, message: str, interval: float = 0.0) -> None: ...
 
     def close(self) -> None:
-        """Đóng virtual device và connection được adapter cache."""
+        """Đóng virtual device và connection được adapter cache.
+        Linux ONLY"""
+        ...
+
+    def create(self) -> None:
+        """Tao UInput device ben Linux"""
         ...

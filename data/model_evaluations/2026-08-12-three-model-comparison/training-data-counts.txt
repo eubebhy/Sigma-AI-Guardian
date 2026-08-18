@@ -1,0 +1,9 @@
+   941 data/training/game/long_game.txt
+   250 data/training/game/short_game.txt
+   679 data/training/gore/long_gore.txt
+    37 data/training/gore/short_gore.txt
+  1057 data/training/pornography/long_pornography.txt
+   531 data/training/pornography/short_pornography.txt
+  8487 data/training/unknown/long_unknown.txt
+   762 data/training/unknown/short_unknown.txt
+ 12744 total

@@ -57,11 +57,7 @@ _KEY_NAMES = {
 }
 _SHARED_KEY_NAMES = {name: shared for shared, name in _KEY_NAMES.items()}
 
-
-def _input() -> Any:
-    """Import dependency Windows tại thời điểm thực sự gửi input."""
-
-    return cast(Any, importlib.import_module("pydirectinput"))
+import pydirectinput as dinput
 
 
 def _key_name(key: Key) -> str:
@@ -73,35 +69,34 @@ def _key_name(key: Key) -> str:
 def keyDown(key: Key) -> None:
     """Nhấn và giữ một phím."""
 
-    _input().keyDown(_key_name(key), _pause=False)
+    dinput.keyDown(_key_name(key), _pause=False)
 
 
 def keyUp(key: Key) -> None:
     """Thả một phím."""
 
-    _input().keyUp(_key_name(key), _pause=False)
+    dinput.keyUp(_key_name(key), _pause=False)
 
 
 def press(keys: Key | Sequence[Key]) -> None:
     """Nhấn rồi thả tuần tự các phím."""
 
     key_names = (keys,) if isinstance(keys, str) else tuple(keys)
-    _input().press(tuple(_key_name(key) for key in key_names), _pause=False)
+    dinput.press(tuple(_key_name(key) for key in key_names), _pause=False)
 
 
 def write(message: str, interval: float = 0.0) -> None:
     """Gõ text theo layout US và để thư viện tự xử lý Shift."""
 
-    _input().write(message, interval=interval, auto_shift=True, _pause=False)
+    dinput.write(message, interval=interval, auto_shift=True, _pause=False)
 
 
 def supportedKeys() -> tuple[str, ...]:
     """Trả key name mà `pydirectinput-rgx` đang hỗ trợ."""
 
-    mappings = cast(dict[str, object], _input().KEYBOARD_MAPPING)
+    mappings = cast(dict[str, object], dinput.KEYBOARD_MAPPING)
     return tuple(
-        _SHARED_KEY_NAMES[key] if key in _SHARED_KEY_NAMES else key
-        for key in mappings
+        _SHARED_KEY_NAMES[key] if key in _SHARED_KEY_NAMES else key for key in mappings
     )
 
 

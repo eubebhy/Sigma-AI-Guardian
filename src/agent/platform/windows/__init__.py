@@ -11,9 +11,7 @@ from agent.platform.windows.browser import WindowsBrowserOperations
 from agent.platform.windows.cursor import WindowsCursorOperations
 from agent.platform.windows.hosts import WindowsHostsPathOperations
 from agent.platform.windows.input_blocker import WindowsInputBlockingOperations
-from agent.platform.windows.input_controller_operations import (
-    WindowsInputControllerOperations,
-)
+from agent.platform.windows.input_controller import WindowsInput
 from agent.platform.windows.key_listener import WindowsKeyListenerOperations
 from agent.platform.windows.processes import WindowsProcessOperations
 from agent.platform.windows.windows import WindowsWindowOperations
@@ -30,6 +28,6 @@ def create_services() -> PlatformServices:
         hosts=WindowsHostsPathOperations(),
         input_blocker=WindowsInputBlockingOperations(),
         key_listener=WindowsKeyListenerOperations(),
-        input_controller=WindowsInputControllerOperations(),
+        input_controller=WindowsInput(),
         cursor_controller=WindowsCursorOperations(),
     )

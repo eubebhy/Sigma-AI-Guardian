@@ -342,4 +342,7 @@ class KeyLogger:
         return "".join(cls._buffer)
 
 
-__all__ = ["KeyLogger"]
+key_logger = KeyLogger()
+
+
+__all__ = ["key_logger"]

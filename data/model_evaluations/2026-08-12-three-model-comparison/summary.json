@@ -1,0 +1,538 @@
+{
+  "evaluation": {
+    "date": "2026-08-12",
+    "cases_per_level": 953,
+    "levels": [
+      "xlow",
+      "low",
+      "mid",
+      "strict",
+      "xstrict"
+    ],
+    "order": "sequential",
+    "flow": "clean_text -> rule_based -> local model fallback"
+  },
+  "models": {
+    "git-3990c652": {
+      "path": "data/models/Ritchie-git-3990c652.pkl",
+      "sha256": "a363bded34bbae10c9a543ac1fb992894f0e8c044fc74d4b37487a8a6536dc75",
+      "levels": {
+        "xlow": {
+          "passed": 773,
+          "failed": 180,
+          "total": 953,
+          "accuracy": 0.8111227701993704,
+          "classroom_false_positives": 5,
+          "classroom_false_positive_rate": 0.01098901098901099,
+          "prohibited_false_negatives": 168,
+          "prohibited_recall": 0.6626506024096386,
+          "prohibited_precision": 0.9641791044776119,
+          "confusion": {
+            "Game->Game": 116,
+            "Game->Pornography": 1,
+            "Game->Unknown": 2,
+            "Gore->Gore": 101,
+            "Gore->Pornography": 3,
+            "Gore->Unknown": 58,
+            "Pornography->Gore": 3,
+            "Pornography->Pornography": 106,
+            "Pornography->Unknown": 108,
+            "Unknown->Gore": 3,
+            "Unknown->Pornography": 2,
+            "Unknown->Unknown": 450
+          }
+        },
+        "low": {
+          "passed": 783,
+          "failed": 170,
+          "total": 953,
+          "accuracy": 0.8216159496327388,
+          "classroom_false_positives": 6,
+          "classroom_false_positive_rate": 0.013186813186813187,
+          "prohibited_false_negatives": 151,
+          "prohibited_recall": 0.6967871485943775,
+          "prohibited_precision": 0.9461756373937678,
+          "confusion": {
+            "Game->Game": 117,
+            "Game->Pornography": 1,
+            "Game->Unknown": 1,
+            "Gore->Gore": 106,
+            "Gore->Pornography": 3,
+            "Gore->Unknown": 53,
+            "Pornography->Game": 2,
+            "Pornography->Gore": 7,
+            "Pornography->Pornography": 111,
+            "Pornography->Unknown": 97,
+            "Unknown->Game": 1,
+            "Unknown->Gore": 3,
+            "Unknown->Pornography": 2,
+            "Unknown->Unknown": 449
+          }
+        },
+        "mid": {
+          "passed": 800,
+          "failed": 153,
+          "total": 953,
+          "accuracy": 0.8394543546694648,
+          "classroom_false_positives": 11,
+          "classroom_false_positive_rate": 0.024175824175824177,
+          "prohibited_false_negatives": 118,
+          "prohibited_recall": 0.7630522088353414,
+          "prohibited_precision": 0.9104859335038363,
+          "confusion": {
+            "Game->Game": 118,
+            "Game->Pornography": 1,
+            "Gore->Game": 2,
+            "Gore->Gore": 116,
+            "Gore->Pornography": 5,
+            "Gore->Unknown": 39,
+            "Pornography->Game": 5,
+            "Pornography->Gore": 11,
+            "Pornography->Pornography": 122,
+            "Pornography->Unknown": 79,
+            "Unknown->Game": 3,
+            "Unknown->Gore": 5,
+            "Unknown->Pornography": 3,
+            "Unknown->Unknown": 444
+          }
+        },
+        "strict": {
+          "passed": 791,
+          "failed": 162,
+          "total": 953,
+          "accuracy": 0.8300104931794333,
+          "classroom_false_positives": 23,
+          "classroom_false_positive_rate": 0.05054945054945055,
+          "prohibited_false_negatives": 106,
+          "prohibited_recall": 0.7871485943775101,
+          "prohibited_precision": 0.8650602409638555,
+          "confusion": {
+            "Game->Game": 119,
+            "Gore->Game": 4,
+            "Gore->Gore": 116,
+            "Gore->Pornography": 5,
+            "Gore->Unknown": 37,
+            "Pornography->Game": 11,
+            "Pornography->Gore": 13,
+            "Pornography->Pornography": 124,
+            "Pornography->Unknown": 69,
+            "Unknown->Game": 12,
+            "Unknown->Gore": 7,
+            "Unknown->Pornography": 4,
+            "Unknown->Unknown": 432
+          }
+        },
+        "xstrict": {
+          "passed": 694,
+          "failed": 259,
+          "total": 953,
+          "accuracy": 0.7282266526757608,
+          "classroom_false_positives": 124,
+          "classroom_false_positive_rate": 0.2725274725274725,
+          "prohibited_false_negatives": 96,
+          "prohibited_recall": 0.8072289156626506,
+          "prohibited_precision": 0.6901140684410646,
+          "confusion": {
+            "Game->Game": 119,
+            "Gore->Game": 8,
+            "Gore->Gore": 118,
+            "Gore->Pornography": 5,
+            "Gore->Unknown": 31,
+            "Pornography->Game": 12,
+            "Pornography->Gore": 14,
+            "Pornography->Pornography": 126,
+            "Pornography->Unknown": 65,
+            "Unknown->Game": 107,
+            "Unknown->Gore": 10,
+            "Unknown->Pornography": 7,
+            "Unknown->Unknown": 331
+          }
+        }
+      }
+    },
+    "current": {
+      "path": "data/models/Ritchie.pkl",
+      "sha256": "736ce2689b0795fc266a67c5ae937d6635d389af15600a11e5bdad389fb6a072",
+      "levels": {
+        "xlow": {
+          "passed": 765,
+          "failed": 188,
+          "total": 953,
+          "accuracy": 0.8027282266526757,
+          "classroom_false_positives": 5,
+          "classroom_false_positive_rate": 0.01098901098901099,
+          "prohibited_false_negatives": 177,
+          "prohibited_recall": 0.6445783132530121,
+          "prohibited_precision": 0.9662576687116564,
+          "confusion": {
+            "Game->Game": 116,
+            "Game->Pornography": 1,
+            "Game->Unknown": 2,
+            "Gore->Gore": 99,
+            "Gore->Pornography": 3,
+            "Gore->Unknown": 60,
+            "Pornography->Gore": 2,
+            "Pornography->Pornography": 100,
+            "Pornography->Unknown": 115,
+            "Unknown->Gore": 3,
+            "Unknown->Pornography": 2,
+            "Unknown->Unknown": 450
+          }
+        },
+        "low": {
+          "passed": 781,
+          "failed": 172,
+          "total": 953,
+          "accuracy": 0.8195173137460651,
+          "classroom_false_positives": 6,
+          "classroom_false_positive_rate": 0.013186813186813187,
+          "prohibited_false_negatives": 153,
+          "prohibited_recall": 0.6927710843373494,
+          "prohibited_precision": 0.9458689458689459,
+          "confusion": {
+            "Game->Game": 117,
+            "Game->Pornography": 1,
+            "Game->Unknown": 1,
+            "Gore->Gore": 108,
+            "Gore->Pornography": 3,
+            "Gore->Unknown": 51,
+            "Pornography->Game": 2,
+            "Pornography->Gore": 7,
+            "Pornography->Pornography": 107,
+            "Pornography->Unknown": 101,
+            "Unknown->Game": 1,
+            "Unknown->Gore": 3,
+            "Unknown->Pornography": 2,
+            "Unknown->Unknown": 449
+          }
+        },
+        "mid": {
+          "passed": 790,
+          "failed": 163,
+          "total": 953,
+          "accuracy": 0.8289611752360966,
+          "classroom_false_positives": 12,
+          "classroom_false_positive_rate": 0.026373626373626374,
+          "prohibited_false_negatives": 127,
+          "prohibited_recall": 0.7449799196787149,
+          "prohibited_precision": 0.9060052219321149,
+          "confusion": {
+            "Game->Game": 118,
+            "Game->Pornography": 1,
+            "Gore->Game": 2,
+            "Gore->Gore": 111,
+            "Gore->Pornography": 5,
+            "Gore->Unknown": 44,
+            "Pornography->Game": 6,
+            "Pornography->Gore": 10,
+            "Pornography->Pornography": 118,
+            "Pornography->Unknown": 83,
+            "Unknown->Game": 3,
+            "Unknown->Gore": 5,
+            "Unknown->Pornography": 4,
+            "Unknown->Unknown": 443
+          }
+        },
+        "strict": {
+          "passed": 784,
+          "failed": 169,
+          "total": 953,
+          "accuracy": 0.8226652675760755,
+          "classroom_false_positives": 23,
+          "classroom_false_positive_rate": 0.05054945054945055,
+          "prohibited_false_negatives": 113,
+          "prohibited_recall": 0.7730923694779116,
+          "prohibited_precision": 0.8627450980392157,
+          "confusion": {
+            "Game->Game": 119,
+            "Gore->Game": 4,
+            "Gore->Gore": 112,
+            "Gore->Pornography": 5,
+            "Gore->Unknown": 41,
+            "Pornography->Game": 11,
+            "Pornography->Gore": 13,
+            "Pornography->Pornography": 121,
+            "Pornography->Unknown": 72,
+            "Unknown->Game": 12,
+            "Unknown->Gore": 7,
+            "Unknown->Pornography": 4,
+            "Unknown->Unknown": 432
+          }
+        },
+        "xstrict": {
+          "passed": 689,
+          "failed": 264,
+          "total": 953,
+          "accuracy": 0.7229800629590766,
+          "classroom_false_positives": 123,
+          "classroom_false_positive_rate": 0.2703296703296703,
+          "prohibited_false_negatives": 102,
+          "prohibited_recall": 0.7951807228915663,
+          "prohibited_precision": 0.6878612716763006,
+          "confusion": {
+            "Game->Game": 119,
+            "Gore->Game": 8,
+            "Gore->Gore": 115,
+            "Gore->Pornography": 5,
+            "Gore->Unknown": 34,
+            "Pornography->Game": 12,
+            "Pornography->Gore": 14,
+            "Pornography->Pornography": 123,
+            "Pornography->Unknown": 68,
+            "Unknown->Game": 107,
+            "Unknown->Gore": 10,
+            "Unknown->Pornography": 6,
+            "Unknown->Unknown": 332
+          }
+        }
+      }
+    },
+    "rebuilt": {
+      "path": "data/models/Ritchie-rebuilt.pkl",
+      "sha256": "84ec37507ed7b67b6d0bbf9d15162e1f28dc8d3a79765d9b3d12551e442df691",
+      "levels": {
+        "xlow": {
+          "passed": 766,
+          "failed": 187,
+          "total": 953,
+          "accuracy": 0.8037775445960126,
+          "classroom_false_positives": 5,
+          "classroom_false_positive_rate": 0.01098901098901099,
+          "prohibited_false_negatives": 175,
+          "prohibited_recall": 0.6485943775100401,
+          "prohibited_precision": 0.9634146341463414,
+          "confusion": {
+            "Game->Game": 116,
+            "Game->Pornography": 1,
+            "Game->Unknown": 2,
+            "Gore->Gore": 98,
+            "Gore->Pornography": 3,
+            "Gore->Unknown": 61,
+            "Pornography->Gore": 3,
+            "Pornography->Pornography": 102,
+            "Pornography->Unknown": 112,
+            "Unknown->Gore": 3,
+            "Unknown->Pornography": 2,
+            "Unknown->Unknown": 450
+          }
+        },
+        "low": {
+          "passed": 781,
+          "failed": 172,
+          "total": 953,
+          "accuracy": 0.8195173137460651,
+          "classroom_false_positives": 6,
+          "classroom_false_positive_rate": 0.013186813186813187,
+          "prohibited_false_negatives": 153,
+          "prohibited_recall": 0.6927710843373494,
+          "prohibited_precision": 0.9458689458689459,
+          "confusion": {
+            "Game->Game": 117,
+            "Game->Pornography": 1,
+            "Game->Unknown": 1,
+            "Gore->Gore": 108,
+            "Gore->Pornography": 3,
+            "Gore->Unknown": 51,
+            "Pornography->Game": 2,
+            "Pornography->Gore": 7,
+            "Pornography->Pornography": 107,
+            "Pornography->Unknown": 101,
+            "Unknown->Game": 1,
+            "Unknown->Gore": 3,
+            "Unknown->Pornography": 2,
+            "Unknown->Unknown": 449
+          }
+        },
+        "mid": {
+          "passed": 791,
+          "failed": 162,
+          "total": 953,
+          "accuracy": 0.8300104931794333,
+          "classroom_false_positives": 11,
+          "classroom_false_positive_rate": 0.024175824175824177,
+          "prohibited_false_negatives": 126,
+          "prohibited_recall": 0.7469879518072289,
+          "prohibited_precision": 0.9060052219321149,
+          "confusion": {
+            "Game->Game": 118,
+            "Game->Pornography": 1,
+            "Gore->Game": 2,
+            "Gore->Gore": 111,
+            "Gore->Pornography": 5,
+            "Gore->Unknown": 44,
+            "Pornography->Game": 6,
+            "Pornography->Gore": 11,
+            "Pornography->Pornography": 118,
+            "Pornography->Unknown": 82,
+            "Unknown->Game": 3,
+            "Unknown->Gore": 5,
+            "Unknown->Pornography": 3,
+            "Unknown->Unknown": 444
+          }
+        },
+        "strict": {
+          "passed": 784,
+          "failed": 169,
+          "total": 953,
+          "accuracy": 0.8226652675760755,
+          "classroom_false_positives": 23,
+          "classroom_false_positive_rate": 0.05054945054945055,
+          "prohibited_false_negatives": 113,
+          "prohibited_recall": 0.7730923694779116,
+          "prohibited_precision": 0.8627450980392157,
+          "confusion": {
+            "Game->Game": 119,
+            "Gore->Game": 4,
+            "Gore->Gore": 112,
+            "Gore->Pornography": 5,
+            "Gore->Unknown": 41,
+            "Pornography->Game": 11,
+            "Pornography->Gore": 13,
+            "Pornography->Pornography": 121,
+            "Pornography->Unknown": 72,
+            "Unknown->Game": 12,
+            "Unknown->Gore": 7,
+            "Unknown->Pornography": 4,
+            "Unknown->Unknown": 432
+          }
+        },
+        "xstrict": {
+          "passed": 689,
+          "failed": 264,
+          "total": 953,
+          "accuracy": 0.7229800629590766,
+          "classroom_false_positives": 123,
+          "classroom_false_positive_rate": 0.2703296703296703,
+          "prohibited_false_negatives": 102,
+          "prohibited_recall": 0.7951807228915663,
+          "prohibited_precision": 0.6878612716763006,
+          "confusion": {
+            "Game->Game": 119,
+            "Gore->Game": 8,
+            "Gore->Gore": 115,
+            "Gore->Pornography": 5,
+            "Gore->Unknown": 34,
+            "Pornography->Game": 12,
+            "Pornography->Gore": 14,
+            "Pornography->Pornography": 123,
+            "Pornography->Unknown": 68,
+            "Unknown->Game": 107,
+            "Unknown->Gore": 10,
+            "Unknown->Pornography": 6,
+            "Unknown->Unknown": 332
+          }
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "rebuilt-vs-git-3990c652": {
+      "xlow": {
+        "changed": 11,
+        "improved": 2,
+        "regressed": 9,
+        "changed_wrong": 0,
+        "transitions": {
+          "Gore->Unknown": 4,
+          "Pornography->Unknown": 5,
+          "Unknown->Gore": 1,
+          "Unknown->Pornography": 1
+        }
+      },
+      "low": {
+        "changed": 6,
+        "improved": 2,
+        "regressed": 4,
+        "changed_wrong": 0,
+        "transitions": {
+          "Pornography->Unknown": 4,
+          "Unknown->Gore": 2
+        }
+      },
+      "mid": {
+        "changed": 12,
+        "improved": 1,
+        "regressed": 10,
+        "changed_wrong": 1,
+        "transitions": {
+          "Gore->Unknown": 5,
+          "Pornography->Unknown": 5,
+          "Unknown->Game": 1,
+          "Unknown->Pornography": 1
+        }
+      },
+      "strict": {
+        "changed": 9,
+        "improved": 1,
+        "regressed": 8,
+        "changed_wrong": 0,
+        "transitions": {
+          "Gore->Unknown": 5,
+          "Pornography->Unknown": 3,
+          "Unknown->Gore": 1
+        }
+      },
+      "xstrict": {
+        "changed": 9,
+        "improved": 2,
+        "regressed": 7,
+        "changed_wrong": 0,
+        "transitions": {
+          "Gore->Unknown": 4,
+          "Pornography->Unknown": 4,
+          "Unknown->Gore": 1
+        }
+      }
+    },
+    "rebuilt-vs-current": {
+      "xlow": {
+        "changed": 4,
+        "improved": 2,
+        "regressed": 1,
+        "changed_wrong": 1,
+        "transitions": {
+          "Gore->Unknown": 1,
+          "Unknown->Gore": 1,
+          "Unknown->Pornography": 2
+        }
+      },
+      "low": {
+        "changed": 2,
+        "improved": 1,
+        "regressed": 1,
+        "changed_wrong": 0,
+        "transitions": {
+          "Gore->Unknown": 1,
+          "Unknown->Gore": 1
+        }
+      },
+      "mid": {
+        "changed": 2,
+        "improved": 1,
+        "regressed": 0,
+        "changed_wrong": 1,
+        "transitions": {
+          "Pornography->Unknown": 1,
+          "Unknown->Gore": 1
+        }
+      },
+      "strict": {
+        "changed": 2,
+        "improved": 1,
+        "regressed": 1,
+        "changed_wrong": 0,
+        "transitions": {
+          "Gore->Unknown": 1,
+          "Unknown->Gore": 1
+        }
+      },
+      "xstrict": {
+        "changed": 0,
+        "improved": 0,
+        "regressed": 0,
+        "changed_wrong": 0,
+        "transitions": {}
+      }
+    }
+  }
+}

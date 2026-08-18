@@ -1,25 +1,40 @@
-#!/usr/bin/env bash
-set -euo pipefail
+#!/bin/sh
+set -eu
 
-if (( $# != 1 )); then
+if [ "$#" -ne 1 ]; then
   printf 'Usage: %s <python-file-or-directory>\n' "$0" >&2
   exit 2
 fi
 
 TARGET="$1"
 
-if [[ ! -f "$TARGET" && ! -d "$TARGET" ]]; then
+if [ ! -f "$TARGET" ] && [ ! -d "$TARGET" ]; then
   printf 'Target does not exist: %s\n' "$TARGET" >&2
   exit 2
 fi
 
-if [[ -f "$TARGET" && "$TARGET" != *.py ]]; then
-  printf 'Target file must use the .py extension: %s\n' "$TARGET" >&2
-  exit 2
+if [ -f "$TARGET" ]; then
+  case "$TARGET" in
+    *.py) ;;
+    *)
+      printf 'Target file must use the .py extension: %s\n' "$TARGET" >&2
+      exit 2
+      ;;
+  esac
 fi
 
-pyright --outputjson "$TARGET" 2>/dev/null |
+RESULT=$(mktemp)
+trap 'rm -f "$RESULT"' EXIT HUP INT TERM
+
+if ! pyright --outputjson "$TARGET" > "$RESULT" 2>/dev/null; then
   jq -r '
+.generalDiagnostics[]?
+| "\(.file):\(.range.start.line + 1): \(.message)"
+' "$RESULT" >&2
+  exit 1
+fi
+
+jq -r '
 .generalDiagnostics
 | if length == 0 then
     "No issues."
@@ -31,4 +46,4 @@ pyright --outputjson "$TARGET" 2>/dev/null |
         | "\(.range.start.line + 1)\t|\t\(.message)"
       )
   end
-'
+  ' "$RESULT"

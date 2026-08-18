@@ -12,10 +12,9 @@ from __future__ import annotations
 import platform
 import threading
 from dataclasses import dataclass
-from collections.abc import Iterator, Sequence
-from typing import NoReturn
 
 import logging
+
 from agent.platform_protocols import (
     BrowserOperations,
     HostsPathOperations,
@@ -28,8 +27,6 @@ from agent.platform_protocols import (
 )
 
 
-# Doi tuong bat bien, khong the thay doi gia tri truyen vao sau khi tao
-# PlatformServices()
 @dataclass(frozen=True)
 class PlatformServices:
     """Các adapter OS được tạo một lần cho một Agent runtime."""
@@ -41,8 +38,8 @@ class PlatformServices:
     hosts: HostsPathOperations
     input_blocker: InputBlockingOperations
     key_listener: KeyListenerOperations
-    input_controller: InputControllerOperations
     cursor_controller: CursorOperations
+    input_controller: InputControllerOperations
 
 
 logger = logging.getLogger(__name__)

@@ -439,4 +439,7 @@ class ScreenLocker:
         unlock()
 
 
-__all__ = ["ScreenLocker"]
+screen_locker = ScreenLocker()
+
+
+__all__ = ["screen_locker"]

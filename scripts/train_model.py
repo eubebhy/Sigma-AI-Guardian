@@ -14,6 +14,7 @@ Thiet ke ma theo huong sau:
 # pyright: reportUnknownVariableType=false, reportUnknownMemberType=false
 
 from pathlib import Path
+import sys
 from typing import TypeAlias
 
 import joblib  # type: ignore[import-not-found]
@@ -27,7 +28,7 @@ TRAINING_DIR = PROJECT_ROOT / "data" / "training"
 MODEL_DIR = PROJECT_ROOT / "data" / "models"
 DEFAULT_MODEL_NAME = "Ritchie.pkl"
 TRAINING_CATEGORY_TO_MODEL_LABEL = {
-    "education": "Unknown",
+    "unknown": "Unknown",
     "game": "Game",
     "gore": "Gore",
     "pornography": "Pornography",
@@ -106,4 +107,5 @@ def train_model(
 
 
 if __name__ == "__main__":
-    print(train_model())
+    selected_model_name = sys.argv[1] if len(sys.argv) > 1 else DEFAULT_MODEL_NAME
+    print(train_model(model_name=selected_model_name))

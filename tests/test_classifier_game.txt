@@ -1,119 +1,250 @@
-AMD Adrenalin Overlay
-AMD Shader Cache
-Albion Online
-Among Us
-Apex Legends
-Asset Cache
-BattlEye Launcher
-BattlEye Service
-Black Desert Online
-Blacklight: Retribution
-Bluestacks 5 - Liên Quân Mobile (Garena)
-Brawlhalla
-Counter-Strike 2
-Counter-Strike 2 - Matchmaking Server 12
-CrossFire
-Crossout
-Crusader Kings II
-DXVK Cache Generator
-Dead by Daylight
-Destiny 2
-Dirty Bomb
-Dota 2
-EA AntiCheat Service
-EA SPORTS FC 25
-EVE Online
-Easy Anti Cheat Launcher
-EasyAntiCheat_EOS
-Enlisted
-Epic Background Service
-Epic Games
-Epic Games Launcher - Grand Theft Auto V
-Epic Online Services
-Epic Store URL
-Fall Guys
-Final Fantasy XIV
-Fortnite
-GameFAQs
-Genshin Impact
-GenshinImpact.exe
-Guild Wars 2
-Hawken
-Hearthstone
-Heroes of the Storm
-Honkai: Star Rail
-IGN Walkthrough
-League of Legends
-League of Legends (TM) Client
-Liquipedia
-Lost Ark
-MapleStory
-Minecraft Launcher
-MultiVersus
-Nexus Mods
-OBS Capture
-OBS Replay Buffer
-OBS Window Capture
-Old School RuneScape
-Overwatch 2
-PCGamingWiki
-PUBG: Battlegrounds
-Paladins
-Palia
-Patch Downloader
-Path of Exile
-Plants vs. Zombies
-Riot Client - League of Legends
-Riot Vanguard Service
-Roblox
-Roblox AppPlayer - Blox Fruits
-Rocket League
-Rogue Company
-RuneScape
-Shatterline
-Smite
-Speedrun.com
-Splitgate
-Star Wars: The Old Republic
-StarCraft II
-StarCraft: Remastered
-Steam - ARK: Survival Ascended
-Steam - Apex Legends
-Steam - Black Myth: Wukong
-Steam - Dead by Daylight
-Steam - Dota 2
-Steam - Downloading: Cyberpunk 2077 (Update 2026)
-Steam - Elden Ring
-Steam - Free online games - GameVui.vn
-Steam - HELLDIVERS 2
-Steam - Rust
-Steam - Team Fortress 2
-Steam - The Witcher 3: Wild Hunt
-Steam Client Bootstrapper
-Steam Cloud Synchronization
-Steam Crash Handler
-Steam Input
-Steam Link
-Steam Overlay UI
-Steam Store
-Steam Web Helper
-Team Fortress 2
-Teamfight Tactics
-The Elder Scrolls Online
-The Finals
-The Sims 4
-TrackMania
-VALORANT (Production-X64-Release)
-Valorant
-War Thunder
-Warcraft III: Reforged
-Warframe
-World of Tanks
-World of Warcraft
-World of Warships
-XDefiant
-Xbox App - Cloud Gaming - Forza Horizon 5
-YouTube - Độ Mixi đang live stream bắn PUBG - Google Chrome
-itch.io
-osu!
-Chicken Invaders
+Minecraft Survival Mode
+Fortnite Battle Royale lobby
+The player crafted a diamond sword before nightfall.
+Dialogue: Revive me near the checkpoint!
+System message: Achievement unlocked for winning ten matches.
+Grand Theft Auto V is updating through the game launcher.
+Window title: League of Legends Champion Select
+Steam notification: Your friend invited you to play Portal 2.
+Clipboard: use the left stick to move and press A to jump
+Teacher speech: Pause the game and return your controllers.
+Search query: best beginner build for Elden Ring
+Process: RobloxPlayerBeta.exe
+File: saves/Zelda/autosave.dat
+The boss fight starts after the castle cutscene.
+Mario Kart split-screen tournament
+My health bar is low, but I still have one healing potion.
+Press Escape to open the in-game settings menu.
+Overwatch team voice chat
+The quest marker points toward a hidden treasure chest.
+PlayStation controller connected for local multiplayer.
+The Sims 4 character creation screen
+He selected the mage class and equipped a fire spell.
+Nintendo Switch software notification: Game data downloaded.
+Can we queue for another ranked match after dinner?
+Rocket League replay saved successfully.
+The tutorial teaches movement, jumping, and inventory management.
+Valorant match found; choose an agent.
+Animal Crossing island backup completed.
+I respawned at the last checkpoint after losing the level.
+World of Warcraft guild raid scheduled for Friday.
+The game awarded bonus experience points for the daily mission.
+Call of Duty multiplayer loadout editor
+She built a farm beside her base in Stardew Valley.
+Xbox Game Bar recording captured the final round.
+Pokémon battle: Pikachu used Thunderbolt.
+The difficulty menu offers easy, normal, and hard modes.
+Discord status: Playing Counter-Strike 2
+Please save your game before closing the application.
+The racing game added a new desert track and two cars.
+Terraria server: four players online
+His character gained a level and unlocked a new ability.
+Search results for cooperative puzzle games on PC
+The minimap shows enemies as red icons, not real people.
+Hades run ended in the third chamber.
+Game launcher warning: Cloud save conflict detected.
+The player traded gold for armor at the village shop.
+FIFA career mode season standings
+I found the key needed to open the dungeon door.
+Genshin Impact daily commission complete.
+Keyboard controls: WASD to walk, Space to jump.
+The match timer reached zero and our team won.
+Halo campaign checkpoint saved.
+She decorated her virtual house with furniture earned in quests.
+Downloadable content installed for Cyberpunk 2077.
+The strategy game requires gathering resources and training units.
+Among Us emergency meeting called.
+Parental controls blocked the game's mature costume pack.
+The fantasy warrior defeated a skeleton; blood effects were disabled.
+Resident Evil inventory screen shows herbs and puzzle keys.
+Game review: the fictional combat is tense but not graphic.
+The romance route ends with a fade-to-black game cutscene.
+Mortal Kombat match started with the optional gore filter enabled.
+He searched for a walkthrough to escape the haunted game level.
+System message: You cannot join while the online match is in progress.
+The arcade cabinet displays INSERT COIN.
+Fall Guys party lobby waiting for one more player.
+The player chose a nonviolent stealth route through the mission.
+Skyrim mod manager finished deploying texture files.
+The final boss has three phases and a visible stamina meter.
+Game chat: Nice shot, meet at the respawn point.
+Epic Games Launcher is verifying installed game files.
+The virtual zombie vanished into pixels when its health reached zero.
+Age rating notice: fantasy violence in a role-playing game.
+Clipboard: server address for tonight's Minecraft realm
+Teacher speech: This game-design lesson covers sprites and collision.
+The speedrunner used a frame-perfect wall clip in the Any Percent route.
+Rollback netcode corrected the remote player's late input.
+This roguelike seed generated an unusually early relic room.
+The metroidvania map marks ability-gated passages with distinct icons.
+Dialogue: Spend one action point to cleanse the debuff.
+The fighting game's hitbox viewer shows startup and recovery frames.
+System message: Shader precompilation completed for Vulkan gameplay.
+Search query: optimal parry window for the secret superboss
+The player manipulated enemy aggro to skip a patrol cycle.
+Window title: Dwarf Fortress Legends Mode
+The immersive simulation lets water conduct electricity between systems.
+Clipboard: seed 84721 for a procedural dungeon with two mimics
+The raid leader assigned the off-tank to intercept the add wave.
+Game file: replays/qualifier_round_rollback.rpl
+An input buffer preserves the jump command during landing recovery.
+The tactical role-playing game applies permadeath to recruited units.
+Notification: A rare chromatic aberration shader mod was enabled.
+The dungeon crawler's trinket passive triggered a critical-hit effect.
+Teacher speech: Coyote time makes platforming jumps feel more forgiving.
+The player routed a sequence break around the double-jump upgrade.
+Search query: explain negative edge inputs in arcade fighting games
+The grand strategy save entered an alternate succession crisis.
+Dialogue: My summon build needs more poise before New Game Plus.
+The bullet hell pattern leaves a narrow safespot near the lower corner.
+System message: Dedicated server tick rate changed to 128.
+Ph0to m0de: adjust depth-of-field around the virtual waterfall.
+P1nball alert: multiball activated on all three lanes!
+Lineup file: start the r00kie pitcher in tonight's baseball g4me.
+G0lf HUD: the cr0sswind is eight knots toward the left bunker.
+Skate g4me chat: chain a kickflip into the handrail gr1nd.
+Submarine sim: s0nar detected a contact beyond the virtual reef.
+Docking g4me warning: align the sp@cecraft with bay three.
+Detective g4me clipboard: connect the alibi to the museum ticket.
+C1ty-builder notice: residential demand rose after the new bus route.
+H0spital sim window: assign the next virtual patient to radiology.
+Courtroom g4me: present the f0rged receipt during cross-examination.
+Idle-g4me report: the clockwork mine earned 4,200 coins offline.
+M@hjong match dialogue: discard the bamboo tile or declare a kong.
+W0rd-game hint: rearrange LPAEY into a gaming verb.
+Trivia g4me buzzer: select the answer before the timer flashes red.
+Accessibility menu: enable the deuteranopia p@lette for team outlines.
+Esports observer: switch the free c@mera to the northern objective.
+Rugby g4me HUD: fill the scrum meter without crossing the marker.
+B0wling notification: one spare needed to complete the tenth frame.
+Dr0ne-racing window: calibrate gate detection before the time trial.
+Mech g4me warning: reactor h3at reached ninety percent.
+F0ssil dig simulator: brush the virtual ribs without cracking them.
+Tabletop g4me chat: roll two d1ce and move the blue token.
+Falconry g4me: recall the virtual bird before the training timer ends.
+Weather sandbox: spawn a t0rnado inside the empty simulation map.
+Quán net phường tổ chức giải Đế Chế vào tối Chủ nhật.
+Cụm từ: cày cấp thuê trong Võ Lâm Truyền Kỳ
+Tiêu đề cửa sổ: Liên Quân Mobile - Chỉnh bảng ngọc
+Thông báo Garena: Sự kiện đăng nhập Tết đã bắt đầu.
+Hội thoại tổ đội: Cậu giữ đường giữa, mình đi rừng.
+Sau ba hiệp Audition, Lan mới phá được kỷ lục chuỗi nhịp.
+Hệ thống Gunny: Góc bắn hiện tại là 62 độ.
+Lời giáo viên: Hôm nay lớp sẽ dựng bản đồ mê cung bằng Scratch.
+Truy vấn: đội hình Cờ Liên Quân khắc chế sát thủ
+Tiến trình trò chơi: CrossFire.exe
+Tệp cấu hình: DuongLenDinhPhuBan/ban_phim.ini
+Bảng nhớ tạm: mã phòng 483920 để đấu Ma Sói trực tuyến
+Cửa sổ giả lập: ZingSpeed Mobile - Ga-ra xe
+Bạn cùng đội nói: Cắm mắt ở hang Rồng giúp mình nhé.
+Thông báo trò chơi: Lá bài này không đủ năng lượng để triển khai.
+Nhóm bạn chia phe dựng thành trong Mini World suốt giờ nghỉ.
+Điện thoại báo: Thể lực trong Ngôi Sao Thời Trang đã hồi đầy.
+Màn chọn bài hát của trò chơi nhịp điệu
+Máy gắp thú ảo thưởng thêm một lượt quay miễn phí.
+Đối thoại trong game: Nhường tôi tướng hỗ trợ được không?
+Tiêu đề: Football Manager - Thị trường chuyển nhượng
+Tìm kiếm: mẹo qua ải bảo vệ hoa trong Plants vs. Zombies
+Thầy nhắc cả lớp thoát tài khoản game trước khi đổi máy.
+Hệ thống: Đối thủ xin hòa trong ván cờ trực tuyến.
+Chú mèo ảo mang về một chiếc chuông sau chuyến thám hiểm.
+Thông báo eFootball: Đội hình xuất phát thiếu thủ môn.
+Hội thoại: Đừng bán con cá hiếm, mai bảo tàng mới mở.
+Chế độ xây công viên trong RollerCoaster Tycoon
+Tệp ảnh: anh_chup_man_hinh/chien_thang_co_caro.png
+Tiến trình giả lập: pcsx2-qt.exe đang chạy trò chơi đua mô tô.
+Bảng nhớ tạm: Mã quà tặng TAMQUOC2026 còn hạn sử dụng
+Cửa sổ Dota 2: Kho báu vật phẩm cộng đồng
+Hệ thống chống gian lận đã cho phép khởi động trận đấu.
+Cậu bé nuôi rồng ảo đến cấp trưởng thành rồi đặt tên là Mít.
+Sự kiện săn boss bang hội trong Thiên Long Bát Bộ
+Hội thoại phòng chờ: Bật chế độ cấm chọn cho công bằng nhé.
+Truy vấn tìm kiếm: vị trí kho báu chìm trong Play Together
+Thông báo: Vé quay thú cưng sẽ hết hạn sau hai ngày.
+Cửa sổ trò chơi: Bảng đấu giải PES nội bộ
+Hệ thống: Kết nối lại thành công sau khi mất mạng.
+Mô phỏng lái tàu hỏa qua đèo Hải Vân
+Trong trò xếp gạch, khối dài rơi đúng khe và xóa bốn hàng.
+Lời cô giáo: Nhân vật Scratch chỉ ghi điểm khi chạm quả táo.
+Bảng nhớ tạm chứa công thức ghép đá trong game nông trại.
+Tiêu đề cửa sổ: Hearthstone - Bộ bài Thợ săn
+Thông báo câu lạc bộ: Thành viên mới đã vào đội đua xe.
+Đồng đội gọi: Ném bom khói che lối rút trong PUBG Mobile.
+Trò chơi thực tế ảo mô phỏng chèo thuyền giữa vịnh.
+Tìm kiếm: cách mở sân bóng bí mật trong Doraemon Story of Seasons
+Tiến trình trò chơi: emulator_gamepad_service.exe đang nhận tín hiệu tay cầm.
+Tệp nhật ký: logs/tran_dau_co_tuong_12.log
+Hệ thống: Người chơi rời sớm sẽ bị khóa ghép trận năm phút.
+Cô bé đổi vé lễ hội lấy bộ kimono cho nhân vật Chibi.
+Thông báo Free Fire: Hòm thư có quà từ đồng đội.
+Màn hình chọn bàn bida chín bi
+Hội thoại: Mời cậu vào gia tộc để cùng chiếm thành.
+Cửa sổ cài đặt: Bật phụ đề tiếng Việt cho game phiêu lưu.
+Lời giáo viên: Hãy giảm âm lượng hiệu ứng trước khi thi đấu điện tử.
+Bảng nhớ tạm: tên đảo MuaHe để nhập vào trò chơi quản lý khu nghỉ dưỡng
+Truy vấn: lịch mở máy chủ mới của Kiếm Thế Origin
+Hệ thống: Tài khoản đã liên kết với hồ sơ trò chơi trên điện thoại.
+Trong game nấu ăn, nồi súp bị cháy vì khách gọi quá nhiều món.
+Tuyến hẹn hò của visual novel chỉ có lời tỏ tình, không chứa cảnh người lớn.
+Nhân vật hoạt hình bị trúng tên rồi biến thành luồng sáng, hoàn toàn là cảnh game.
+Trò kinh dị giải đố dùng tiếng cửa cót két để báo hiệu căn phòng bí mật.
+Võ đài Tekken chọn sàn đấu không có hiệu ứng máu.
+Gói trang phục mùa hè của trò chơi chỉ gồm áo khoác và kính râm.
+Thông báo NoxPlayer: Đã tối ưu bàn phím cho game MOBA.
+Người chơi gọi: Canh cổng dịch chuyển, quái sắp tràn sang.
+Tìm kiếm: máy yếu nên đặt cấu hình đồ họa Auto Chess thế nào
+Tiêu đề cửa sổ trò chơi: Trình tạo nhân vật hoạt hình chibi
+Hệ thống: Mã quà tặng đã đổi thành công, vật phẩm nằm trong hòm thư.
+Tiêu đề cửa sổ trò chơi: Quản lý bến cảng và lịch tàu hàng
+Đội xanh ghi bàn bằng cú sút phạt ở phút bù giờ của trận game bóng đá.
+Phòng máy đang thi đấu trò bắn cá theo đội.
+Người chơi triệt hoạt ảnh kỹ năng để nối đòn nhanh hơn.
+Khung bất tử sau cú lướt giúp nhân vật né sát thương đúng thời điểm.
+Vũ khí hitscan tính trúng đích ngay khi máy chủ nhận thao tác bắn.
+Sát thương suy giảm theo khoảng cách khiến khẩu súng kém hiệu quả ở cuối bản đồ.
+Lợi thế người ló góc xuất hiện rõ khi độ trễ giữa hai máy chênh lệch.
+Kỹ thuật nhảy thỏ duy trì động lượng qua nhiều đoạn dốc.
+Người chơi vừa di chuyển ngang vừa chỉnh tâm để thực hiện counter-strafe.
+Lớp sương chiến tranh che các đơn vị chưa được trinh sát.
+Thông báo đồ họa: Đã bật loại bỏ vật thể bị che khuất.
+Mức mipmap cao giúp bề mặt ở xa bớt nhấp nháy trong game.
+Lọc bất đẳng hướng giữ họa tiết mặt đường rõ khi nhìn xiên.
+Biểu đồ nhịp khung hình cho thấy game bị khựng dù số FPS trung bình cao.
+Vùng chết của cần analog quá rộng làm xe khó ôm cua nhẹ.
+Gia tốc tâm ngắm tăng dần khi người chơi giữ cần sang phải.
+Giao diện diegetic hiển thị số đạn trực tiếp trên khẩu súng trong thế giới game.
+Lối chơi phát sinh khiến hai hệ thống đơn giản tạo ra chiến thuật ngoài dự kiến.
+Nhân vật mắc kẹt vĩnh viễn do một softlock sau khi cửa nhiệm vụ đóng.
+Anh ấy nạp lại bản lưu nhiều lần để đổi kết quả ngẫu nhiên của game.
+Bảng vật phẩm rơi quy định quái tinh anh có thể cho nguyên liệu nào.
+Cơ chế bảo hiểm lượt quay hiếm sẽ kích hoạt sau chín mươi lần không trúng.
+Đồng hồ cuồng nộ buộc tổ đội kết thúc boss trước khi hết thời gian.
+Ải này là phép kiểm tra sát thương mỗi giây đối với toàn đội.
+Nhóm người chơi theorycraft một bộ kỹ năng xoay quanh hiệu ứng thiêu đốt.
+Lối tối ưu cực hạn hy sinh phòng thủ để đạt chỉ số chí mạng cao nhất.
+Nhà phê bình bàn về sự lệch pha giữa cốt truyện và hành động mà game cho phép.
+Ván Ô_ăn_qu@n số: rải tiếp năm viên sỏi qua ô dân.
+Cờ_cá_ngựa online: quân đỏ vừa vào ô an_t0àn.
+Sud0ku g4me: ghi chú hai ứng viên cho ô giữa bảng.
+Màn hình g4me trượt_tuyết: chọn ván mới cho dốc băng ảo.
+Dom1no điện tử: nối quân đôi sáu để chốt ván.
+Game quản_lý bưu_điện: xe phát thư ảo sắp rời kho.
+Thông báo g4me bóng_ném: avatar thủ môn đã chặn cú ném phạt.
+Mô phỏng bắn_cung: chỉnh tâm ngắm theo g1ó ngang.
+Game leo_núi: thanh lực bám đang cạn ở mỏm đá ảo.
+T@xi sim báo hành khách g4me đang chờ trước nhà ga.
+Cửa sổ game sân_bay: băng chuyền số ba đang kẹt hành lý.
+Game đấu_vật sumo: giữ thăng bằng bên trong vòng tròn ảo.
+Mô phỏng đài_thiên_văn: xoay mái vòm theo chòm sao Thiên Cầm.
+Mô phỏng đàn_0ng: cử ong thợ đến vườn hoa hướng dương.
+Game khảo_sát hang động: thả dây đo xuống hố sâu ảo.
+Sổ giả_kim ảo: ghép thủy ngân với đá mặt trời.
+Game làm_g0m: giữ đều bàn xoay để thành bình không bị lệch.
+Nhà máy tự_động trong g4me bị nghẽn ở băng chuyền đồng.
+Mô phỏng địa_hình_hóa: tăng ôxy cho hành tinh lên mười hai phần trăm.
+Game cứu_hỏa: dập đám cháy ảo ở tầng hai trước khi hết giờ.
+Trò thổi_thủy_tinh: giữ nhiệt để tạo chiếc cốc ảo cân đối.
+Hải chiến bàn cờ: khai_h0a vào tọa độ D7 trên lưới game.
+Game thợ_khóa: xoay đĩa số để mở két ảo trong ba lượt.
+Mô phỏng nuôi_tằm: chuyển kén ảo sang khay trước mùa mưa.
+Môn curling số: quét băng để viên đá g4me dừng gần tâm.

@@ -20,6 +20,7 @@ from typing import TypedDict
 from agent.platform_protocols import BrowserOperations, ProcessOperations
 from agent.platform import PlatformServices, get_default_platform_services
 
+
 class BrowserSpec(TypedDict):
     name: str
     executables: tuple[str, ...]
@@ -75,7 +76,7 @@ BROWSER_SPECS: tuple[BrowserSpec, ...] = (
         "processes": ("coccoc", "coccoc.exe"),
     },
     {
-        "name": "tor",
+        "name": "tor",  # Mac du that te chang ai dung TOR Browser tren truong
         "executables": ("tor-browser", "tor.exe"),
         "processes": ("tor", "tor-browser", "tor.exe"),
     },
@@ -116,10 +117,7 @@ def _browser_states(
             process_operations = default_services.processes
         if browser_operations is None:
             browser_operations = default_services.browser
-    processes = {
-        name: pid
-        for pid, name in process_operations.list_processes()
-    }
+    processes = {name: pid for pid, name in process_operations.list_processes()}
     states: list[BrowserState] = []
     for index, spec in enumerate(BROWSER_SPECS):
         pid = _find_pid(spec, processes)
@@ -165,12 +163,17 @@ def open_tab(url: str, platform_services: PlatformServices | None = None) -> boo
 
     if not url.startswith(("http://", "https://")):
         raise ValueError(f"Invalid URL {url!r}: must start with HTTP or HTTPS")
+
     if platform_services is None:
         for browser in _pick_browser(require_running=True):
-            if browser["executable"] and _run_open_command([browser["executable"], url]):
+            if browser["executable"] and _run_open_command(
+                [browser["executable"], url]
+            ):
                 return True
         for browser in _pick_browser(require_running=False):
-            if browser["executable"] and _run_open_command([browser["executable"], url]):
+            if browser["executable"] and _run_open_command(
+                [browser["executable"], url]
+            ):
                 return True
         if get_default_platform_services().browser.open_default_url(url):
             return True

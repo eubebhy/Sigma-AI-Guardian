@@ -42,6 +42,8 @@ max_fps = 30.0
 min_fps = 1.0
 
 [screen_lock]
+enabled = false
+timeout = 402 # 6.7 mins
 message = '''Your workstation has been restricted for one of the following reasons:
 
 The administrator has manually locked your machine.

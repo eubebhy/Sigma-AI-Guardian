@@ -82,6 +82,9 @@ def ui_alive(ui: UInputDevice) -> bool:
     return True
 
 
+# Hien tai UInputManager dang la bottleneck lon
+# No dang chay nhieu kiem tra nang tren hot path
+# Tuy khong cham cho nhu cau remote desktop, nhung tuong lai nen toi uu clean hon
 class UInputManager:
     """Giữ, kiểm tra và tạo lại một virtual input device."""
 

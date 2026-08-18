@@ -37,7 +37,7 @@ from test_support import add_source_path, run_module, test_modes
 add_source_path()
 
 from content_classifier import content_classifier
-from content_classifier.tags import ContentCategory
+from content_classifier.types import ContentCategory
 from device_controller import screen_locker as screenlocker
 from system_monitor.window_tracker import get_all_open_windows
 
@@ -115,7 +115,9 @@ def run_real(arguments: Sequence[str]) -> int:
                 screenlocker.lock()
                 _sleep_or_stop(stop_event, LOCK_SECONDS)
                 if not screenlocker.unlock():
-                    print("Unlock failed: UI cleanup was not confirmed", file=sys.stderr)
+                    print(
+                        "Unlock failed: UI cleanup was not confirmed", file=sys.stderr
+                    )
                     result = 1
                     break
             _sleep_or_stop(stop_event, command.interval)

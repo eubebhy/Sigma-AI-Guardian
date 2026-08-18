@@ -42,6 +42,7 @@ def listen_mice(
 
     return _get_operations().listen_mice(timeout, stop_event)
 
+
 __all__ = [
     "KeyEvent",
     "KeyState",

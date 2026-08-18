@@ -13,6 +13,9 @@ Nguyên lý:
 
 from typing import Protocol, runtime_checkable
 
+# @runtime_checkable la decorator quan trong de co the kiem tra:
+# isinstance(Object, Service)
+
 
 @runtime_checkable
 class Service(Protocol):

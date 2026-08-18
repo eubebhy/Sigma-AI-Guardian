@@ -1,0 +1,956 @@
+=== rebuilt | moderation=xstrict ===
+[PASS][game] AMD Adrenalin Overlay
+[PASS][game] AMD Shader Cache
+[PASS][game] Albion Online
+[PASS][game] Among Us
+[PASS][game] Apex Legends
+[PASS][game] Asset Cache
+[PASS][game] BattlEye Launcher
+[PASS][game] BattlEye Service
+[PASS][game] Black Desert Online
+[PASS][game] Blacklight: Retribution
+[PASS][game] Bluestacks 5 - Liên Quân Mobile (Garena)
+[PASS][game] Brawlhalla
+[PASS][game] Counter-Strike 2
+[PASS][game] Counter-Strike 2 - Matchmaking Server 12
+[PASS][game] CrossFire
+[PASS][game] Crossout
+[PASS][game] Crusader Kings II
+[PASS][game] DXVK Cache Generator
+[PASS][game] Dead by Daylight
+[PASS][game] Destiny 2
+[PASS][game] Dirty Bomb
+[PASS][game] Dota 2
+[PASS][game] EA AntiCheat Service
+[PASS][game] EA SPORTS FC 25
+[PASS][game] EVE Online
+[PASS][game] Easy Anti Cheat Launcher
+[PASS][game] EasyAntiCheat_EOS
+[PASS][game] Enlisted
+[PASS][game] Epic Background Service
+[PASS][game] Epic Games
+[PASS][game] Epic Games Launcher - Grand Theft Auto V
+[PASS][game] Epic Online Services
+[PASS][game] Epic Store URL
+[PASS][game] Fall Guys
+[PASS][game] Final Fantasy XIV
+[PASS][game] Fortnite
+[PASS][game] GameFAQs
+[PASS][game] Genshin Impact
+[PASS][game] GenshinImpact.exe
+[PASS][game] Guild Wars 2
+[PASS][game] Hawken
+[PASS][game] Hearthstone
+[PASS][game] Heroes of the Storm
+[PASS][game] Honkai: Star Rail
+[PASS][game] IGN Walkthrough
+[PASS][game] League of Legends
+[PASS][game] League of Legends (TM) Client
+[PASS][game] Liquipedia
+[PASS][game] Lost Ark
+[PASS][game] MapleStory
+[PASS][game] Minecraft Launcher
+[PASS][game] MultiVersus
+[PASS][game] Nexus Mods
+[PASS][game] OBS Capture
+[PASS][game] OBS Replay Buffer
+[PASS][game] OBS Window Capture
+[PASS][game] Old School RuneScape
+[PASS][game] Overwatch 2
+[PASS][game] PCGamingWiki
+[PASS][game] PUBG: Battlegrounds
+[PASS][game] Paladins
+[PASS][game] Palia
+[PASS][game] Patch Downloader
+[PASS][game] Path of Exile
+[PASS][game] Plants vs. Zombies
+[PASS][game] Riot Client - League of Legends
+[PASS][game] Riot Vanguard Service
+[PASS][game] Roblox
+[PASS][game] Roblox AppPlayer - Blox Fruits
+[PASS][game] Rocket League
+[PASS][game] Rogue Company
+[PASS][game] RuneScape
+[PASS][game] Shatterline
+[PASS][game] Smite
+[PASS][game] Speedrun.com
+[PASS][game] Splitgate
+[PASS][game] Star Wars: The Old Republic
+[PASS][game] StarCraft II
+[PASS][game] StarCraft: Remastered
+[PASS][game] Steam - ARK: Survival Ascended
+[PASS][game] Steam - Apex Legends
+[PASS][game] Steam - Black Myth: Wukong
+[PASS][game] Steam - Dead by Daylight
+[PASS][game] Steam - Dota 2
+[PASS][game] Steam - Downloading: Cyberpunk 2077 (Update 2026)
+[PASS][game] Steam - Elden Ring
+[PASS][game] Steam - Free online games - GameVui.vn
+[PASS][game] Steam - HELLDIVERS 2
+[PASS][game] Steam - Rust
+[PASS][game] Steam - Team Fortress 2
+[PASS][game] Steam - The Witcher 3: Wild Hunt
+[PASS][game] Steam Client Bootstrapper
+[PASS][game] Steam Cloud Synchronization
+[PASS][game] Steam Crash Handler
+[PASS][game] Steam Input
+[PASS][game] Steam Link
+[PASS][game] Steam Overlay UI
+[PASS][game] Steam Store
+[PASS][game] Steam Web Helper
+[PASS][game] Team Fortress 2
+[PASS][game] Teamfight Tactics
+[PASS][game] The Elder Scrolls Online
+[PASS][game] The Finals
+[PASS][game] The Sims 4
+[PASS][game] TrackMania
+[PASS][game] VALORANT (Production-X64-Release)
+[PASS][game] Valorant
+[PASS][game] War Thunder
+[PASS][game] Warcraft III: Reforged
+[PASS][game] Warframe
+[PASS][game] World of Tanks
+[PASS][game] World of Warcraft
+[PASS][game] World of Warships
+[PASS][game] XDefiant
+[PASS][game] Xbox App - Cloud Gaming - Forza Horizon 5
+[PASS][game] YouTube - Độ Mixi đang live stream bắn PUBG - Google Chrome
+[PASS][game] itch.io
+[PASS][game] osu!
+[PASS][game] Chicken Invaders
+[PASS][porn] Google Search: phim s.e.x m.ớ.i n.h.ấ.t
+[PASS][porn] Cốc Cốc - xem phim xex ko che thuyet minh
+[PASS][porn] Telegram (5) - [18+] JAV Uncensored & Hentai Group
+[PASS][porn] X.com: @hentai_art_gallery / X
+[PASS][porn] Reddit - r/Rule34: Hot posts this week - Google Chrome
+[PASS][porn] PotPlayer - [Vietsub] phim 18+ HD.mp4
+[PASS][porn] javhd.net/video/uncensored-leak-asian-student
+[PASS][porn] Chrome - h e n t a i anime vietsub online
+[PASS][porn] IDM - [1080p] uncensored_hentai_scene_1.mp4.aria2
+[PASS][porn] Google Chrome - Pornhub
+[PASS][porn] Microsoft Edge - XVideos
+[PASS][porn] Firefox - XNXX
+[PASS][porn] Brave - Redtube
+[PASS][porn] Opera GX - YouPorn
+[PASS][porn] Safari - SpankBang
+[PASS][porn] Discord - nsfw
+[PASS][porn] Telegram - 18+ videos
+[FAIL][porn] Reddit - r/gonewild | got=Unknown
+[PASS][porn] OnlyFans
+[FAIL][porn] Fansly | got=Unknown
+[PASS][porn] CamSoda
+[FAIL][porn] Chaturbate | got=Unknown
+[FAIL][porn] Stripchat | got=Unknown
+[PASS][porn] LiveJasmin
+[FAIL][porn] MyFreeCams | got=Game
+[PASS][porn] Brazzers
+[PASS][porn] Reality Kings
+[FAIL][porn] Naughty America | got=Gore
+[PASS][porn] BangBros
+[PASS][porn] Blacked
+[FAIL][porn] Vixen | got=Unknown
+[PASS][porn] Digital Playground
+[FAIL][porn] Fake Taxi | got=Unknown
+[PASS][porn] MILF Hunter
+[PASS][porn] Hentai Haven
+[PASS][porn] NHentai
+[PASS][porn] Rule34
+[PASS][porn] Rule 34
+[PASS][porn] porn
+[FAIL][porn] pr0n | got=Unknown
+[PASS][porn] p0rn
+[PASS][porn] p.o.r.n
+[PASS][porn] nsfw
+[FAIL][porn] 18+ | got=Unknown
+[PASS][porn] xxx
+[PASS][porn] xXx
+[FAIL][porn] adult video | got=Gore
+[FAIL][porn] sex video | got=Gore
+[PASS][porn] hardcore
+[PASS][porn] blowjob
+[PASS][porn] deepthroat
+[PASS][porn] anal
+[PASS][porn] creampie
+[PASS][porn] cumshot
+[PASS][porn] bukkake
+[PASS][porn] hentai
+[PASS][porn] doujin
+[PASS][porn] uncensored JAV
+[PASS][porn] Google Chrome -> search: free adult streaming site
+[PASS][porn] Firefox - uncensored asian video collection
+[PASS][porn] Brave browser - premium adult portal
+[FAIL][porn] Microsoft Edge - mature video archive | got=Gore
+[PASS][porn] Opera GX - anime adult library
+[PASS][porn] Safari - exclusive creator platform
+[PASS][porn] Chrome - HD mature clips online
+[PASS][porn] Google Search: uncensored anime episode
+[FAIL][porn] Google Search: adult live camera site | got=Unknown
+[PASS][porn] Telegram - VIP 18+ media channel
+[PASS][porn] Telegram - private creator updates
+[FAIL][porn] Discord - age restricted media | got=Unknown
+[FAIL][porn] Discord - adult creator server | got=Unknown
+[FAIL][porn] Reddit - adult creators discussion | got=Unknown
+[PASS][porn] Reddit - NSFW artwork gallery
+[FAIL][porn] X - adult illustration account | got=Unknown
+[PASS][porn] Browser - premium membership page
+[FAIL][porn] Browser - exclusive subscriber content | got=Unknown
+[FAIL][porn] Chrome - creator subscription login | got=Unknown
+[FAIL][porn] Firefox - age verification page | got=Unknown
+[FAIL][porn] Brave - mature comic archive | got=Gore
+[PASS][porn] Edge - uncensored animation collection
+[PASS][porn] Anime adult illustration gallery
+[FAIL][porn] Animated mature artwork archive | got=Gore
+[PASS][porn] Digital comic adult edition
+[PASS][porn] Premium creator dashboard
+[PASS][porn] Subscriber only gallery
+[PASS][porn] Creator exclusive feed
+[FAIL][porn] Creator media vault | got=Unknown
+[PASS][porn] Private content collection
+[FAIL][porn] VIP media archive | got=Gore
+[PASS][porn] HD uncensored release
+[FAIL][porn] 4K remastered edition | got=Unknown
+[FAIL][porn] Extended director cut | got=Unknown
+[FAIL][porn] Full version online | got=Game
+[FAIL][porn] Download complete package | got=Unknown
+[FAIL][porn] Latest weekly uploads | got=Unknown
+[PASS][porn] Trending premium creators
+[FAIL][porn] Popular creator ranking | got=Game
+[FAIL][porn] Recommended mature content | got=Unknown
+[PASS][porn] Suggested exclusive creators
+[FAIL][porn] Recently viewed media | got=Unknown
+[FAIL][porn] Continue watching queue | got=Unknown
+[FAIL][porn] History - viewed items | got=Unknown
+[FAIL][porn] Bookmarks - saved creators | got=Unknown
+[PASS][porn] Favorites - premium pages
+[FAIL][porn] Playlist - saved videos | got=Gore
+[FAIL][porn] Media library sync | got=Unknown
+[FAIL][porn] Offline download complete | got=Unknown
+[FAIL][porn] Streaming session active | got=Game
+[FAIL][porn] Cloud playback history | got=Unknown
+[FAIL][porn] Desktop app login | got=Unknown
+[FAIL][porn] Mobile sync enabled | got=Unknown
+[FAIL][porn] Account subscription active | got=Unknown
+[FAIL][porn] Billing history page | got=Unknown
+[FAIL][porn] Membership renewal notice | got=Game
+[FAIL][porn] Profile settings privacy | got=Unknown
+[FAIL][porn] Notification center updates | got=Unknown
+[FAIL][porn] Inbox - creator messages | got=Unknown
+[FAIL][porn] Live broadcast started | got=Unknown
+[FAIL][porn] Live room available | got=Unknown
+[PASS][porn] Private livestream session
+[FAIL][porn] Viewer chat connected | got=Unknown
+[FAIL][porn] Community guidelines page | got=Unknown
+[FAIL][porn] Age verification required | got=Unknown
+[FAIL][porn] Region restricted media | got=Unknown
+[FAIL][porn] Content unavailable region | got=Unknown
+[FAIL][porn] Mirror site online | got=Game
+[FAIL][porn] CDN asset delivery | got=Unknown
+[FAIL][porn] Media cache rebuild | got=Unknown
+[FAIL][porn] Playback error retry | got=Unknown
+[FAIL][porn] Video buffering 67% | got=Gore
+[FAIL][porn] Episode collection complete | got=Unknown
+[FAIL][porn] Season archive updated | got=Gore
+[FAIL][porn] Volume 05 extras | got=Unknown
+[FAIL][porn] Bonus scene pack | got=Game
+[FAIL][porn] Behind the scenes | got=Gore
+[PASS][porn] Interview with creator
+[FAIL][porn] Creator announcement post | got=Unknown
+[FAIL][porn] Creator merchandise shop | got=Game
+[PASS][porn] Premium access granted
+[FAIL][porn] Session expired login | got=Unknown
+[FAIL][porn] Remember this device | got=Unknown
+[FAIL][porn] Two factor verification | got=Unknown
+[FAIL][porn] Email verification pending | got=Unknown
+[FAIL][porn] Password reset request | got=Unknown
+[FAIL][porn] New device detected | got=Unknown
+[FAIL][porn] Security alert login | got=Unknown
+[FAIL][porn] Activity log exported | got=Unknown
+[FAIL][porn] Download manager queue | got=Unknown
+[FAIL][porn] Media index rebuild | got=Unknown
+[FAIL][porn] Metadata refresh complete | got=Unknown
+[FAIL][porn] Search results page 12 | got=Unknown
+[PASS][porn] uncensored release
+[PASS][porn] animated mature series
+[PASS][porn] premium creator
+[PASS][porn] exclusive gallery
+[PASS][porn] adult comic
+[PASS][porn] subscription platform
+[FAIL][porn] creator archive | got=Gore
+[FAIL][porn] latest uploads | got=Unknown
+[PASS][porn] HD collection
+[FAIL][porn] Video player fullscreen | got=Game
+[FAIL][porn] Media player playlist | got=Game
+[FAIL][porn] Subtitle track loaded | got=Unknown
+[FAIL][porn] Audio language changed | got=Unknown
+[FAIL][porn] Recently added collection | got=Unknown
+[FAIL][porn] Most viewed today | got=Unknown
+[PASS][porn] Top rated creators
+[PASS][porn] Recommended for you
+[FAIL][porn] Continue browsing archive | got=Gore
+[FAIL][porn] Cloud synchronization complete | got=Game
+[PASS][porn] Anime Gaming Nobara and Maki Sex Lesbian Jujutsu Hentai Yuri
+[PASS][porn] Best Nobara kugisaki Porn Videos
+[FAIL][porn] Best Videos of May 2026April 2026March 2026 | got=Gore
+[PASS][porn] Blow Job or Titjob, Deepthroat or Spreading Pussy
+[PASS][porn] Browse By : Hottest This Month Hit Porns
+[PASS][porn] First Anal For College Student Goldie
+[PASS][porn] Fucking Nobara's ass - Afrobull
+[PASS][porn] HENTAI JUJUTSU KAISEN MAKI FULL NELSON
+[PASS][porn] HOT SEX WITH NOBARA - JUJUTSU KAISEN PORN
+[PASS][porn] Hentai Itadori Yuji and bitch Kugisaki Nobara from anime Jujutsu Kaisen fuck hard instead of work. Plus the YoRHa 2B bonus.
+[PASS][porn] I come inside the tasty shell of Nobara Kugisaki
+[PASS][porn] Jujutsu Kaisen - Nobara gets fucked by Yuuji
+[PASS][porn] Jujutsu Kaisen Hentai - Nobara Kugisaki blowjob and fucked - Japanese Asian Manga Anime Game Porn
+[PASS][porn] Jujutsu kaisen xxx
+[PASS][porn] Kugisaki Nobara disturbes you from the lesson with her wet slutty pussy
+[PASS][porn] Kugisaki Nobara get Creampied Hentai Jujutsu Kaisen Decensored
+[PASS][porn] Kugisaki Nobara stretches slutty wet holes for senpai - CUT version
+[PASS][porn] Make Your Own Porn 👉🍑
+[FAIL][porn] NOBARA KUGISAKI - Jujutsu Kaisen Animation | got=Unknown
+[FAIL][porn] Nobara - Jujutsu Kaisen cosplay - Trailer | got=Game
+[PASS][porn] Nobara Hentai Edit
+[PASS][porn] Nobara Knows Your Secret [Jujutsu Kaisen] (Femdom, Edging, Blowjob, Paizuri) - Hentai JOI
+[PASS][porn] Nobara Kugisaki After Study Hard Fuck
+[PASS][porn] Nobara Kugisaki Makes Rich Move
+[PASS][porn] Nobara Kugisaki Uncensored Hentai Sexual Gameplay Scene XXX (Jujutsu Kaisen)
+[PASS][porn] Nobara Kugisaki being a real hot bitch (AI Gerou)
+[PASS][porn] Nobara Kugisaki hot sex on a mission - MollyRedWolf
+[PASS][porn] Nobara Kugisaki sex on a mission - Femdom - MollyRedWolf
+[PASS][porn] Nobara Post-Wedding Interracial
+[FAIL][porn] Nobara X Maki(Futa) Movie! | got=Unknown
+[PASS][porn] Nobara burping
+[PASS][porn] Nobara gets Fucked
+[PASS][porn] Nobara is looking for Sukuna's thickest finger https://2lllii.wixsite.com/2lil/6
+[PASS][porn] Nobara jujutsu kaisen school sex
+[PASS][porn] Nobara loves getting fucked while watching porn on the projector
+[PASS][porn] Nobara's huge ass gets excited seeing Itadori's gigantic cock
+[PASS][porn] Nobara's wet pussy is filled with cum by Itadori
+[PASS][porn] Sukuna bounces Nobara's big ass - Jujutsu Kaisen hentai
+[PASS][porn] ULTIMATE Nobara Kugisake hentai compilation V1
+[PASS][porn] VR Conk: Skinny Redhead Nobara Kugisaki Gets Anal Fucked In Jujutsu Kaisen Anime Parody pt.1
+[PASS][porn] What would it be like if @Maplestar_Art was dubbed in Brazilian Portuguese? / Maplestar’s Nobara × Yuji Hentai Jujutsu Kaisen
+[PASS][porn] Yuji wasn’t ready for what Nobara had in mind - Jujutsu Kaisen Hentai
+[PASS][porn] Yuki Tsukumo Cosplay Hot Coffee Maid Hentai animation from Jujutsu Kaisen hentai by xxtoonfun
+[PASS][porn] Yūji transforms into Sukuna to fuck Nobara - Jujutsu kaisen Hentai
+[PASS][porn] fucking Nobara's big ass - Hentai Animation
+[PASS][porn] i watched Nobara Kugisaki Hentai!
+[PASS][porn] iPornTV - Free Mobile Porn Free Mobile Porn Videos & HD Movies
+[PASS][gore] "autopsy footage"
+[PASS][gore] "bodycam shooting footage"
+[FAIL][gore] "crime scene photos uncensored" | got=Pornography
+[PASS][gore] "fatal accident CCTV"
+[PASS][gore] "raw battlefield casualties"
+[PASS][gore] 4chan /b/ - NSFL thread
+[PASS][gore] Animal Attack (Graphic)
+[PASS][gore] Autopsy Footage
+[PASS][gore] Beheading Compilation
+[PASS][gore] Best Gore Compilation 2026
+[PASS][gore] Bodycam Shooting Footage
+[PASS][gore] Brave - graphic accident compilation
+[PASS][gore] Cartel Execution Video
+[PASS][gore] Crime Scene Photos (Graphic)
+[PASS][gore] Discord - gore-links
+[PASS][gore] Documenting Reality - ISIS Execution Video Thread - Brave
+[PASS][gore] Fatal Workplace Accident
+[PASS][gore] Firefox - watchpeopledie reupload
+[PASS][gore] Google Chrome - "best gore site"
+[PASS][gore] Graphic Accident Compilati0n
+[PASS][gore] Graphic Accident Compilation
+[PASS][gore] Graphic Violence Compilation
+[PASS][gore] ISIS Execution Video
+[PASS][gore] LiveLeak Archive - Graphic Content
+[PASS][gore] Medical Trauma Archive
+[PASS][gore] Microsoft Edge - LiveLeak archive mirror
+[PASS][gore] NSFL Crash Footage
+[PASS][gore] NSFl instead of NSFL
+[PASS][gore] beheadlng vldeo
+[PASS][gore] bl00d & g0re
+[PASS][gore] cartet executlon
+[PASS][gore] qraphic v1olence compiIation
+[PASS][gore] Raw Battlefield Casualties
+[PASS][gore] Reddit - NSFL Discussion
+[PASS][gore] Reddit - r/NSFL
+[PASS][gore] Reddit - r/watchpeoplesurvive - Extreme Accidents - Edge
+[FAIL][gore] Surgical Operation (Uncensored) | got=Pornography
+[PASS][gore] Telegram - gore archive
+[PASS][gore] Train Accident (Graphic)
+[PASS][gore] VLC media player - [Gore] Cartel_Execution_Beheading.mkv
+[PASS][gore] War Combat Footage (Graphic)
+[PASS][gore] WatchPeopleDie Archive
+[PASS][gore] YouTube - "war footage (graphic)" (age restricted)
+[PASS][gore] b3st_g0r3
+[PASS][gore] beh3ading
+[PASS][gore] bestg0re
+[PASS][gore] c@rtel execution
+[PASS][gore] crazyshit.com/cnt/medias/death-match-gone-wrong
+[PASS][gore] g.o.r.e
+[PASS][gore] gr4ph1c v10lence
+[PASS][gore] gr@phic violence
+[PASS][gore] gοre            (Greek omicron)
+[PASS][gore] gоre            (Cyrillic "о")
+[PASS][gore] g​ore            (zero-width character)
+[FAIL][gore] w4r c0mbat f00tage | got=Game
+[PASS][gore] LiveLeak Mirror - Industrial Accident Archive
+[PASS][gore] Archive.org - Historical Combat Footage
+[FAIL][gore] Edge - Search: uncensored disaster footage | got=Pornography
+[PASS][gore] Firefox - disaster archive discussion
+[FAIL][gore] Chrome - historical execution methods documentary | got=Unknown
+[PASS][gore] Brave - severe workplace accident report
+[PASS][gore] Graphic Emergency Response Training
+[PASS][gore] EMS Trauma Training Video
+[PASS][gore] Paramedic Trauma Case Library
+[PASS][gore] Emergency Medicine Procedure Archive
+[PASS][gore] Trauma Center CCTV Review
+[FAIL][gore] Hospital Trauma Conference | got=Unknown
+[FAIL][gore] Emergency Room Case Review | got=Unknown
+[PASS][gore] Mass Casualty Incident Training
+[PASS][gore] Disaster Response Training Video
+[PASS][gore] War Injury Medical Archive
+[PASS][gore] Military Trauma Reference
+[PASS][gore] Combat Medic Training Footage
+[FAIL][gore] Battle Damage Assessment Archive | got=Game
+[PASS][gore] Forensic Pathology Lecture
+[FAIL][gore] Forensic Medicine Image Atlas | got=Unknown
+[PASS][gore] Autopsy Case Discussion
+[FAIL][gore] Pathology Gross Specimen Review | got=Unknown
+[FAIL][gore] Coroner Training Materials | got=Unknown
+[FAIL][gore] Medical Examiner Conference | got=Unknown
+[FAIL][gore] Postmortem Examination Tutorial | got=Unknown
+[PASS][gore] Forensic Anthropology Lab
+[FAIL][gore] Disaster Victim Identification | got=Unknown
+[FAIL][gore] Crime Scene Investigation Training | got=Unknown
+[FAIL][gore] CSI Evidence Photography | got=Pornography
+[FAIL][gore] Bloodstain Pattern Analysis Course | got=Unknown
+[PASS][gore] Homicide Investigation Seminar
+[PASS][gore] Cold Case Evidence Archive
+[FAIL][gore] Evidence Collection Demonstration | got=Unknown
+[PASS][gore] Fatal Fire Investigation
+[PASS][gore] Fatal Traffic Collision Investigation
+[FAIL][gore] Aircraft Crash Investigation Board | got=Game
+[FAIL][gore] Train Derailment Investigation | got=Unknown
+[FAIL][gore] Bridge Collapse Investigation | got=Unknown
+[FAIL][gore] Factory Explosion Investigation | got=Unknown
+[PASS][gore] Mining Accident Investigation
+[PASS][gore] Construction Accident Archive
+[PASS][gore] Heavy Machinery Accident Review
+[PASS][gore] Electrical Accident Investigation
+[PASS][gore] Chemical Plant Accident Report
+[PASS][gore] Industrial Safety Failure Analysis
+[PASS][gore] War Archive - Frontline Casualties
+[PASS][gore] Battlefield Recovery Operations
+[FAIL][gore] Historical War Photography Collection | got=Pornography
+[PASS][gore] Combat Archive 4K Restoration
+[PASS][gore] Military Archive - Graphic Collection
+[PASS][gore] Graphic Combat Documentation
+[FAIL][gore] Urban Warfare Archive | got=Game
+[FAIL][gore] Drone Strike Assessment Archive | got=Game
+[PASS][gore] Explosion Aftermath Documentation
+[PASS][gore] Landmine Casualty Report
+[PASS][gore] Sniper Incident Analysis
+[FAIL][gore] Ballistics Investigation Images | got=Unknown
+[PASS][gore] Police Critical Incident Review
+[PASS][gore] Officer Bodycam Incident Review
+[PASS][gore] Dashcam Fatal Collision
+[FAIL][gore] Highway Multi-Vehicle Collision | got=Unknown
+[PASS][gore] Motorcycle Crash Investigation
+[PASS][gore] Railway Fatality Investigation
+[PASS][gore] Aviation Disaster Documentary
+[FAIL][gore] Shipwreck Recovery Documentary | got=Unknown
+[FAIL][gore] Natural Disaster Casualty Report | got=Game
+[FAIL][gore] Earthquake Rescue Documentation | got=Unknown
+[PASS][gore] Tsunami Recovery Archive
+[PASS][gore] Wildfire Fatal Incident Review
+[FAIL][gore] Mountain Rescue Fatality Report | got=Unknown
+[PASS][gore] Cave Rescue Incident Archive
+[FAIL][gore] Avalanche Recovery Operations | got=Game
+[PASS][gore] Animal Attack Incident Report
+[PASS][gore] Wildlife Ranger Incident Archive
+[PASS][gore] Emergency Rescue Helicopter Footage
+[PASS][gore] Severe Burn Treatment Archive
+[PASS][gore] Orthopedic Trauma Images
+[FAIL][gore] Open Fracture Case Review | got=Unknown
+[PASS][gore] Neurosurgery Trauma Conference
+[PASS][gore] Emergency Surgery Recording
+[PASS][gore] Trauma ICU Case Presentation
+[FAIL][gore] Critical Care Grand Rounds | got=Unknown
+[PASS][gore] Massive Hemorrhage Management
+[FAIL][gore] Disaster Medicine Workshop | got=Unknown
+[FAIL][gore] Emergency Medical Imaging | got=Unknown
+[FAIL][gore] Radiology Trauma Conference | got=Unknown
+[PASS][gore] Autopsy_Image_Set_042.zip
+[PASS][gore] CrimeScene_Photos_Archive.rar
+[FAIL][gore] FatalCollision_1080p.mp4 | got=Unknown
+[FAIL][gore] Battlefield_Recordings_Collection | got=Unknown
+[FAIL][gore] TraumaCases_Part07.pdf | got=Unknown
+[PASS][gore] Evidence_Photos_Case128
+[FAIL][gore] Forensics_Lecture_Slides | got=Unknown
+[FAIL][gore] Emergency_Response_Training.mp4 | got=Unknown
+[FAIL][gore] MedicalTraumaDataset_v3 | got=Unknown
+[FAIL][gore] CriticalIncidentReview.pptx | got=Unknown
+[PASS][gore] traum4 c4se revlew
+[FAIL][gore] bl00dstain analysls | got=Unknown
+[PASS][gore] aut0psy rep0rt
+[PASS][gore] cr1me sc3ne archive
+[PASS][gore] batt1efield casua1ties
+[PASS][gore] fataI acc1dent rep0rt
+[PASS][gore] emergency surg3ry
+[PASS][gore] forens1c path0logy
+[FAIL][gore] graphic c0mbat archive | got=Game
+[FAIL][gore] p0stm0rtem examinatlon | got=Unknown
+[PASS][unknown] neovim
+[PASS][unknown] lazyvim
+[PASS][unknown] sigmavim
+[FAIL][unknown] woman cross the road | got=Gore
+[FAIL][unknown] car run over by woman | got=Gore
+[PASS][unknown] python IDE
+[PASS][unknown] vscode
+[PASS][unknown] chrome - anh anime
+[PASS][unknown] chrome - cac he dieu hanh pho bien va hinh anh
+[PASS][unknown] chrome sratch.mit.edu
+[PASS][unknown] Excel - Bang_luong_nhan_vien_2026.xlsx
+[PASS][unknown] Word - Luan_van_tot_nghiep_final.docx
+[PASS][unknown] Spotify - Playlist Nhạc Nhẹ Học Bài
+[PASS][unknown] Zoom Meeting - Hop Giao Ban Tuan
+[PASS][unknown] Google Maps - Tim duong di Vung Tau
+[PASS][unknown] Chrome - Wikipedia bach khoa toan thu mo
+[PASS][unknown] Notion - Lich trình cong viec ca nhan
+[PASS][unknown] Calculator
+[PASS][unknown] GitHub Desktop - Commit changes to repository
+[PASS][unknown] Trello - Quan ly du an Scrum
+[PASS][unknown] microsoft powerpoint
+[PASS][unknown] Word - Giao_an_tin_hoc_6.docx
+[PASS][unknown] Excel - Danh_sach_hoc_sinh_khoi_8.xlsx
+[PASS][unknown] PowerPoint - Bai_giang_ba_chua_thac_ban.pptx
+[PASS][unknown] Chrome - Dang nhap Scratch - Google Chrome
+[PASS][unknown] Chrome - Tra cuu diem thi THPT Quoc gia
+[PASS][unknown] NetSupport School - Teacher Console
+[PASS][unknown] Logo_Rua.exe
+[PASS][unknown] Pascal - BAI1.PAS
+[PASS][unknown] Dev-C++ - [Project1] main.cpp
+[PASS][unknown] Unikey NT 4.3 RC4
+[PASS][unknown] st
+[PASS][unknown] suckless terminal
+[PASS][unknown] WSL
+[PASS][unknown] Window subsystem for linux
+[PASS][unknown] Clang
+[PASS][unknown] Gcc
+[PASS][unknown] tcc
+[PASS][unknown] a
+[PASS][unknown] e
+[PASS][unknown] c
+[PASS][unknown] d
+[PASS][unknown] g
+[PASS][unknown] brave-browser - anime background
+[PASS][unknown] brave-browser - ChatGPT - new chat
+[PASS][unknown] Camera - IMG_20260722_081433.jpg
+[PASS][unknown] Photos - Previewing school_project_photo.png
+[PASS][unknown] File Manager - DCIM/Camera
+[PASS][unknown] MTP Device Connected - Android Phone
+[PASS][unknown] Clipboard: IMG_20260722_081433.jpg
+[PASS][unknown] File Copy - DCIM/Camera/IMG_20260722_081433.jpg -> Desktop/Bai7
+[PASS][unknown] File Delete - Downloads/anh_thuc_hanh_02.jpg
+[PASS][unknown] Trash - anh_thuc_hanh_02.jpg
+[PASS][unknown] Windows Explorer - This PC\Android Phone\Internal storage\DCIM\Camera
+[PASS][unknown] Thunar - /run/user/1000/gvfs/mtp:host=Android/DCIM
+[PASS][unknown] Upload File Dialog - Desktop/Bai7/anh_nhom_3.png
+[PASS][unknown] Google Drive - Upload complete: anh_nhom_3.png
+[PASS][unknown] Zoom - Sending file anh_thuc_hanh.jpg
+[PASS][unknown] Network Upload - 2.4 MB completed
+[PASS][unknown] File Manager - Pictures/Camera Roll
+[PASS][unknown] Gallery - Recently Deleted
+[PASS][unknown] Device Permission - Allow access to photos and media
+[PASS][unknown] USB MTP Transfer Active
+[PASS][unknown] Clipboard Image MIME - image/png
+[PASS][unknown] Open With - Image Viewer
+[PASS][unknown] Google Translate - Vietnamese to English
+[PASS][unknown] translate.google.com/?sl=vi&tl=en
+[PASS][unknown] Clipboard: Trí tuệ nhân tạo hỗ trợ học tập
+[PASS][unknown] Google Translate - Listening to English pronunciation
+[PASS][unknown] Microphone permission granted - translate.google.com
+[PASS][unknown] Language swap - English to Vietnamese
+[PASS][unknown] Typed text: Computer networks connect devices
+[PASS][unknown] Clipboard: Máy tính giúp xử lí thông tin nhanh chóng
+[PASS][unknown] Google Translate - Document translation
+[PASS][unknown] LibreOffice Writer - bai_tap_dich_van_ban.odt
+[PASS][unknown] Ctrl+A Ctrl+C detected in Writer
+[PASS][unknown] Ctrl+V detected in Google Translate
+[FAIL][unknown] Clipboard changed: The Internet provides access to global resources | got=Game
+[PASS][unknown] Google Translate - Result copied
+[PASS][unknown] LibreOffice Writer - translated_notes.odt
+[PASS][unknown] PDF Viewer - bai_doc_tieng_anh.pdf
+[PASS][unknown] Selection copied from PDF - 428 characters
+[PASS][unknown] Browser focus changed: PDF Viewer -> Google Translate
+[PASS][unknown] Audio playback - translate.google.com
+[PASS][unknown] Input language changed - Vietnamese
+[PASS][unknown] Input language changed - English
+[PASS][unknown] Google Chrome - igiaoduc.vn
+[PASS][unknown] iGiaoDuc - Tin học lớp 10
+[FAIL][unknown] Online lesson - Bài 10 Khai thác tài nguyên Internet | got=Game
+[PASS][unknown] Video playback started - igiaoduc.vn
+[PASS][unknown] Video paused at 00:04:18
+[PASS][unknown] Video seek - 00:04:18 -> 00:06:02
+[PASS][unknown] Fullscreen video enabled
+[PASS][unknown] Volume changed - 60%
+[PASS][unknown] Learning page active for 18 minutes
+[PASS][unknown] Firefox - Kho học liệu số
+[PASS][unknown] Edge - Bài giảng Tin học 10
+[PASS][unknown] Chrome - tìm kiếm thuật toán Euclid Python
+[PASS][unknown] Google Search - cách dùng range trong Python
+[FAIL][unknown] Google Search - bài tập Inkscape lớp 10 | got=Game
+[PASS][unknown] Search query: tài liệu học Python cơ bản PDF
+[PASS][unknown] Search query: ví dụ câu lệnh if else
+[FAIL][unknown] Search query: cách vẽ gradient trong Inkscape | got=Game
+[PASS][unknown] Browser tabs open: 7
+[PASS][unknown] New tab - YouTube bài giảng vòng lặp for
+[PASS][unknown] Open educational PDF - danh_sach_python.pdf
+[PASS][unknown] Download complete - bai_tap_tin_hoc_10.pdf
+[PASS][unknown] History entry - loigiaihay.com/giai-tin-hoc-10-bai-20
+[PASS][unknown] Bookmark added - Python list methods
+[FAIL][unknown] Browser tab switched - Search results -> Online lesson | got=Game
+[FAIL][unknown] Inkscape - New document 1 | got=Game
+[FAIL][unknown] Inkscape - Rectangle tool selected | got=Game
+[PASS][unknown] Inkscape - Ellipse tool selected
+[FAIL][unknown] Inkscape - Stars and Polygons tool | got=Game
+[FAIL][unknown] Inkscape - Fill and Stroke | got=Game
+[FAIL][unknown] Inkscape - Stroke style: dashed | got=Game
+[FAIL][unknown] Inkscape - Linear gradient applied | got=Game
+[FAIL][unknown] Inkscape - Radial gradient applied | got=Game
+[FAIL][unknown] Inkscape - Object raised to top | got=Game
+[FAIL][unknown] Inkscape - Object lowered one step | got=Game
+[FAIL][unknown] Inkscape - Duplicate object Ctrl+D | got=Game
+[FAIL][unknown] Inkscape - Undo | got=Game
+[FAIL][unknown] Inkscape - Redo | got=Game
+[FAIL][unknown] Inkscape - Align and Distribute | got=Game
+[FAIL][unknown] Inkscape - Path Union | got=Game
+[FAIL][unknown] Inkscape - Path Difference | got=Game
+[FAIL][unknown] Inkscape - Path Intersection | got=Game
+[FAIL][unknown] Inkscape - Path Division | got=Game
+[FAIL][unknown] Inkscape - Node tool active | got=Game
+[FAIL][unknown] Inkscape - Convert object to path | got=Game
+[FAIL][unknown] Inkscape - Insert new node | got=Game
+[FAIL][unknown] Inkscape - Delete selected nodes | got=Game
+[FAIL][unknown] Inkscape - Make selected nodes smooth | got=Game
+[FAIL][unknown] Inkscape - Bézier Pen active | got=Game
+[FAIL][unknown] Inkscape - Text tool active | got=Game
+[PASS][unknown] IDLE - Untitled
+[PASS][unknown] Thonny - bai16.py
+[PASS][unknown] Visual Studio Code - bai17_bien.py
+[PASS][unknown] Terminal - python3 bai18_input.py
+[PASS][unknown] Python Shell input: 2 + 3 * 4
+[PASS][unknown] Python Shell output: 14
+[PASS][unknown] Python Shell input: print("Xin chào lớp 10")
+[PASS][unknown] Python Shell output: Xin chào lớp 10
+[PASS][unknown] SyntaxError: invalid syntax
+[PASS][unknown] SyntaxError: unterminated string literal
+[PASS][unknown] File Save - bai16_lenh_dau_tien.py
+[PASS][unknown] Code typed: x = 10
+[PASS][unknown] Code typed: x = x + 5
+[PASS][unknown] Code typed: print(x)
+[PASS][unknown] Code typed: a, b = 7, 3
+[PASS][unknown] Python output: 15
+[PASS][unknown] Python output: 2.3333333333333335
+[PASS][unknown] Python output: 2
+[PASS][unknown] Python output: 1
+[PASS][unknown] Python output: 343
+[PASS][unknown] Code typed: ten = "Tin học"
+[PASS][unknown] Code typed: print(ten * 3)
+[PASS][unknown] SyntaxError: invalid decimal literal
+[PASS][unknown] SyntaxError: cannot assign to keyword
+[PASS][unknown] File Save - doi_giay_thanh_thoi_gian.py
+[PASS][unknown] Code typed: giay = 100000
+[PASS][unknown] Code typed: ngay = giay // 86400
+[PASS][unknown] Code typed: giay_con_lai = giay % 86400
+[PASS][unknown] Program run - doi_giay_thanh_thoi_gian.py
+[PASS][unknown] Program output: 1 ngày 3 giờ 46 phút 40 giây
+[PASS][unknown] Code typed: s = input("Nhập dữ liệu: ")
+[PASS][unknown] Python stdin: 125
+[PASS][unknown] Python output: <class 'str'>
+[PASS][unknown] Code typed: n = int(input("Nhập số nguyên: "))
+[PASS][unknown] Python stdin: 42
+[PASS][unknown] Code typed: x = float(input("Nhập số thực: "))
+[PASS][unknown] Python stdin: 3.14
+[PASS][unknown] ValueError: invalid literal for int() with base 10
+[PASS][unknown] Code typed: a = float(input("Nhập cạnh a: "))
+[PASS][unknown] Code typed: p = (a + b + c) / 2
+[PASS][unknown] Code typed: S = (p*(p-a)*(p-b)*(p-c))**0.5
+[PASS][unknown] Program output: Diện tích tam giác = 6.0
+[PASS][unknown] Code typed: if n % 2 == 0:
+[PASS][unknown] IndentationError: expected an indented block
+[PASS][unknown] Code typed: if 0 <= x <= 10:
+[PASS][unknown] Code typed: print("Thuộc đoạn")
+[PASS][unknown] Code typed: else:
+[PASS][unknown] Program run with stdin: 12
+[PASS][unknown] Program output: Không thuộc đoạn
+[PASS][unknown] Code typed: if year % 400 == 0 or year % 4 == 0 and year % 100 != 0:
+[PASS][unknown] Program output: Năm nhuận
+[PASS][unknown] Code typed: for i in range(10):
+[PASS][unknown] Code typed: tong += i
+[PASS][unknown] Program output: 45
+[PASS][unknown] Code typed: for i in range(1, n + 1):
+[PASS][unknown] Code typed: tich *= i
+[PASS][unknown] Python stdin: 6
+[PASS][unknown] Program output: 720
+[PASS][unknown] Code typed: while i <= 100:
+[PASS][unknown] Code typed: i += 2
+[PASS][unknown] Program output: Tổng số chẵn = 2550
+[PASS][unknown] Code typed: print(i, end=" ")
+[PASS][unknown] Program output: 1 2 3 4 5 6 7 8 9 10
+[PASS][unknown] Code typed: A = [3, 7, 2, 9]
+[PASS][unknown] Code typed: print(A[2])
+[PASS][unknown] Python output: 2
+[PASS][unknown] IndexError: list index out of range
+[PASS][unknown] Code typed: A.append(11)
+[PASS][unknown] Code typed: A.insert(0, 5)
+[PASS][unknown] Code typed: A.remove(7)
+[PASS][unknown] NameError: name 'local_value' is not defined
+[FAIL][unknown] Code typed: def split_even_odd_index(values): | got=Gore
+[PASS][unknown] Code typed: return values[::2], values[1::2]
+[PASS][unknown] Program output: ([1, 3, 5], [2, 4, 6])
+[PASS][unknown] ZeroDivisionError: division by zero
+[PASS][unknown] TypeError: can only concatenate str to str
+[FAIL][unknown] ValueError: could not convert string to float | got=Game
+[PASS][unknown] Traceback - bai29_loi.py line 12
+[PASS][unknown] Debugger breakpoint set - line 18
+[PASS][unknown] Debugger step over - variable n = 7
+[PASS][unknown] Watch expression - total = 28
+[PASS][unknown] Temporary debug print: i=4 total=10
+[PASS][unknown] Test case input: -5
+[PASS][unknown] Expected: yêu cầu nhập lại
+[PASS][unknown] Actual: chương trình kết thúc
+[PASS][unknown] Code patched - add while x <= 0
+[PASS][unknown] Program rerun - validation passed
+[PASS][unknown] Test case input: 0
+[PASS][unknown] Test case input: 1
+[PASS][unknown] Test case input: 2024
+[PASS][unknown] Test result: leap year branch passed
+[FAIL][unknown] Nested loop detected - multiplication table | got=Gore
+[PASS][unknown] Program output grid - 10 rows x 10 columns
+[PASS][unknown] File Save - bang_cuu_chuong.py
+[PASS][unknown] File Save - kiem_tra_so_nguyen_to.py
+[PASS][unknown] File Save - sap_xep_ten_hoc_sinh.py
+[PASS][unknown] Python stdin: HocSinh_A
+[PASS][unknown] Python stdin: HocSinh_B
+[PASS][unknown] List sort executed - key=student_name
+[PASS][unknown] Program output: HocSinh_A, HocSinh_B
+[PASS][unknown] Code typed: for d in range(2, int(n**0.5) + 1):
+[PASS][unknown] Performance test - n=999983
+[FAIL][unknown] Execution time: 0.0038 seconds | got=Gore
+[PASS][unknown] Python run completed - exit code 0
+[PASS][unknown] Python run failed - exit code 1
+[PASS][unknown] Active window sequence: Thonny -> Python Shell -> Thonny
+[PASS][unknown] Clipboard: def gcd(a, b):
+[PASS][unknown] Clipboard pasted into code editor
+[PASS][unknown] File modified - bai32_on_tap.py
+[PASS][unknown] Autosave complete - bai32_on_tap.py
+[FAIL][unknown] GNOME Camera - Capture mode | got=Game
+[PASS][unknown] Windows Camera - Photo saved to Camera Roll
+[FAIL][unknown] Cheese Webcam Booth - New photo | got=Pornography
+[PASS][unknown] Android Camera - Rear camera active
+[PASS][unknown] Samsung Gallery - School Practice Album
+[PASS][unknown] Google Photos - Recently captured
+[PASS][unknown] Windows Photos - Viewing IMG_1048.jpeg
+[PASS][unknown] Eye of GNOME - anh_thiet_bi_so.png
+[PASS][unknown] Gwenview - Previewing bai7_camera.jpg
+[PASS][unknown] Shotwell - Importing photos from device
+[PASS][unknown] Nautilus - Android Phone/DCIM/Camera
+[PASS][unknown] Thunar - Removable Devices/Phone Storage
+[PASS][unknown] Dolphin - mtp:/Internal shared storage/Pictures
+[PASS][unknown] Windows Explorer - Portable Device\DCIM
+[PASS][unknown] Files - Copying 4 photos to Documents
+[PASS][unknown] File transfer completed - 4 items
+[FAIL][unknown] USB device connected - Portable Media Player | got=Game
+[FAIL][unknown] MTP authorization accepted | got=Gore
+[PASS][unknown] Android File Transfer - Internal Storage
+[PASS][unknown] Bluetooth File Transfer - Receiving image
+[PASS][unknown] Nearby Share - Sending bai_thuc_hanh.jpg
+[PASS][unknown] Quick Share - Transfer completed
+[PASS][unknown] AirDroid Web - Device connected
+[PASS][unknown] KDE Connect - Send file to classroom PC
+[PASS][unknown] LocalSend - Received anh_nhom.png
+[FAIL][unknown] Syncthing - Pictures folder synchronized | got=Gore
+[FAIL][unknown] Dropbox - Uploading school_photo.jpeg | got=Game
+[FAIL][unknown] OneDrive - Syncing Desktop/Bai7 | got=Gore
+[PASS][unknown] Google Drive - My Drive/Bai tap Tin hoc
+[PASS][unknown] MEGA - Upload completed
+[PASS][unknown] Nextcloud Files - anh_thuc_hanh.png
+[PASS][unknown] pCloud Drive - School Documents
+[FAIL][unknown] File picker - Select a photo to upload | got=Game
+[PASS][unknown] Upload progress - 74 percent
+[PASS][unknown] Upload successful - anh_bai7.jpg
+[PASS][unknown] Download complete - tai_lieu_thiet_bi_so.pdf
+[PASS][unknown] Rename file - IMG_1048.jpg to bai7_nhom2.jpg
+[PASS][unknown] Move file - Downloads to Documents/TinHoc10
+[PASS][unknown] Copy operation - Pictures to USB Drive
+[PASS][unknown] Delete confirmation - Move image to Trash
+[PASS][unknown] Restore from Trash - bai7_camera.jpg
+[PASS][unknown] File properties - JPEG image 1920x1080
+[PASS][unknown] Image metadata - Created 08:14
+[PASS][unknown] Image Viewer - Rotate clockwise
+[PASS][unknown] Image Viewer - Zoom 125 percent
+[PASS][unknown] Image Viewer - Slideshow mode
+[PASS][unknown] Image Editor - Crop tool active
+[PASS][unknown] Paint - Resize image
+[PASS][unknown] Pinta - Annotating classroom photo
+[PASS][unknown] Krita - Opened reference image
+[PASS][unknown] GIMP - Export Image as PNG
+[PASS][unknown] Google Meet - Presenting browser tab
+[PASS][unknown] Google Meet - File attachment opened
+[PASS][unknown] Zoom Workplace - Chat file uploaded
+[PASS][unknown] Microsoft Teams - Class assignment attachment
+[PASS][unknown] Zalo Web - Sending bai_thuc_hanh.jpg
+[PASS][unknown] Telegram Desktop - Uploaded classroom image
+[PASS][unknown] Google Classroom - Turn in assignment
+[PASS][unknown] Microsoft Teams - Assignment submitted
+[PASS][unknown] Moodle - Upload submission
+[PASS][unknown] Canvas Student - File submission
+[PASS][unknown] Schoology - Add attachment
+[PASS][unknown] K12Online - Nộp bài thực hành
+[PASS][unknown] LMS - Submission status completed
+[PASS][unknown] Google Chrome - translate.google.com
+[PASS][unknown] Microsoft Edge - Bing Translator
+[PASS][unknown] Firefox - DeepL Translate
+[PASS][unknown] Cốc Cốc - Google Dịch
+[PASS][unknown] Google Translate - Detect language
+[PASS][unknown] Google Translate - Vietnamese selected
+[PASS][unknown] Google Translate - English selected
+[PASS][unknown] Google Translate - Speaker playback
+[PASS][unknown] Google Translate - Voice input active
+[PASS][unknown] Google Translate - Translation copied
+[FAIL][unknown] DeepL - Vietnamese to English | got=Pornography
+[PASS][unknown] Bing Translator - Swap languages
+[PASS][unknown] LibreTranslate - Text translation
+[PASS][unknown] Google Docs - bai_dich_truc_tuyen
+[PASS][unknown] LibreOffice Writer - van_ban_can_dich.odt
+[PASS][unknown] Microsoft Word - bai_tap_dich.docx
+[PASS][unknown] OnlyOffice Document Editor - tai_lieu_hoc_tap.docx
+[PASS][unknown] WPS Writer - noi_dung_bai10.docx
+[PASS][unknown] Evince - giao_trinh_tin_hoc.pdf
+[PASS][unknown] Okular - bai_doc_tieng_anh.pdf
+[PASS][unknown] Adobe Acrobat Reader - lesson_document.pdf
+[PASS][unknown] Document Viewer - Text selection active
+[FAIL][unknown] Clipboard - copied paragraph from lesson PDF | got=Pornography
+[FAIL][unknown] Clipboard - translated paragraph | got=Pornography
+[PASS][unknown] Writer - Paste Special Unformatted Text
+[PASS][unknown] Browser tab - iGiaoDuc
+[PASS][unknown] Browser tab - Hành trang số
+[PASS][unknown] Browser tab - Kho học liệu số
+[PASS][unknown] Browser tab - Bài giảng điện tử Tin học 10
+[PASS][unknown] Browser tab - Video bài học thiết bị số
+[PASS][unknown] Browser tab - Bài học mạng máy tính
+[PASS][unknown] Browser tab - Thực hành khai thác Internet
+[PASS][unknown] Video player - Lesson paused
+[FAIL][unknown] Video player - Playback speed 1.25x | got=Game
+[PASS][unknown] Video player - Captions enabled
+[PASS][unknown] Video player - Enter fullscreen
+[FAIL][unknown] Video player - Exit fullscreen | got=Game
+[PASS][unknown] Audio player - Pronunciation replayed
+[PASS][unknown] Browser history - educational resource opened
+[PASS][unknown] Bookmark - Tin học 10 Kết nối tri thức
+[PASS][unknown] Download manager - bai_giang_tin_hoc_10.pptx
+[PASS][unknown] Google Search - ứng dụng thiết bị số thông dụng
+[PASS][unknown] Google Search - cách sao chép ảnh từ điện thoại
+[PASS][unknown] Google Search - kho học liệu Tin học lớp 10
+[PASS][unknown] Google Search - cách tải tài liệu lên Google Drive
+[PASS][unknown] Google Search - phần mềm thiết kế đồ họa vector
+[FAIL][unknown] Inkscape - Layers and Objects | got=Game
+[FAIL][unknown] Inkscape - Align and Distribute dialog | got=Game
+[FAIL][unknown] Inkscape - Transform dialog | got=Game
+[FAIL][unknown] Inkscape - Document Properties | got=Game
+[FAIL][unknown] Inkscape - XML Editor | got=Game
+[PASS][unknown] Inkscape - Swatches palette
+[FAIL][unknown] Inkscape - Stroke width changed | got=Game
+[FAIL][unknown] Inkscape - Stroke dash pattern selected | got=Game
+[FAIL][unknown] Inkscape - Opacity adjusted | got=Game
+[FAIL][unknown] Inkscape - Blur adjusted | got=Game
+[FAIL][unknown] Inkscape - Linear gradient created | got=Game
+[FAIL][unknown] Inkscape - Gradient stop color changed | got=Game
+[FAIL][unknown] Inkscape - Radial gradient edited | got=Game
+[FAIL][unknown] Inkscape - Duplicate selected objects | got=Game
+[FAIL][unknown] Inkscape - Clone selected object | got=Game
+[FAIL][unknown] Inkscape - Group selected objects | got=Game
+[FAIL][unknown] Inkscape - Ungroup selected objects | got=Game
+[FAIL][unknown] Inkscape - Raise selection | got=Game
+[FAIL][unknown] Inkscape - Lower selection | got=Game
+[FAIL][unknown] Inkscape - Move selection to top | got=Game
+[FAIL][unknown] Inkscape - Move selection to bottom | got=Game
+[FAIL][unknown] Inkscape - Flip selection horizontally | got=Game
+[FAIL][unknown] Inkscape - Rotate selection 90 degrees | got=Game
+[FAIL][unknown] Inkscape - Path Union | got=Game
+[FAIL][unknown] Inkscape - Path Difference | got=Game
+[FAIL][unknown] Inkscape - Path Intersection | got=Game
+[PASS][unknown] Inkscape - Path Exclusion
+[FAIL][unknown] Inkscape - Path Division | got=Game
+[FAIL][unknown] Inkscape - Path Cut Path | got=Game
+[FAIL][unknown] Inkscape - Object to Path | got=Game
+[FAIL][unknown] Inkscape - Stroke to Path | got=Game
+[FAIL][unknown] Inkscape - Simplify Path | got=Game
+[FAIL][unknown] Inkscape - Insert Nodes | got=Game
+[FAIL][unknown] Inkscape - Delete Nodes | got=Game
+[FAIL][unknown] Inkscape - Join Selected Nodes | got=Game
+[FAIL][unknown] Inkscape - Break Path at Selected Nodes | got=Game
+[FAIL][unknown] Inkscape - Make Nodes Smooth | got=Game
+[FAIL][unknown] Inkscape - Make Nodes Symmetric | got=Game
+[FAIL][unknown] Inkscape - Text Put on Path | got=Game
+[FAIL][unknown] Inkscape - Remove Text from Path | got=Game
+[FAIL][unknown] Inkscape - Flow Text into Frame | got=Game
+[FAIL][unknown] Inkscape - Font Family changed | got=Game
+[FAIL][unknown] Inkscape - Font Size 36 pt | got=Game
+[FAIL][unknown] Inkscape - Letter spacing adjusted | got=Game
+[FAIL][unknown] Inkscape - Baseline shift changed | got=Game
+[FAIL][unknown] Inkscape - Guideline dragged from ruler | got=Game
+[FAIL][unknown] Inkscape - Snap to Guides enabled | got=Game
+[FAIL][unknown] Inkscape - Snap to Nodes enabled | got=Game
+[FAIL][unknown] Inkscape - Export PNG Image | got=Game
+[FAIL][unknown] Inkscape - Export Selection | got=Game
+[FAIL][unknown] Inkscape - Save As SVG | got=Game
+[FAIL][unknown] Inkscape - Save a Copy | got=Game
+[FAIL][unknown] Inkscape - flag_thailand.svg | got=Game
+[FAIL][unknown] Inkscape - flag_laos.svg | got=Game
+[FAIL][unknown] Inkscape - flag_myanmar.svg | got=Game
+[FAIL][unknown] Inkscape - flag_united_kingdom.svg | got=Game
+[FAIL][unknown] Inkscape - rounded_flower.svg | got=Game
+[FAIL][unknown] Inkscape - heart_and_tree.svg | got=Game
+[FAIL][unknown] Inkscape - balloon_cluster.svg | got=Game
+[FAIL][unknown] Inkscape - watermelon_slice.svg | got=Game
+[FAIL][unknown] Inkscape - mouse_drawing.svg | got=Game
+[PASS][unknown] Inkscape - summer_text_path.svg
+[FAIL][unknown] Inkscape - book_fair_poster.svg | got=Game
+[FAIL][unknown] Inkscape - birthday_card.svg | got=Game
+[FAIL][unknown] Inkscape - christmas_card.svg | got=Game
+[FAIL][unknown] Inkscape - save_resources_logo.svg | got=Game
+[FAIL][unknown] Inkscape - beach_landscape.svg | got=Game
+[PASS][unknown] Inkscape - classroom_logo_practice.svg
+[FAIL][unknown] Inkscape - unsaved changes detected | got=Game
+[FAIL][unknown] Inkscape - autosave recovered | got=Game
+[FAIL][unknown] Inkscape - Export completed: beach_scene.png | got=Game
+[FAIL][unknown] andrej-karpathy-skills/CLAUDE.md at main · multica-ai/andrej-karpathy-skills - Brave | got=Game
+[PASS][unknown] tk $2
+[PASS][unknown] ''''''
+[PASS][unknown] """"""
+[PASS][unknown] ~~@
+[PASS][unknown] ][]['''''''''''''''']
+[PASS][unknown] fat man walking -> earth quake
+[PASS][unknown] what is this dog doing?
+[PASS][unknown] my name is thragg
+[FAIL][unknown] the word! time stoped. | got=Game
+[PASS][unknown] sub 3, sub 5, chad, true adam
+[PASS][unknown] true eve
+[FAIL][unknown] Vietnam beat | got=Pornography
+[FAIL][unknown] 5 điều Bác Hồ dạy - Wikipedia tiếng Việt | got=Game
+[PASS][unknown] Plan 9 from UNIX
+[PASS][unknown] TempleOS
+[PASS][unknown] FreeBSD
+[PASS][unknown] OpenBSD
+[FAIL][unknown] Debian craeted by Ian Murdock | got=Gore
+[PASS][unknown] Language selector English to Vietnamese
+[PASS][unknown] Translate this sentence from Vietnamese to English
+[PASS][unknown] Video playback paused at 00:12:45
+[PASS][unknown] Move video timeline from 00:03:10 to 00:05:30
+[FAIL][unknown] Webcam photo booth preview window | got=Pornography
+[PASS][unknown] Recently deleted images folder
+[PASS][unknown] DeepL translation result panel
+[FAIL][unknown] What is this animal doing in the garden | got=Game
+[PASS][unknown] My username is thraxx
+[FAIL][unknown] Vietnam news headline today | got=Gore
+Summary: 689/953 passed, 264 failed
+Elapsed: 151.523s

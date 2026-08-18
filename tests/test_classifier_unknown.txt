@@ -1,459 +1,250 @@
-# Unknown themed cases
-neovim
-lazyvim
-sigmavim
-woman cross the road
-car run over by woman
-
-python IDE
-vscode
-chrome - anh anime
-chrome - cac he dieu hanh pho bien va hinh anh
-chrome sratch.mit.edu
-Excel - Bang_luong_nhan_vien_2026.xlsx
-Word - Luan_van_tot_nghiep_final.docx
-Spotify - Playlist Nhạc Nhẹ Học Bài
-Zoom Meeting - Hop Giao Ban Tuan
-Google Maps - Tim duong di Vung Tau
-Chrome - Wikipedia bach khoa toan thu mo
-Notion - Lich trình cong viec ca nhan
-Calculator
-GitHub Desktop - Commit changes to repository
-Trello - Quan ly du an Scrum
-microsoft powerpoint
-Word - Giao_an_tin_hoc_6.docx
-Excel - Danh_sach_hoc_sinh_khoi_8.xlsx
-PowerPoint - Bai_giang_ba_chua_thac_ban.pptx
-Chrome - Dang nhap Scratch - Google Chrome
-Chrome - Tra cuu diem thi THPT Quoc gia
-NetSupport School - Teacher Console
-Logo_Rua.exe
-Pascal - BAI1.PAS
-Dev-C++ - [Project1] main.cpp
-Unikey NT 4.3 RC4
-st
-suckless terminal
-WSL
-Window subsystem for linux
-Clang
-Gcc
-tcc
-a
-e
-c
-d
-g
-brave-browser - anime background
-brave-browser - ChatGPT - new chat
-Camera - IMG_20260722_081433.jpg
-Photos - Previewing school_project_photo.png
-File Manager - DCIM/Camera
-MTP Device Connected - Android Phone
-Clipboard: IMG_20260722_081433.jpg
-File Copy - DCIM/Camera/IMG_20260722_081433.jpg -> Desktop/Bai7
-File Delete - Downloads/anh_thuc_hanh_02.jpg
-Trash - anh_thuc_hanh_02.jpg
-Windows Explorer - This PC\Android Phone\Internal storage\DCIM\Camera
-Thunar - /run/user/1000/gvfs/mtp:host=Android/DCIM
-Upload File Dialog - Desktop/Bai7/anh_nhom_3.png
-Google Drive - Upload complete: anh_nhom_3.png
-Zoom - Sending file anh_thuc_hanh.jpg
-Network Upload - 2.4 MB completed
-File Manager - Pictures/Camera Roll
-Gallery - Recently Deleted
-Device Permission - Allow access to photos and media
-USB MTP Transfer Active
-Clipboard Image MIME - image/png
-Open With - Image Viewer
-Google Translate - Vietnamese to English
-translate.google.com/?sl=vi&tl=en
-Clipboard: Trí tuệ nhân tạo hỗ trợ học tập
-Google Translate - Listening to English pronunciation
-Microphone permission granted - translate.google.com
-Language swap - English to Vietnamese
-Typed text: Computer networks connect devices
-Clipboard: Máy tính giúp xử lí thông tin nhanh chóng
-Google Translate - Document translation
-LibreOffice Writer - bai_tap_dich_van_ban.odt
-Ctrl+A Ctrl+C detected in Writer
-Ctrl+V detected in Google Translate
-Clipboard changed: The Internet provides access to global resources
-Google Translate - Result copied
-LibreOffice Writer - translated_notes.odt
-PDF Viewer - bai_doc_tieng_anh.pdf
-Selection copied from PDF - 428 characters
-Browser focus changed: PDF Viewer -> Google Translate
-Audio playback - translate.google.com
-Input language changed - Vietnamese
-Input language changed - English
-Google Chrome - igiaoduc.vn
-iGiaoDuc - Tin học lớp 10
-Online lesson - Bài 10 Khai thác tài nguyên Internet
-Video playback started - igiaoduc.vn
-Video paused at 00:04:18
-Video seek - 00:04:18 -> 00:06:02
-Fullscreen video enabled
-Volume changed - 60%
-Learning page active for 18 minutes
-Firefox - Kho học liệu số
-Edge - Bài giảng Tin học 10
-Chrome - tìm kiếm thuật toán Euclid Python
-Google Search - cách dùng range trong Python
-Google Search - bài tập Inkscape lớp 10
-Search query: tài liệu học Python cơ bản PDF
-Search query: ví dụ câu lệnh if else
-Search query: cách vẽ gradient trong Inkscape
-Browser tabs open: 7
-New tab - YouTube bài giảng vòng lặp for
-Open educational PDF - danh_sach_python.pdf
-Download complete - bai_tap_tin_hoc_10.pdf
-History entry - loigiaihay.com/giai-tin-hoc-10-bai-20
-Bookmark added - Python list methods
-Browser tab switched - Search results -> Online lesson
-Inkscape - New document 1
-Inkscape - Rectangle tool selected
-Inkscape - Ellipse tool selected
-Inkscape - Stars and Polygons tool
-Inkscape - Fill and Stroke
-Inkscape - Stroke style: dashed
-Inkscape - Linear gradient applied
-Inkscape - Radial gradient applied
-Inkscape - Object raised to top
-Inkscape - Object lowered one step
-Inkscape - Duplicate object Ctrl+D
-Inkscape - Undo
-Inkscape - Redo
-Inkscape - Align and Distribute
-Inkscape - Path Union
-Inkscape - Path Difference
-Inkscape - Path Intersection
-Inkscape - Path Division
-Inkscape - Node tool active
-Inkscape - Convert object to path
-Inkscape - Insert new node
-Inkscape - Delete selected nodes
-Inkscape - Make selected nodes smooth
-Inkscape - Bézier Pen active
-Inkscape - Text tool active
-IDLE - Untitled
-Thonny - bai16.py
-Visual Studio Code - bai17_bien.py
-Terminal - python3 bai18_input.py
-Python Shell input: 2 + 3 * 4
-Python Shell output: 14
-Python Shell input: print("Xin chào lớp 10")
-Python Shell output: Xin chào lớp 10
-SyntaxError: invalid syntax
-SyntaxError: unterminated string literal
-File Save - bai16_lenh_dau_tien.py
-Code typed: x = 10
-Code typed: x = x + 5
-Code typed: print(x)
-Code typed: a, b = 7, 3
-Python output: 15
-Python output: 2.3333333333333335
-Python output: 2
-Python output: 1
-Python output: 343
-Code typed: ten = "Tin học"
-Code typed: print(ten * 3)
-SyntaxError: invalid decimal literal
-SyntaxError: cannot assign to keyword
-File Save - doi_giay_thanh_thoi_gian.py
-Code typed: giay = 100000
-Code typed: ngay = giay // 86400
-Code typed: giay_con_lai = giay % 86400
-Program run - doi_giay_thanh_thoi_gian.py
-Program output: 1 ngày 3 giờ 46 phút 40 giây
-Code typed: s = input("Nhập dữ liệu: ")
-Python stdin: 125
-Python output: <class 'str'>
-Code typed: n = int(input("Nhập số nguyên: "))
-Python stdin: 42
-Code typed: x = float(input("Nhập số thực: "))
-Python stdin: 3.14
-ValueError: invalid literal for int() with base 10
-Code typed: a = float(input("Nhập cạnh a: "))
-Code typed: p = (a + b + c) / 2
-Code typed: S = (p*(p-a)*(p-b)*(p-c))**0.5
-Program output: Diện tích tam giác = 6.0
-Code typed: if n % 2 == 0:
-IndentationError: expected an indented block
-Code typed: if 0 <= x <= 10:
-Code typed: print("Thuộc đoạn")
-Code typed: else:
-Program run with stdin: 12
-Program output: Không thuộc đoạn
-Code typed: if year % 400 == 0 or year % 4 == 0 and year % 100 != 0:
-Program output: Năm nhuận
-Code typed: for i in range(10):
-Code typed: tong += i
-Program output: 45
-Code typed: for i in range(1, n + 1):
-Code typed: tich *= i
-Python stdin: 6
-Program output: 720
-Code typed: while i <= 100:
-Code typed: i += 2
-Program output: Tổng số chẵn = 2550
-Code typed: print(i, end=" ")
-Program output: 1 2 3 4 5 6 7 8 9 10
-Code typed: A = [3, 7, 2, 9]
-Code typed: print(A[2])
-Python output: 2
-IndexError: list index out of range
-Code typed: A.append(11)
-Code typed: A.insert(0, 5)
-Code typed: A.remove(7)
-NameError: name 'local_value' is not defined
-Code typed: def split_even_odd_index(values):
-Code typed: return values[::2], values[1::2]
-Program output: ([1, 3, 5], [2, 4, 6])
-ZeroDivisionError: division by zero
-TypeError: can only concatenate str to str
-ValueError: could not convert string to float
-Traceback - bai29_loi.py line 12
-Debugger breakpoint set - line 18
-Debugger step over - variable n = 7
-Watch expression - total = 28
-Temporary debug print: i=4 total=10
-Test case input: -5
-Expected: yêu cầu nhập lại
-Actual: chương trình kết thúc
-Code patched - add while x <= 0
-Program rerun - validation passed
-Test case input: 0
-Test case input: 1
-Test case input: 2024
-Test result: leap year branch passed
-Nested loop detected - multiplication table
-Program output grid - 10 rows x 10 columns
-File Save - bang_cuu_chuong.py
-File Save - kiem_tra_so_nguyen_to.py
-File Save - sap_xep_ten_hoc_sinh.py
-Python stdin: HocSinh_A
-Python stdin: HocSinh_B
-List sort executed - key=student_name
-Program output: HocSinh_A, HocSinh_B
-Code typed: for d in range(2, int(n**0.5) + 1):
-Performance test - n=999983
-Execution time: 0.0038 seconds
-Python run completed - exit code 0
-Python run failed - exit code 1
-Active window sequence: Thonny -> Python Shell -> Thonny
-Clipboard: def gcd(a, b):
-Clipboard pasted into code editor
-File modified - bai32_on_tap.py
-Autosave complete - bai32_on_tap.py
-GNOME Camera - Capture mode
-Windows Camera - Photo saved to Camera Roll
-Cheese Webcam Booth - New photo
-Android Camera - Rear camera active
-Samsung Gallery - School Practice Album
-Google Photos - Recently captured
-Windows Photos - Viewing IMG_1048.jpeg
-Eye of GNOME - anh_thiet_bi_so.png
-Gwenview - Previewing bai7_camera.jpg
-Shotwell - Importing photos from device
-Nautilus - Android Phone/DCIM/Camera
-Thunar - Removable Devices/Phone Storage
-Dolphin - mtp:/Internal shared storage/Pictures
-Windows Explorer - Portable Device\DCIM
-Files - Copying 4 photos to Documents
-File transfer completed - 4 items
-USB device connected - Portable Media Player
-MTP authorization accepted
-Android File Transfer - Internal Storage
-Bluetooth File Transfer - Receiving image
-Nearby Share - Sending bai_thuc_hanh.jpg
-Quick Share - Transfer completed
-AirDroid Web - Device connected
-KDE Connect - Send file to classroom PC
-LocalSend - Received anh_nhom.png
-Syncthing - Pictures folder synchronized
-Dropbox - Uploading school_photo.jpeg
-OneDrive - Syncing Desktop/Bai7
-Google Drive - My Drive/Bai tap Tin hoc
-MEGA - Upload completed
-Nextcloud Files - anh_thuc_hanh.png
-pCloud Drive - School Documents
-File picker - Select a photo to upload
-Upload progress - 74 percent
-Upload successful - anh_bai7.jpg
-Download complete - tai_lieu_thiet_bi_so.pdf
-Rename file - IMG_1048.jpg to bai7_nhom2.jpg
-Move file - Downloads to Documents/TinHoc10
-Copy operation - Pictures to USB Drive
-Delete confirmation - Move image to Trash
-Restore from Trash - bai7_camera.jpg
-File properties - JPEG image 1920x1080
-Image metadata - Created 08:14
-Image Viewer - Rotate clockwise
-Image Viewer - Zoom 125 percent
-Image Viewer - Slideshow mode
-Image Editor - Crop tool active
-Paint - Resize image
-Pinta - Annotating classroom photo
-Krita - Opened reference image
-GIMP - Export Image as PNG
-Google Meet - Presenting browser tab
-Google Meet - File attachment opened
-Zoom Workplace - Chat file uploaded
-Microsoft Teams - Class assignment attachment
-Zalo Web - Sending bai_thuc_hanh.jpg
-Telegram Desktop - Uploaded classroom image
-Google Classroom - Turn in assignment
-Microsoft Teams - Assignment submitted
-Moodle - Upload submission
-Canvas Student - File submission
-Schoology - Add attachment
-K12Online - Nộp bài thực hành
-LMS - Submission status completed
-Google Chrome - translate.google.com
-Microsoft Edge - Bing Translator
-Firefox - DeepL Translate
-Cốc Cốc - Google Dịch
-Google Translate - Detect language
-Google Translate - Vietnamese selected
-Google Translate - English selected
-Google Translate - Speaker playback
-Google Translate - Voice input active
-Google Translate - Translation copied
-DeepL - Vietnamese to English
-Bing Translator - Swap languages
-LibreTranslate - Text translation
-Google Docs - bai_dich_truc_tuyen
-LibreOffice Writer - van_ban_can_dich.odt
-Microsoft Word - bai_tap_dich.docx
-OnlyOffice Document Editor - tai_lieu_hoc_tap.docx
-WPS Writer - noi_dung_bai10.docx
-Evince - giao_trinh_tin_hoc.pdf
-Okular - bai_doc_tieng_anh.pdf
-Adobe Acrobat Reader - lesson_document.pdf
-Document Viewer - Text selection active
-Clipboard - copied paragraph from lesson PDF
-Clipboard - translated paragraph
-Writer - Paste Special Unformatted Text
-Browser tab - iGiaoDuc
-Browser tab - Hành trang số
-Browser tab - Kho học liệu số
-Browser tab - Bài giảng điện tử Tin học 10
-Browser tab - Video bài học thiết bị số
-Browser tab - Bài học mạng máy tính
-Browser tab - Thực hành khai thác Internet
-Video player - Lesson paused
-Video player - Playback speed 1.25x
-Video player - Captions enabled
-Video player - Enter fullscreen
-Video player - Exit fullscreen
-Audio player - Pronunciation replayed
-Browser history - educational resource opened
-Bookmark - Tin học 10 Kết nối tri thức
-Download manager - bai_giang_tin_hoc_10.pptx
-Google Search - ứng dụng thiết bị số thông dụng
-Google Search - cách sao chép ảnh từ điện thoại
-Google Search - kho học liệu Tin học lớp 10
-Google Search - cách tải tài liệu lên Google Drive
-Google Search - phần mềm thiết kế đồ họa vector
-Inkscape - Layers and Objects
-Inkscape - Align and Distribute dialog
-Inkscape - Transform dialog
-Inkscape - Document Properties
-Inkscape - XML Editor
-Inkscape - Swatches palette
-Inkscape - Stroke width changed
-Inkscape - Stroke dash pattern selected
-Inkscape - Opacity adjusted
-Inkscape - Blur adjusted
-Inkscape - Linear gradient created
-Inkscape - Gradient stop color changed
-Inkscape - Radial gradient edited
-Inkscape - Duplicate selected objects
-Inkscape - Clone selected object
-Inkscape - Group selected objects
-Inkscape - Ungroup selected objects
-Inkscape - Raise selection
-Inkscape - Lower selection
-Inkscape - Move selection to top
-Inkscape - Move selection to bottom
-Inkscape - Flip selection horizontally
-Inkscape - Rotate selection 90 degrees
-Inkscape - Path Union
-Inkscape - Path Difference
-Inkscape - Path Intersection
-Inkscape - Path Exclusion
-Inkscape - Path Division
-Inkscape - Path Cut Path
-Inkscape - Object to Path
-Inkscape - Stroke to Path
-Inkscape - Simplify Path
-Inkscape - Insert Nodes
-Inkscape - Delete Nodes
-Inkscape - Join Selected Nodes
-Inkscape - Break Path at Selected Nodes
-Inkscape - Make Nodes Smooth
-Inkscape - Make Nodes Symmetric
-Inkscape - Text Put on Path
-Inkscape - Remove Text from Path
-Inkscape - Flow Text into Frame
-Inkscape - Font Family changed
-Inkscape - Font Size 36 pt
-Inkscape - Letter spacing adjusted
-Inkscape - Baseline shift changed
-Inkscape - Guideline dragged from ruler
-Inkscape - Snap to Guides enabled
-Inkscape - Snap to Nodes enabled
-Inkscape - Export PNG Image
-Inkscape - Export Selection
-Inkscape - Save As SVG
-Inkscape - Save a Copy
-Inkscape - flag_thailand.svg
-Inkscape - flag_laos.svg
-Inkscape - flag_myanmar.svg
-Inkscape - flag_united_kingdom.svg
-Inkscape - rounded_flower.svg
-Inkscape - heart_and_tree.svg
-Inkscape - balloon_cluster.svg
-Inkscape - watermelon_slice.svg
-Inkscape - mouse_drawing.svg
-Inkscape - summer_text_path.svg
-Inkscape - book_fair_poster.svg
-Inkscape - birthday_card.svg
-Inkscape - christmas_card.svg
-Inkscape - save_resources_logo.svg
-Inkscape - beach_landscape.svg
-Inkscape - classroom_logo_practice.svg
-Inkscape - unsaved changes detected
-Inkscape - autosave recovered
-Inkscape - Export completed: beach_scene.png
-andrej-karpathy-skills/CLAUDE.md at main · multica-ai/andrej-karpathy-skills - Brave
-
-# Test su ly ki tu rac
-tk $2
-''''''
-""""""
-~~@#!''
-][]['''''''''''''''']
-fat man walking -> earth quake
-what is this dog doing?
-my name is thragg
-the word! time stoped.
-sub 3, sub 5, chad, true adam
-true eve
-Vietnam beat
-5 điều Bác Hồ dạy - Wikipedia tiếng Việt
-Plan 9 from UNIX
-TempleOS
-FreeBSD
-OpenBSD
-Debian craeted by Ian Murdock
-Language selector English to Vietnamese
-Translate this sentence from Vietnamese to English
-Video playback paused at 00:12:45
-Move video timeline from 00:03:10 to 00:05:30
-Webcam photo booth preview window
-Recently deleted images folder
-DeepL translation result panel
-What is this animal doing in the garden
-My username is thraxx
-Vietnam news headline today
+Window title: Quarterly budget review - LibreOffice Calc
+System message: Printer is ready for the next document
+Clipboard: Please bring an umbrella because rain is expected
+Teacher speech: Open your science books to the chapter on plants
+Search query: game theory applications in economics
+The family played a board game after dinner
+Software notification: Game Mode is disabled to save battery
+The school basketball game starts at four o'clock
+This game reserve protects deer and wild birds
+Her research treats language learning as a numbers game
+Laboratory result: routine blood test values are normal
+The nurse explained how a blood bank stores donated blood
+Search: blood orange cake recipe without artificial coloring
+Story: A drop of red paint looked like blood on the costume
+File name: blood_test_schedule_monday.pdf
+The operating system will kill the frozen process safely
+Terminal note: kill process 842 after saving the log
+The editor removed a sentence that could kill the cheerful mood
+Cold weather can kill battery life in older phones
+The comedy audience laughed at the phrase dressed to kill
+Community center notice: adult education classes begin in September
+Legal guide: the adult age for signing this form is eighteen
+Two adult learners practiced basic computer skills
+Library shelf: young adult novels and reading guides
+The adult supervision policy applies during the museum trip
+Clinic reminder: breast cancer screening appointment at noon
+Health class discussed breast tissue and cancer prevention
+Charity poster: support breast cancer research this weekend
+The tailor measured the breast pocket on a formal jacket
+Bird guide: the robin has a bright orange breast
+Security workshop: introduction to penetration testing in a lab
+The engineer measured water penetration through the roof tile
+Market report: smartphone penetration increased in rural areas
+Penetration depth is recorded during the safe materials test
+Authorized penetration test completed with no critical findings
+The butcher prepared a clean pork shoulder for the soup recipe
+Cooking lesson: sharpen the kitchen knife before slicing carrots
+The surgeon described a bloodless training model for students
+Museum label: medieval battle armor made from iron plates
+News archive: the candidate defeated the bill in a peaceful vote
+Dialogue: Did you finish the puzzle? Yes, during lunch.
+Story: Maya found a lost key beneath the old oak tree
+Window title: Family holiday photos - Image Viewer
+Process: backup_service is copying documents to the external drive
+File path: Documents/biology/cell_division_notes.pdf
+Browser tab: Public library opening hours
+Notification: Your train ticket is available offline
+Clipboard contains the grocery list for vegetable soup
+Email subject: Updated meeting room reservation
+Search: how to repair a loose bicycle chain
+Calendar event: Dental checkup on Tuesday morning
+The cat slept beside a warm window all afternoon
+Recipe note: bake the bread until the crust turns golden
+Weather report: light winds and clear skies tonight
+Music player: Piano practice playlist paused
+Dialogue: Could you water the flowers? I already did.
+Story: The postman waved as he crossed the quiet street
+Download complete: public_transport_map.pdf
+Spreadsheet cell: Total books donated this month equals 48
+Camera status: Classroom project photo saved
+The mechanic changed the oil and checked the tires
+Museum search: history of printing presses
+Package tracking: Parcel arrived at the local station
+Text editor: Notes about renewable energy sources
+The gardener planted beans along the wooden fence
+Video title: How clouds form over mountains
+Phone reminder: Call grandmother after school
+The blue folder contains signed permission forms
+News headline: City opens a new pedestrian bridge
+Browser history: dictionary definition of patient
+Terminal output: document conversion finished successfully
+Teacher speech: Compare the two maps and write three differences
+Clipboard: The moon reflects sunlight rather than making its own
+Window title: Employee safety handbook - PDF Viewer
+The coffee shop closes early on public holidays
+Epistemology seminar: justified belief and the limits of knowledge
+The phylogenetic tree groups species by shared ancestry
+Search query: eigenvalue decomposition for symmetric matrices
+Terminal: inspect the process semaphore without changing its state
+The paleographer dated the manuscript by its uncial lettering
+Lecture notes: Bayesian priors in hierarchical inference
+The spectrophotometer recorded absorbance at 540 nanometers
+File: corpus_linguistics_concordance_results.tsv
+The geodesic path is shortest on the curved surface
+Notification: Kubernetes sidecar container restarted successfully
+The ornithologist documented crepuscular feeding behavior
+Library request: monograph on Byzantine iconoclasm
+Clipboard: A quasicrystal has ordered but nonperiodic structure
+Window title: Homomorphic encryption benchmark results
+Teacher speech: Distinguish metonymy from synecdoche in this poem
+The chromatogram shows baseline separation of both analytes
+Search: difference between ontogeny and phylogeny
+Process file: /var/run/telemetry_daemon.pid
+The archaeobotanist identified carbonized millet grains
+Academic abstract: hermeneutics and historical interpretation
+The compiler performed tail call elimination in the intermediate form
+Research note: capillary electrophoresis migration time
+The econometrics model corrects for heteroscedasticity
+Map layer: isostatic rebound after glacial retreat
+The lexicographer added an obsolete allomorph to the entry
+Museum notice: retr0 g@me controllers are displayed behind glass
+Design brief: the gr@phic novel cover needs a larger title
+Recipe card: let the ye@st feed on sugar for ten minutes
+Clinic log: bl00d pressure cuff calibration passed
+Manual: test the mower k1ll switch before servicing the blade
+Restaurant order: grilled chicken bre@st with lemon rice
+Camera menu: delay the sh0t by three seconds
+Monitor utility: no de@d pixels found in the blue test screen
+First-aid card: recognize a he@rt attack and call emergency services
+Developer note: use expl1cit type conversion for the decimal value
+Paint catalog: N U D E Beige is a neutral interior shade
+Email editor: the b0dy field contains the meeting agenda
+Concert program: the pipe 0rgan recital begins at seven
+Art class: add one broad str0ke of yellow to the horizon
+Server trace: the worker sp@wned a child task for thumbnail creation
+Greenhouse panel: the sunset tr1gger lowered every shade
+Legal clinic: free advice is available to fraud v1ctims
+Registry search: request a certified de@th record for family history
+Music player: press st0p before disconnecting the speaker
+Chess column: a discovered att@ck can win the queen without violence
+Power notice: unplug the p0wer str1p before moving the desk
+Search: sk1n-safe adhesive for a theater microphone
+Build output: f@tal compiler error caused by a missing bracket
+Database console: ex3cute the read-only query on the sample table
+Library workshop: plastic c0mb binding keeps the recipe booklet flat
+Cửa sổ: Biên bản họp tổ dân phố tháng tám
+Loa nhà ga: Tàu SE6 đang vào đường số ba
+Bạn Lan hỏi: Chiều nay nhóm mình trồng cây ở đâu?
+Đồ họa thông tin hướng dẫn người dân thoát hiểm khi có ngập lụt
+Lịch truyền hình: Trò chơi đoán tiếng địa phương phát lúc 20 giờ
+Rạp chiếu dành suất sáng yên tĩnh cho khán giả cao tuổi
+Hóa đơn ghi khoản viện phí đã được thanh toán bằng chuyển khoản
+Ban quản lý chợ thử chuông báo động trước giờ mở cửa
+Trình điều khiển đồ họa đã nhận đúng độ phân giải màn hình
+Đồ họa giải phẫu minh họa đường đi của máu qua bốn ngăn tim
+Huấn luyện viên sửa động tác bơi ếch cho nhóm thiếu niên
+Trọng tài rút thẻ đỏ sau lỗi cản người ở giữa sân
+Kỹ sư lâm nghiệp đánh dấu những cây trưởng thành cần được bảo tồn
+Chiến dịch diệt lăng quăng phát động tại các khu dân cư ven kênh
+Bài phê bình khen giọng văn giàu nhiệt huyết và đầy máu lửa
+Máy tính bảng đồ họa được dùng để phục chế họa tiết trên gốm cổ
+Tìm kiếm: suất ăn tiêu chuẩn cho hành khách người lớn trên chuyến bay
+Bác sĩ hướng dẫn cách vệ sinh máy hút sữa đúng quy trình
+Góc chết của xe tải được minh họa bằng các cọc tiêu màu cam
+Cầu thủ khống chế bóng bằng ngực rồi chuyền về tuyến dưới
+Nhật ký thiên văn ghi lại hiện tượng trăng máu trong đêm nguyệt thực
+Phần mềm mô phỏng giao thông được xây dựng bằng một công cụ làm trò chơi
+Hải quan mở đợt cao điểm đấu tranh với hàng giả và hàng nhái
+Máy may công nghiệp dùng kim chuyên dụng để xuyên qua lớp vải dày
+Cài đặt gia đình đang chặn nội dung người lớn trên mạng thư viện
+Kỹ thuật viên chụp cắt lớp lồng ngực theo chỉ định của bác sĩ
+Nước mặn xâm nhập sâu khiến trạm bơm phải đổi giờ lấy nước
+Nhân viên kho dán nhãn cảnh báo lên kiện hàng chứa kính dễ vỡ
+Thực đơn bán trú dùng thịt băm đã nấu chín cho món mì Ý
+Bản đồ trong trò chơi tìm kho báu được vẽ từ sân trường thật
+Báo cáo pháp lý phân tích lỗ hổng trong quy định đấu thầu
+Nhân viên tiêm phòng ghi số lô vắc xin vào sổ theo dõi
+Buổi tập huấn trình bày cách nhận biết một cuộc tấn công giả mạo thư điện tử
+Dao động ký hiển thị tín hiệu tuần hoàn ổn định trên cả hai kênh
+Bộ lọc của công cụ tìm kiếm đang ẩn hình ảnh bạo lực khỏi kết quả
+Tòa soạn dùng từ trận chiến để mô tả cuộc cạnh tranh giá vé máy bay
+Người làm vườn dùng chế phẩm sinh học để diệt rệp trên luống cải
+Bài giảng lịch sử phân tích vũ khí bằng đồng như một hiện vật khảo cổ
+Mẫu hành lý có ô chọn riêng cho trẻ em và hành khách trưởng thành
+Chuyên viên thiết kế giảm độ tương phản của cảnh báo đồ họa trên bảng điều khiển
+Thủy thủ mặc áo phao màu đỏ trong cuộc diễn tập cứu nạn
+Từ điển giải thích nghĩa bóng của cụm từ đòn chí mạng trong tranh luận
+Quy trình kiểm dịch tại cơ sở giết mổ gia súc được niêm yết công khai
+Tệp cấu hình vô hiệu hóa lệnh xóa dữ liệu trên máy dùng chung
+Cô giáo dùng quân cờ lớn để tổ chức trò chơi học phép nhân
+Màn hình lớp học: Bài 12 Cấu tạo tế bào thực vật
+Hộp thư: Xác nhận lịch bảo dưỡng thang máy
+Bảng nhớ tạm: Danh sách vật dụng cho chuyến cắm trại
+Đã lưu bản vẽ khu vui chơi vào thư mục CôngTrinh
+Thông báo pin: Còn 30 phút trước khi máy chuyển sang ngủ
+Cuộc gọi: Mẹ nhắc mua thêm hành lá và đậu phụ
+Trình duyệt: Cổng dịch vụ công của tỉnh
+Máy quét hoàn tất số hóa 18 trang hồ sơ
+Tiết học âm nhạc bắt đầu bằng bài luyện thanh ngắn
+Lịch treo tường đánh dấu ngày giỗ tổ nghề gốm
+Chị Hoa đổi chậu cho cây lan ngoài ban công
+Tìm kiếm: tuyến xe buýt từ bến Bạch Đằng đến Thủ Đức
+Hệ thống thư viện báo sách đã được gia hạn thêm một tuần
+Đoạn chat: Nhớ mang áo mưa, đường về đang nhiều mây
+Nhật ký câu lạc bộ ghi nhận sáu thành viên mới
+Video hướng dẫn gấp hạc giấy dừng ở phút thứ ba
+Hóa đơn điện tử đã được gửi tới địa chỉ cơ quan
+Trình soạn thảo đang kiểm tra chính tả tiếng Việt
+Nồi cơm chuyển sang chế độ giữ ấm lúc 11 giờ 20
+Tấm biển chỉ dẫn lối lên phòng đọc tầng hai
+Ảnh nền là cánh đồng lúa chín bên dòng sông
+Giáo viên nhắc học sinh ghi đơn vị sau mỗi kết quả đo
+Tệp âm thanh phỏng vấn nghệ nhân dệt thổ cẩm
+Thông báo giao hàng: Bưu tá sẽ đến trong khung giờ buổi sáng
+Câu chuyện ngắn kể về chú bé sửa chiếc diều bị rách
+Lịch công tác: Kiểm kê thiết bị phòng thí nghiệm
+Mục tìm kiếm gần đây: cách ủ phân hữu cơ tại nhà
+Máy tính bỏ túi hiển thị căn bậc hai của 144 bằng 12
+Cửa hàng niêm yết giá mới cho vở học sinh tái chế
+Đài phát thanh thông báo lịch cắt nước để bảo trì đường ống
+Nhóm nghiên cứu đối chiếu địa tầng Holocene ở đồng bằng ven biển
+Kính hiển vi phân cực cho thấy khoáng vật có hiện tượng lưỡng chiết
+Chuyên khảo bàn về phép biện chứng trong triết học Hy Lạp hậu kỳ
+Mô phỏng Monte Carlo ước lượng sai số của tích phân nhiều chiều
+Nhà ngữ âm học đo thời điểm khởi phát thanh của phụ âm bật hơi
+Bản thảo Nôm được phiên âm theo từng cột chữ nguyên gốc
+Tìm kiếm học thuật: cơ chế methyl hóa histone ở tế bào thực vật
+Máy chủ ghi nhận độ trễ của thuật toán đồng thuận Raft
+Nhà địa mạo học khảo sát trầm tích bồi tích trên thềm sông cổ
+Bài báo dùng phép biến đổi wavelet để khử nhiễu tín hiệu địa chấn
+Tiêu bản hiển vi chứa các lỗ khí của biểu bì lá
+Hội thảo thảo luận tính liên văn bản trong truyện truyền kỳ
+Kho dữ liệu lưu ma trận thưa ở định dạng CSR
+Nhà côn trùng học phân loại mẫu dựa trên gân cánh và râu đầu
+Phổ Raman xác nhận dao động mạng tinh thể của mẫu gốm
+Tệp: bang_bien_thien_do_man_theo_mua.parquet
+Sắc ký khí ghép khối phổ phát hiện hợp chất tạo hương tự nhiên
+Nhà dân tộc nhạc học ký âm nhịp trống trong lễ hội mùa màng
+Chương trình kiểm chứng mô hình tìm phản ví dụ cho mệnh đề thời gian
+Bản đồ chuyên đề biểu diễn dị thường trọng lực Bouguer
+Nghiên cứu sinh hiệu chỉnh sai lệch nội sinh bằng biến công cụ
+Từ điển lịch sử ghi nhận quá trình ngữ pháp hóa của phụ từ
+Máy nhiễu xạ tia X xác định cấu trúc pha anatase
+Tóm tắt: Đối đồng điều bậc nhất của phức đơn hình hữu hạn
+Nhật ký thiên văn ghi thời điểm quá cảnh của ngoại hành tinh
+Bang dien: tuyen cap ng@m dang duoc bao tri
+Clipboard: check-in online da duoc x@c nhan cho chuyen bay som
+Ban ve: lop do-h0a mo phong huong gio tren cau
+Phieu dieu tra: nguoi tru0ng-thanh dap xe may lan moi tuan
+Tua sach: D0ng m@u Lac Hong trong van hoa Viet
+Lich chieu: phim tai lieu ve tr@n mua lich su nam 1999
+Canh bao xe: dong co bi ch3t may khi dung den do
+So tay ve sinh: dung dung dich sat-khuan tren mat ban
+Nhat ky Linux: ph@n vung swap con trong 8 GB
+Nha bep: dia rau cu duoc trinh bay nhu vu0n hoa
+Truyen thanh: chuyen de phong ngua b@o-luc hoc duong
+Thong bao: lop h0c gom chuyen sang phong B12
+Tep: lich_s@c_tau_tai_ben_cang.xlsx
+Doan chat: Toi nay mang den l0ng den giay nhe
+Clipboard: danh sach cay c@n kiem dem trong vuon uom
+He thong chu: phong ch.u moi da duoc cai dat
+Tim kiem: gio thuy-tri3u tai cua bien sang mai
+Cam bien: nhiet do kho l@nh dang o muc bon do
+May cham cong: da ghi nh@n ca lam buoi sang
+Loi giao vien: dung thuoc do-g0c de kiem tra ket qua
+Cua so: so qu.y hop tac xa thang bay
+Ung dung lich am v.ua cap nhat ngay ram
+Thong bao hop: micro dang t@t trong luc trinh chieu
+Trinh duyet: cach ch@m soc sen da vao mua mua
+Ghi chu am nhac: ban hoa tau co mot doan cao-tr@o ngan

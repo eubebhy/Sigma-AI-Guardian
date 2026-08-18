@@ -128,8 +128,8 @@ def _create_services(browser: _FakeBrowserOperations) -> PlatformServices:
         hosts=_FakeHostsPathOperations(),
         input_blocker=cast(InputBlockingOperations, Mock()),
         key_listener=cast(KeyListenerOperations, Mock()),
-        input_controller=cast(InputControllerOperations, Mock()),
         cursor_controller=cast(CursorOperations, Mock()),
+        input_controller=cast(InputControllerOperations, Mock()),
     )
 
 

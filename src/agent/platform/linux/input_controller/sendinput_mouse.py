@@ -21,7 +21,7 @@ from evdev import ecodes
 from Xlib.display import Display
 
 from agent.platform_protocols import MouseButton
-from agent.platform.linux.input_controller.types import UInputDevice
+from agent.platform.linux.input_controller.types import Capabilities, UInputDevice
 from agent.platform.linux.input_controller.utils import UInputManager
 
 
@@ -50,187 +50,146 @@ class _Root(Protocol):
         ...
 
 
-_display: Display | None = None
-_root: _Root | None = None
-_configured_device_name: str | None = None
 _MOVEMENT_INTERVAL: Final[float] = 0.1
 _DEVICE_NAME: Final[str] = f"Sigma Virtual Mouse {os.getpid()}"
-_ui_manager = UInputManager(
-    _DEVICE_NAME,
-    {
-        ecodes.EV_KEY: list(dict.fromkeys(_BUTTON_CODES.values())),
-        ecodes.EV_REL: [
-            ecodes.REL_X,
-            ecodes.REL_Y,
-            ecodes.REL_WHEEL,
-            ecodes.REL_HWHEEL,
-        ],
-    },
-)
+_CAPABILITIES: Final[Capabilities] = {
+    ecodes.EV_KEY: list(dict.fromkeys(_BUTTON_CODES.values())),
+    ecodes.EV_REL: [
+        ecodes.REL_X,
+        ecodes.REL_Y,
+        ecodes.REL_WHEEL,
+        ecodes.REL_HWHEEL,
+    ],
+}
 
 
-def _get_ui() -> UInputDevice:
-    """Tạo virtual mouse ở lần sử dụng đầu tiên."""
+class MouseInput:
+    """Sở hữu virtual mouse và X11 connection của một input controller Linux."""
 
-    global _configured_device_name
+    def __init__(self) -> None:
+        device_name = f"{_DEVICE_NAME} {id(self)}"
+        self.ui_manager = UInputManager(device_name, _CAPABILITIES)
+        self.configured_device_name: str | None = None
+        self.display: Display | None = None
+        self.root: _Root | None = None
 
-    ui = _ui_manager.get_ui()
-    device_name = ui.name
-    if _configured_device_name == device_name:
+    def close(self) -> None:
+        errors: list[Exception] = []
+        try:
+            self.ui_manager.close()
+        except Exception as error:
+            errors.append(error)
+        self.configured_device_name = None
+        self.root = None
+        if self.display is not None:
+            try:
+                self.display.close()
+            except Exception as error:
+                errors.append(error)
+            else:
+                self.display = None
+        if errors:
+            raise ExceptionGroup("Linux mouse cleanup failed", errors)
+
+    def get_ui(self) -> UInputDevice:
+        ui = self.ui_manager.get_ui()
+        if self.configured_device_name != ui.name:
+            _configure_mouse(ui.name)
+            self.configured_device_name = ui.name
         return ui
 
-    subprocess.run(
-        [
-            "xinput",
-            "set-prop",
-            device_name,
-            "libinput Accel Profile Enabled",
-            "0",
-            "1",
-        ],
-        check=True,
-    )
-    subprocess.run(
-        [
-            "xinput",
-            "set-prop",
-            device_name,
-            "libinput Accel Speed",
-            "0",
-        ],
-        check=True,
-    )
-    _configured_device_name = device_name
-    return ui
+    def get_root(self) -> _Root:
+        if self.root is not None:
+            return self.root
+        last_error: Exception | None = None
+        for attempt in range(1, 4):
+            display: Display | None = None
+            try:
+                display = Display()
+                self.root = cast(_Root, display.screen().root)
+                self.display = display
+                return self.root
+            except Exception as error:
+                if display is not None:
+                    display.close()
+                last_error = error
+                logger.debug(
+                    "X server connection attempt %s of 3 failed: %s", attempt, error
+                )
+        raise RuntimeError("Cannot connect to X server") from last_error
 
+    def position(self, take_new: bool = False) -> tuple[int, int]:
+        pointer = self.get_root().query_pointer()
+        return pointer.root_x, pointer.root_y
 
-def _get_root() -> _Root:
-    """Kết nối X server ở lần cần đọc vị trí con trỏ đầu tiên."""
-    global _display, _root
+    def moveRel(self, x: int | None, y: int | None, duration: float = 0.0) -> None:
+        ui = self.get_ui()
+        steps = max(1, ceil(duration / _MOVEMENT_INTERVAL))
+        remaining_x = 0 if x is None else x
+        remaining_y = 0 if y is None else y
+        step_duration = duration / steps
+        for steps_left in range(steps, 0, -1):
+            step_x = int(remaining_x / steps_left)
+            step_y = int(remaining_y / steps_left)
+            ui.write(ecodes.EV_REL, ecodes.REL_X, step_x)
+            ui.write(ecodes.EV_REL, ecodes.REL_Y, step_y)
+            ui.syn()
+            remaining_x -= step_x
+            remaining_y -= step_y
+            if step_duration:
+                time.sleep(step_duration)
 
-    if _root is not None:
-        return _root
+    def moveTo(self, x: int | None, y: int | None, duration: float = 0.0) -> None:
+        current_x, current_y = self.position()
+        target_x = current_x if x is None else x
+        target_y = current_y if y is None else y
+        self.moveRel(target_x - current_x, target_y - current_y, duration)
 
-    last_error: Exception | None = None
-
-    for attempt in range(1, 4):
-        try:
-            _display = Display()
-            _root = cast(_Root, _display.screen().root)
-            return _root
-        except Exception as error:
-            last_error = error
-            logger.debug("X server connection attempt %s of 3 failed: %s", attempt, error)
-
-    raise RuntimeError("Cannot connect to X server") from last_error
-
-
-def click(
-    x: int | None = None,
-    y: int | None = None,
-    button: MouseButton = "primary",
-) -> None:
-    """Click tại tọa độ chỉ định hoặc giữ nguyên vị trí hiện tại."""
-
-    if x is not None or y is not None:
-        moveTo(x, y)
-    mouseDown(button)
-    time.sleep(0.02467)
-    mouseUp(button)
-
-
-def mouseDown(button: MouseButton) -> None:
-    code = _BUTTON_CODES[button]
-    ui = _get_ui()
-    ui.write(ecodes.EV_KEY, code, 1)
-    ui.syn()
-
-
-def mouseUp(button: MouseButton) -> None:
-    code = _BUTTON_CODES[button]
-    ui = _get_ui()
-    ui.write(ecodes.EV_KEY, code, 0)
-    ui.syn()
-
-
-old_position: tuple[int, int] | None = None
-
-
-def position(take_new: bool = False) -> tuple[int, int]:
-
-    pointer = _get_root().query_pointer()
-    newx, newy = pointer.root_x, pointer.root_y
-
-    return newx, newy
-
-
-def moveTo(x: int | None, y: int | None, duration: float = 0.0) -> None:
-    """Di chuyển đến tọa độ tuyệt đối, giữ nguyên trục có giá trị ``None``."""
-
-    current_x, current_y = position()
-    target_x = current_x if x is None else x
-    target_y = current_y if y is None else y
-    moveRel(target_x - current_x, target_y - current_y, duration)
-
-
-def moveRel(x: int | None, y: int | None, duration: float = 0.0) -> None:
-    """Di chuyển theo độ lệch, xem ``None`` là độ lệch bằng không."""
-
-    ui = _get_ui()
-    steps = max(1, ceil(duration / _MOVEMENT_INTERVAL))
-    remaining_x = 0 if x is None else x
-    remaining_y = 0 if y is None else y
-    step_duration = duration / steps
-
-    for steps_left in range(steps, 0, -1):
-        step_x = int(remaining_x / steps_left)
-        step_y = int(remaining_y / steps_left)
-        ui.write(ecodes.EV_REL, ecodes.REL_X, step_x)
-        ui.write(ecodes.EV_REL, ecodes.REL_Y, step_y)
+    def mouseDown(self, button: MouseButton) -> None:
+        ui = self.get_ui()
+        ui.write(ecodes.EV_KEY, _BUTTON_CODES[button], 1)
         ui.syn()
-        remaining_x -= step_x
-        remaining_y -= step_y
-        if step_duration:
-            time.sleep(step_duration)
+
+    def mouseUp(self, button: MouseButton) -> None:
+        ui = self.get_ui()
+        ui.write(ecodes.EV_KEY, _BUTTON_CODES[button], 0)
+        ui.syn()
+
+    def click(
+        self,
+        x: int | None = None,
+        y: int | None = None,
+        button: MouseButton = "primary",
+    ) -> None:
+        if x is not None or y is not None:
+            self.moveTo(x, y)
+        self.mouseDown(button)
+        time.sleep(0.02467)
+        self.mouseUp(button)
+
+    def scroll(self, amount: int) -> None:
+        ui = self.get_ui()
+        ui.write(ecodes.EV_REL, ecodes.REL_WHEEL, amount)
+        ui.syn()
+
+    def sideScroll(self, amount: int) -> None:
+        ui = self.get_ui()
+        ui.write(ecodes.EV_REL, ecodes.REL_HWHEEL, amount)
+        ui.syn()
 
 
-def scroll(amount: int) -> None:
-    """Cuộn dọc; số dương cuộn lên, số âm cuộn xuống."""
+# Rat qyan trong, tat truot con tro tren X11
+def _configure_mouse(device_name: str) -> None:
+    """Tắt acceleration cho virtual mouse mới."""
 
-    ui = _get_ui()
-    ui.write(ecodes.EV_REL, ecodes.REL_WHEEL, amount)
-    ui.syn()
-
-
-def sideScroll(amount: int) -> None:
-    """Cuộn ngang; số dương sang phải, số âm sang trái."""
-
-    ui = _get_ui()
-    ui.write(ecodes.EV_REL, ecodes.REL_HWHEEL, amount)
-    ui.syn()
+    subprocess.run(
+        ["xinput", "set-prop", device_name, "libinput Accel Profile Enabled", "0", "1"],
+        check=True,
+    )
+    subprocess.run(
+        ["xinput", "set-prop", device_name, "libinput Accel Speed", "0"],
+        check=True,
+    )
 
 
-def close() -> None:
-    """Đóng virtual mouse và X11 connection nếu đã được tạo."""
-
-    global _configured_device_name, _display, _root
-
-    _ui_manager.close()
-    _configured_device_name = None
-    _root = None
-    if _display is not None:
-        _display.close()
-        _display = None
-
-
-__all__ = [
-    "close",
-    "click",
-    "mouseDown",
-    "mouseUp",
-    "moveRel",
-    "moveTo",
-    "position",
-    "scroll",
-    "sideScroll",
-]
+__all__ = ["MouseInput"]

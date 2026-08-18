@@ -41,7 +41,7 @@ AgentRuntime.services
     +-- hosts adapter    -> web_blocker
     +-- input blocker    -> screen_locker
     +-- key listener     -> keylogger
-    `-- input controller -> compatibility facade / caller
+    `-- input controller factory -> Input resource / caller
 ```
 
 `main.py` hiện chỉ cấu hình logging, tạo runtime và kết thúc process. Runtime tạo một
@@ -81,13 +81,13 @@ adapter cho test cũng đơn giản hơn.
 | Browser | validate URL, ưu tiên browser đang chạy | process spawn/session flags |
 | Web block | parse domain, dedupe, marker, atomic write | đường dẫn hosts |
 | Window monitor | API title/process chuẩn hóa | PyWinCtl, fallback `xdotool` trên Linux |
-| Input | facade public và event chuẩn hóa | adapter evdev/UInput/X11; Win32/SendInput/pynput |
+| Input | `Input` resource và event chuẩn hóa | adapter evdev/UInput/X11; Win32/SendInput/pynput |
 | Screen capture | `ScreenRegion`, downsample, lock | MSS backend đa nền tảng |
 
 Code native process, browser, window, hosts và input nằm tại
 `src/agent/platform/linux/` hoặc `src/agent/platform/windows/`. Các package
-`device_controller/input_controller`, `utils/input_blocker` và `utils/key_listener`
-chỉ giữ compatibility facade cho public API cũ.
+`device_controller/input_controller` giữ public `Input` resource; `utils/input_blocker`
+và `utils/key_listener` giữ compatibility facade cho public API cũ.
 Feature trong `device_controller/` và `system_monitor/` không gọi `ps`,
 `tasklist`, `taskkill`, `xdotool`, `os.name`, `sys.platform` hay đường dẫn hosts.
 
