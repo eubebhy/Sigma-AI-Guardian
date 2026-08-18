@@ -5,7 +5,7 @@ Input: lời gọi theo contract chung của input controller.
 Output: API sender có cùng chữ ký với backend Linux.
 Nguyên lý: chỉ re-export các module con; dependency nền tảng được import lazy bên
 trong từng API để package vẫn import được trên Linux. Listener nằm tại
-`utils.key_listener`.
+`system_monitor.keylogger`.
 """
 
 from agent.platform.windows.input_controller.sendinput_kb import (

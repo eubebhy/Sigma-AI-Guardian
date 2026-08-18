@@ -3,7 +3,7 @@
 File path: `src/agent/platform/linux/input_controller/__init__.py`.
 Input: lời gọi sender chuẩn hóa từ facade package cha.
 Output: API sender dùng virtual evdev/UInput.
-Nguyên lý: module chỉ re-export sender; listener nằm tại `utils.key_listener`.
+Nguyên lý: module chỉ re-export sender; listener nằm tại `system_monitor.keylogger`.
 """
 
 from agent.platform.linux.input_controller.sendinput_kb import (

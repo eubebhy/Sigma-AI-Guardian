@@ -5,7 +5,7 @@ File path: `src/device_controller/input_controller/README.md`
 Vai tro: gui va dieu khien keyboard/mouse tren Linux hoac Windows. Input la ten
 phim/nut chung, toa do hoac thoi luong; output la event dieu khien native. Package
 nay cung cap resource `Input`; no khong lang nghe input hoac doc NumLock. Dung
-`utils.key_listener` cho hai nhu cau do.
+`system_monitor.keylogger` cho hai nhu cau do.
 
 ```text
 device_controller/input_controller/
@@ -113,4 +113,4 @@ moveTo(500, 300); click(); write("Hello"); press("enter")
 ```
 
 Thoat bang `exit()`, `quit()` hoac Ctrl+D de dong `Input`. Event listener nam tai
-[`src/utils/key_listener/README.md`](../../utils/key_listener/README.md).
+`src/system_monitor/keylogger/`.

@@ -35,7 +35,7 @@ from test_support import add_source_path, run_module, test_modes
 add_source_path()
 
 from system_monitor.keylogger import KeyLogger
-from utils.key_listener import KeyEvent
+from system_monitor.keylogger import KeyEvent
 
 
 class _StoppingListener:

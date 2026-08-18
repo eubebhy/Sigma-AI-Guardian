@@ -33,7 +33,7 @@ try:
     if not sys.platform.startswith("linux"):
         raise ModuleNotFoundError
     from evdev import ecodes
-    from utils import key_listener
+    from system_monitor import keylogger as key_listener
     from agent.platform.linux import key_listener_backend as linux_listener
 except ModuleNotFoundError:
     _linux_fake_tests_available = False
@@ -216,10 +216,6 @@ class LinuxListenerFakeTests(unittest.TestCase):
         self.assertTrue(callable(key_listener.listen_keys))
         self.assertTrue(callable(key_listener.listen_mice))
         self.assertTrue(callable(key_listener.get_num_lock_state))
-
-        from utils.key_listener import linux
-
-        self.assertTrue(callable(linux.listen_keys))
 
     def test_listener_normalizes_and_validates_devices(self) -> None:
         keyboard = _FakeInputDevice([_FakeEvent(ecodes.EV_KEY, ecodes.KEY_A, 1)])

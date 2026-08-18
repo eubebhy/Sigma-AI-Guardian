@@ -47,7 +47,7 @@ from agent.platform.linux.input_controller import LinuxInput
 from agent.platform.linux.input_controller import sendinput_mouse
 from agent.platform.linux.input_controller import utils as linux_utils
 from device_controller.input_controller import Input
-from utils import key_listener
+from system_monitor import keylogger
 
 _linux_fake_tests_available = True
 linux_api = LinuxInput()
@@ -89,7 +89,7 @@ def _preflight_control() -> None:
     if shutil.which("xinput") is None:
         raise _PrerequisiteError("missing required binary: xinput")
     try:
-        key_listener.get_num_lock_state()
+        keylogger.get_num_lock_state()
     except Exception as e:
         raise _PrerequisiteError(f"cannot connect to the X11 display: {e}") from e
 

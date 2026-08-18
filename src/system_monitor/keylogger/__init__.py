@@ -17,8 +17,16 @@ from __future__ import annotations
 
 import threading
 
-from agent.platform_protocols import KeyListenerOperations
-from utils.key_listener import KeyEvent, get_num_lock_state, listen_keys
+from collections.abc import Iterator
+
+from agent.platform import get_default_platform_services
+from agent.platform_protocols import (
+    KeyEvent,
+    KeyListenerOperations,
+    KeyState,
+    MouseEvent,
+    MouseState,
+)
 
 
 _MODIFIERS = {"KEY_LEFTALT", "KEY_RIGHTALT", "KEY_LEFTSHIFT", "KEY_RIGHTSHIFT"}
@@ -102,6 +110,34 @@ _SHIFTED_KEY_SYMBOLS = {
     "KEY_DOT": ">",
     "KEY_SLASH": "?",
 }
+
+
+def _get_operations() -> KeyListenerOperations:
+    return get_default_platform_services().key_listener
+
+
+def get_num_lock_state() -> bool:
+    """Trả trạng thái NumLock từ adapter platform mặc định."""
+
+    return _get_operations().get_num_lock_state()
+
+
+def listen_keys(
+    timeout: float | None = None,
+    stop_event: threading.Event | None = None,
+) -> Iterator[KeyEvent]:
+    """Sinh keyboard event từ adapter platform mặc định."""
+
+    return _get_operations().listen_keys(timeout, stop_event)
+
+
+def listen_mice(
+    timeout: float | None = None,
+    stop_event: threading.Event | None = None,
+) -> Iterator[MouseEvent]:
+    """Sinh mouse event từ adapter platform mặc định."""
+
+    return _get_operations().listen_mice(timeout, stop_event)
 
 
 class KeyLogger:
@@ -345,4 +381,13 @@ class KeyLogger:
 key_logger = KeyLogger()
 
 
-__all__ = ["key_logger"]
+__all__ = [
+    "KeyEvent",
+    "KeyState",
+    "MouseEvent",
+    "MouseState",
+    "get_num_lock_state",
+    "key_logger",
+    "listen_keys",
+    "listen_mice",
+]
