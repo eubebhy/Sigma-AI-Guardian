@@ -153,7 +153,10 @@ class ProcessGuard:
         )
 
     def _should_kill(self, name: str) -> bool:
-        if self.whitelist and name in self.whitelist:
+        if self.whitelist and (
+            name in self.whitelist
+            or name in self._process_operations.list_system_processes()
+        ):
             return False
 
         if name in self.blocked:
