@@ -49,9 +49,7 @@ class ProcessGuard:
     def set_whitelist(self, values: list[str] | None) -> None:
         """Đặt danh sách process name không được kill, hoặc xoá whitelist."""
 
-        self.whitelist = (
-            {value.strip().lower() for value in values} if values else None
-        )
+        self.whitelist = {value.strip().lower() for value in values} if values else None
 
     def set_blacklist(self, values: list[str]) -> None:
         """Đặt danh sách process bị chặn."""
@@ -125,12 +123,16 @@ class ProcessGuard:
     def _scan_and_kill(self) -> None:
         for pid, name in self._process_operations.list_processes():
             normalized_name = name.strip().lower()
+
             if not self._should_kill(normalized_name):
                 continue
+
             if not self._has_same_name(pid, normalized_name):
                 continue
+
             try:
                 self._process_operations.kill_process(pid)
+
             except ProcessLookupError:
                 logger.warning(
                     "Process %s exited before the process guard could kill it",
@@ -153,8 +155,10 @@ class ProcessGuard:
     def _should_kill(self, name: str) -> bool:
         if self.whitelist and name in self.whitelist:
             return False
+
         if name in self.blocked:
             return True
+
         return False
 
 

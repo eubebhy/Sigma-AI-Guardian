@@ -9,6 +9,31 @@ Nguyên lý: giữ toàn bộ lệnh process Windows ở đây thay vì lặp tr
 import csv
 import subprocess
 
+WINDOWS_PROTECTED_PROCESSES = [
+    "smss.exe",
+    "csrss.exe",
+    "wininit.exe",
+    "logonui.exe",
+    "lsass.exe",
+    "services.exe",
+    "winlogon.exe",
+    "svchost.exe",
+    # Windows desktop / basic session
+    "explorer.exe",
+    "dwm.exe",
+    "sihost.exe",
+    "taskhostw.exe",
+    "ctfmon.exe",
+    "fontdrvhost.exe",
+    "RuntimeBroker.exe",
+    "audiodg.exe",
+    "conhost.exe",
+    # Security / basic OS functionality
+    "smartscreen.exe",
+    "SecurityHealthService.exe",
+    "SearchIndexer.exe",
+]
+
 
 class WindowsProcessOperations:
     """Thao tác process qua tasklist và taskkill."""
@@ -32,3 +57,6 @@ class WindowsProcessOperations:
         """Yêu cầu Windows kết thúc PID; exit code khác 0 được giữ nguyên cho caller."""
 
         subprocess.run(["taskkill", "/PID", str(pid), "/F"], check=True)
+
+    def list_system_processes(self) -> list[str]:
+        return WINDOWS_PROTECTED_PROCESSES

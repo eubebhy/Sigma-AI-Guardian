@@ -1,6 +1,8 @@
+
 [system]
 config_update_check_interval_seconds = 6.7
-# ================================================================
+
+# ========================== High level control ==================
 [web_blocker]
 enabled = true
 
@@ -14,33 +16,24 @@ block_entertainment = true
 custom_allowlist = []
 custom_blocklist = []
 
-# ================================================================
+# ------
 [process_guard]
-enabled = false
-scan_interval_seconds = 1.6767
-blocked_processes = []
-
-# ================================================================
-[window_monitor]
 enabled = true
 scan_interval_seconds = 1.6767
-scope = "active"
 
-# ================================================================
-[classifier]
-enabled = true
-default_strictness = "mid"
+custom_allowlist = []
+custom_blocklist = []
 
-# ================================================================
-[screen_monitor]
+block_games = true
+block_vpn = true
+block_proxy = true
+block_unmanaged_browsers = true
+block_messaging = false
+block_entertainment = true
+block_p2p = false
+block_remote_access = false
 
-# fps = clamp(min_fps, max_fps,
-#             max_fps_scale / monitor_count)
-
-max_fps_scale = 67.0
-max_fps = 30.0
-min_fps = 1.0
-
+# ------
 [screen_lock]
 enabled = false
 timeout = 402 # 6.7 mins
@@ -61,4 +54,36 @@ While waiting for unlock, you are strictly required to follow these rules:
     3. Remain at the computer and wait for the administrator to unlock it.
 
 Improper shutdown or unauthorized interference with the system may result in
-UNINTENDED CONSEQUENCES.'''
+iUNINTENDED CONSEQUENCES.'''
+
+# ========================= Low level control ====================
+[monitor.window_monitor]
+enabled = true
+scan_interval_seconds = 1.6767
+scope = "active"
+
+# ------
+[monitor.keylogger]
+enabled = true
+max_bufferi_chars = 6767 # 67 = Tuff 
+
+# ------
+[monitor.mouse_tracker]
+interval = 0.067
+max_positions = 1000 # 67 sec
+
+# ------
+[classifier]
+enabled = true
+default_strictness = "mid"
+
+# ------
+[screen_monitor]
+
+# fps = clamp(min_fps, max_fps,
+#             max_fps_scale / monitor_count)
+
+max_fps_scale = 67.0
+max_fps = 30.0
+min_fps = 1.0
+

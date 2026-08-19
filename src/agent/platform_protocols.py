@@ -11,7 +11,7 @@ from __future__ import annotations
 from collections.abc import Iterator, Sequence
 from pathlib import Path
 import threading
-from typing import Callable, Literal, Protocol, TypeAlias
+from typing import Literal, Protocol, TypeAlias
 
 
 Key: TypeAlias = str
@@ -44,6 +44,8 @@ class ProcessOperations(Protocol):
         """Yêu cầu hệ điều hành kết thúc process theo PID và giữ nguyên lỗi native."""
 
         ...
+
+    def list_system_processes(self) -> list[str]: ...
 
 
 class CursorOperations(Protocol):
