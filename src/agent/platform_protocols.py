@@ -45,7 +45,9 @@ class ProcessOperations(Protocol):
 
         ...
 
-    def list_system_processes(self) -> list[str]: ...
+    def list_system_processes(self) -> list[str]:
+        """Tra ve danh sach ten cac tien trinh he thong quan trong"""
+        ...
 
 
 class CursorOperations(Protocol):
