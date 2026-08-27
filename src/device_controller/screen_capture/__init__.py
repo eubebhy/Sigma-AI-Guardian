@@ -151,4 +151,4 @@ def _create_capture_backend() -> ScreenCapture:
 _capture_instance: ScreenCapture = _create_capture_backend()
 screen_capture = _capture_instance
 
-__all__ = ["screen_capture"]
+__all__ = ["ScreenCapture"]

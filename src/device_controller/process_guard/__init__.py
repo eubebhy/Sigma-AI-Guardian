@@ -165,7 +165,4 @@ class ProcessGuard:
         return False
 
 
-process_guard = ProcessGuard()
-
-
-__all__ = ["process_guard"]
+__all__ = ["ProcessGuard"]

@@ -34,6 +34,13 @@ block_p2p = false
 block_remote_access = false
 
 # ------
+[system_monitoring]
+trictness = "mid"
+block_games = true
+block_porn = true
+block_gore = true
+
+# ------
 [screen_lock]
 enabled = false
 timeout = 402 # 6.7 mins

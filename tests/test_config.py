@@ -1,10 +1,9 @@
-"""Kiểm tra load và fallback config Agent.
+"""Kiểm tra schema hiện tại và cơ chế fallback config Agent.
 
 File path: `tests/test_config.py`.
-Input: ba file TOML temporary: primary, last-good và fallback.
-Output: config dùng field hợp lệ ưu tiên từ primary, rồi last-good, rồi fallback.
-Nguyên lý: fallback phải khớp hoàn toàn schema; primary và last-good được cứu theo
-từng field để giữ tối đa cấu hình hợp lệ.
+Input: primary, last-good và fallback TOML trong temporary directory.
+Output: mỗi field hợp lệ được chọn theo thứ tự primary, last-good rồi fallback.
+Nguyên lý: dùng config thật làm schema chuẩn và chỉ thay giá trị cần kiểm tra.
 """
 
 from pathlib import Path
@@ -17,7 +16,7 @@ from test_support import add_source_path, run_module, test_modes
 
 add_source_path()
 
-from config import AgentConfig, ConfigSchemaError, ConfigTypeError
+from config import AgentConfig, ConfigSchemaError
 
 
 _CONFIG_PATH = (
@@ -27,92 +26,118 @@ _CONFIG_PATH = (
 
 class ConfigTests(unittest.TestCase):
     @test_modes("fake")
-    def test_loads_primary_and_saves_last_good(self) -> None:
-        with tempfile.TemporaryDirectory() as temporary_directory:
-            primary_path = Path(temporary_directory) / "primary.toml"
-            last_good_path = Path(temporary_directory) / "last-good.toml"
-            fallback_path = Path(temporary_directory) / "fallback.toml"
-            _copy_config(primary_path)
+    def test_loads_current_schema_from_fallback(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fallback_path = root / "fallback.toml"
             _copy_config(fallback_path)
 
             config = AgentConfig()
-            config.load(primary_path, last_good_path, fallback_path)
+            config.load(
+                root / "missing.toml",
+                root / "missing-good.toml",
+                fallback_path,
+            )
 
-            self.assertTrue(config.web_blocker.block_porn)
-            self.assertTrue(last_good_path.exists())
-            self.assertEqual(last_good_path.read_text(), primary_path.read_text())
+            self.assertTrue(config.system_monitoring.block_games)
+            self.assertEqual(config.process_guard.scan_interval_seconds, 1.6767)
+            self.assertEqual(config.keylogger.max_bufferi_chars, 6767)
+            self.assertEqual(config.mouse_tracker.interval, 0.067)
 
     @test_modes("fake")
-    def test_uses_last_good_only_for_invalid_primary_field(self) -> None:
-        with tempfile.TemporaryDirectory() as temporary_directory:
-            primary_path = Path(temporary_directory) / "primary.toml"
-            last_good_path = Path(temporary_directory) / "last-good.toml"
-            fallback_path = Path(temporary_directory) / "fallback.toml"
-            _copy_config(last_good_path)
+    def test_uses_each_source_per_field(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            primary_path = root / "primary.toml"
+            last_good_path = root / "last-good.toml"
+            fallback_path = root / "fallback.toml"
             _copy_config(fallback_path)
-            primary_text = _CONFIG_PATH.read_text().replace(
-                "enabled = false",
-                'enabled = "invalid"',
-            )
-            primary_text = primary_text.replace(
+            _write_changed(last_good_path, "timeout = 402", "timeout = 500")
+            primary_text = _changed_config(
                 "scan_interval_seconds = 1.6767",
-                "scan_interval_seconds = 2.0",
-            )
+                "scan_interval_seconds = 3.0",
+            ).replace("timeout = 402", 'timeout = "invalid"')
             primary_path.write_text(primary_text)
 
             config = AgentConfig()
             config.load(primary_path, last_good_path, fallback_path)
 
-            self.assertFalse(config.process_guard.enabled)
-            self.assertEqual(config.process_guard.scan_interval_seconds, 2.0)
+            self.assertEqual(config.process_guard.scan_interval_seconds, 3.0)
+            self.assertEqual(config.screen_lock.timeout, 500)
+            self.assertEqual(config.mouse_tracker.max_positions, 1000)
 
     @test_modes("fake")
-    def test_uses_fallback_when_primary_and_last_good_field_are_invalid(
-        self,
-    ) -> None:
-        with tempfile.TemporaryDirectory() as temporary_directory:
-            primary_path = Path(temporary_directory) / "primary.toml"
-            last_good_path = Path(temporary_directory) / "last-good.toml"
-            fallback_path = Path(temporary_directory) / "fallback.toml"
+    def test_uses_fallback_when_other_sources_have_invalid_field(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            primary_path = root / "primary.toml"
+            last_good_path = root / "last-good.toml"
+            fallback_path = root / "fallback.toml"
             _copy_config(fallback_path)
-            invalid_text = _CONFIG_PATH.read_text().replace(
-                "block_game = true",
-                'block_game = "invalid"',
-            )
-            primary_path.write_text(invalid_text)
-            last_good_path.write_text(invalid_text)
+            _write_changed(primary_path, "timeout = 402", 'timeout = "invalid"')
+            _write_changed(last_good_path, "timeout = 402", 'timeout = "invalid"')
 
             config = AgentConfig()
             config.load(primary_path, last_good_path, fallback_path)
 
-            self.assertTrue(config.web_blocker.block_game)
+            self.assertEqual(config.screen_lock.timeout, 402)
 
     @test_modes("fake")
-    def test_rejects_fallback_with_unmatched_field(self) -> None:
-        with tempfile.TemporaryDirectory() as temporary_directory:
-            primary_path = Path(temporary_directory) / "primary.toml"
-            last_good_path = Path(temporary_directory) / "last-good.toml"
-            fallback_path = Path(temporary_directory) / "fallback.toml"
+    def test_saves_only_complete_valid_primary_as_last_good(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            primary_path = root / "primary.toml"
+            last_good_path = root / "last-good.toml"
+            fallback_path = root / "fallback.toml"
             _copy_config(primary_path)
-            fallback_path.write_text(
-                _CONFIG_PATH.read_text() + "\nunknown = true\n"
-            )
+            _copy_config(fallback_path)
 
             config = AgentConfig()
+            config.load(primary_path, last_good_path, fallback_path)
 
-            with self.assertRaises(ConfigSchemaError):
-                config.load(primary_path, last_good_path, fallback_path)
+            self.assertEqual(last_good_path.read_text(), primary_path.read_text())
 
     @test_modes("fake")
-    def test_rejects_wrong_config_field_type(self) -> None:
-        with self.assertRaises(ConfigTypeError):
-            from config import ProcessGuardConfig
+    def test_does_not_replace_last_good_with_invalid_primary(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            primary_path = root / "primary.toml"
+            last_good_path = root / "last-good.toml"
+            fallback_path = root / "fallback.toml"
+            _write_changed(primary_path, "timeout = 402", 'timeout = "invalid"')
+            _write_changed(last_good_path, "timeout = 402", "timeout = 500")
+            _copy_config(fallback_path)
 
-            ProcessGuardConfig("false", 1.0, [])  # type: ignore[arg-type]
+            config = AgentConfig()
+            config.load(primary_path, last_good_path, fallback_path)
+
+            self.assertIn("timeout = 500", last_good_path.read_text())
+
+    @test_modes("fake")
+    def test_rejects_invalid_fallback_schema(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            fallback_path = root / "fallback.toml"
+            fallback_path.write_text(_CONFIG_PATH.read_text() + "\nunknown = true\n")
+
+            with self.assertRaises(ConfigSchemaError):
+                AgentConfig().load(
+                    root / "missing.toml",
+                    root / "missing-good.toml",
+                    fallback_path,
+                )
 
 
-def _copy_config(destination_path: Path) -> None:
-    destination_path.write_text(_CONFIG_PATH.read_text())
+def _copy_config(destination: Path) -> None:
+    destination.write_text(_CONFIG_PATH.read_text())
+
+
+def _changed_config(old: str, new: str) -> str:
+    return _CONFIG_PATH.read_text().replace(old, new)
+
+
+def _write_changed(destination: Path, old: str, new: str) -> None:
+    destination.write_text(_changed_config(old, new))
 
 
 if __name__ == "__main__":

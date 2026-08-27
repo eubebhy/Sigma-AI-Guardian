@@ -378,16 +378,13 @@ class KeyLogger:
         return "".join(cls._buffer)
 
 
-key_logger = KeyLogger()
-
-
 __all__ = [
     "KeyEvent",
     "KeyState",
+    "KeyLogger",
     "MouseEvent",
     "MouseState",
     "get_num_lock_state",
-    "key_logger",
     "listen_keys",
     "listen_mice",
 ]

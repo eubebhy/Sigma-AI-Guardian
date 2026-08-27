@@ -83,7 +83,24 @@ class WebBlockerConfig(_ConfigSection):
 class ProcessGuardConfig(_ConfigSection):
     enabled: bool
     scan_interval_seconds: float
-    blocked_processes: list[str]
+    custom_allowlist: list[str]
+    custom_blocklist: list[str]
+    block_games: bool
+    block_vpn: bool
+    block_proxy: bool
+    block_unmanaged_browsers: bool
+    block_messaging: bool
+    block_entertainment: bool
+    block_p2p: bool
+    block_remote_access: bool
+
+
+@dataclass(frozen=True)
+class SystemMonitoringConfig(_ConfigSection):
+    trictness: str
+    block_games: bool
+    block_porn: bool
+    block_gore: bool
 
 
 @dataclass(frozen=True)
@@ -91,6 +108,18 @@ class WindowMonitorConfig(_ConfigSection):
     enabled: bool
     scan_interval_seconds: float
     scope: str
+
+
+@dataclass(frozen=True)
+class KeyloggerConfig(_ConfigSection):
+    enabled: bool
+    max_bufferi_chars: int
+
+
+@dataclass(frozen=True)
+class MouseTrackerConfig(_ConfigSection):
+    interval: float
+    max_positions: int
 
 
 @dataclass(frozen=True)
@@ -117,10 +146,26 @@ _SECTION_TYPES: dict[str, type[_ConfigSection]] = {
     "system": SystemConfig,
     "web_blocker": WebBlockerConfig,
     "process_guard": ProcessGuardConfig,
+    "system_monitoring": SystemMonitoringConfig,
     "window_monitor": WindowMonitorConfig,
+    "keylogger": KeyloggerConfig,
+    "mouse_tracker": MouseTrackerConfig,
     "classifier": ClassifierConfig,
     "screen_monitor": ScreenMonitorConfig,
     "screen_lock": ScreenLockConfig,
+}
+
+_SECTION_PATHS: dict[str, tuple[str, ...]] = {
+    "system": ("system",),
+    "web_blocker": ("web_blocker",),
+    "process_guard": ("process_guard",),
+    "system_monitoring": ("system_monitoring",),
+    "window_monitor": ("monitor", "window_monitor"),
+    "keylogger": ("monitor", "keylogger"),
+    "mouse_tracker": ("monitor", "mouse_tracker"),
+    "classifier": ("classifier",),
+    "screen_monitor": ("screen_monitor",),
+    "screen_lock": ("screen_lock",),
 }
 
 _SECTION_FIELD_TYPES: dict[str, dict[str, object]] = {
@@ -136,7 +181,10 @@ class AgentConfig:
     system: SystemConfig
     web_blocker: WebBlockerConfig
     process_guard: ProcessGuardConfig
+    system_monitoring: SystemMonitoringConfig
     window_monitor: WindowMonitorConfig
+    keylogger: KeyloggerConfig
+    mouse_tracker: MouseTrackerConfig
     classifier: ClassifierConfig
     screen_monitor: ScreenMonitorConfig
     screen_lock: ScreenLockConfig
@@ -145,7 +193,10 @@ class AgentConfig:
         "system",
         "web_blocker",
         "process_guard",
+        "system_monitoring",
         "window_monitor",
+        "keylogger",
+        "mouse_tracker",
         "classifier",
         "screen_monitor",
         "screen_lock",
@@ -234,7 +285,7 @@ def _read_field(
 ) -> object | None:
     if data is None:
         return None
-    section = data.get(section_name)
+    section = _read_section(data, _SECTION_PATHS[section_name])
     if not isinstance(section, dict):
         return None
     values = cast(dict[str, Any], section)
@@ -242,6 +293,18 @@ def _read_field(
     if not _matches_type(value, expected_type):
         return None
     return value
+
+
+def _read_section(
+    data: dict[str, Any],
+    section_path: tuple[str, ...],
+) -> object:
+    section: object = data
+    for path_part in section_path:
+        if not isinstance(section, dict):
+            return None
+        section = cast(object, section.get(path_part))
+    return section
 
 
 # File and schema validation
@@ -276,9 +339,17 @@ def _is_complete_valid_config(data: dict[str, Any] | None) -> bool:
 
 
 def _validate_complete_config(data: dict[str, Any]) -> None:
-    _validate_keys(data, set(_SECTION_TYPES), "config")
+    root_names = {path[0] for path in _SECTION_PATHS.values()}
+    _validate_keys(data, root_names, "config")
+    monitor_names = {
+        path[1] for path in _SECTION_PATHS.values() if path[0] == "monitor"
+    }
+    monitor = data.get("monitor")
+    if not isinstance(monitor, dict):
+        raise ConfigSchemaError("Missing or invalid section [monitor]")
+    _validate_keys(cast(dict[str, Any], monitor), monitor_names, "section [monitor]")
     for section_name, config_type in _SECTION_TYPES.items():
-        section = data[section_name]
+        section = _read_section(data, _SECTION_PATHS[section_name])
         if not isinstance(section, dict):
             raise ConfigSchemaError(f"Missing or invalid section [{section_name}]")
         section_values = cast(dict[str, Any], section)
@@ -336,10 +407,13 @@ __all__ = [
     "ConfigFormatError",
     "ConfigSchemaError",
     "ConfigTypeError",
+    "KeyloggerConfig",
+    "MouseTrackerConfig",
     "ProcessGuardConfig",
     "ScreenLockConfig",
     "ScreenMonitorConfig",
     "SystemConfig",
+    "SystemMonitoringConfig",
     "WebBlockerConfig",
     "WindowMonitorConfig",
     "Config",

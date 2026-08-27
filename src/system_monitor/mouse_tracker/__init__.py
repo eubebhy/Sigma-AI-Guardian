@@ -114,9 +114,6 @@ class MouseTracker:
             raise cls._listener_error
 
 
-mouse_tracker = MouseTracker()
-
-
 def _parse_real_interval(arguments: Sequence[str]) -> float | None:
     if len(arguments) != 1:
         return None
@@ -156,4 +153,4 @@ def run_real(arguments: Sequence[str]) -> int:
         MouseTracker.stop()
 
 
-__all__ = ["mouse_tracker"]
+__all__ = ["MouseTracker", "run_real"]

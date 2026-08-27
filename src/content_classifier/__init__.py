@@ -37,7 +37,7 @@ def local_ai_classifier(
 
 
 # Classifier chính
-class _Classifier:
+class Classifier:
     """Classifier chính, sở hữu local AI và cache runtime."""
 
     def __init__(self) -> None:
@@ -88,18 +88,23 @@ class _Classifier:
         self._cache.clear()
 
 
-classifier = _Classifier()
-
-
-# Compatibility API
 def content_classifier(
     text: str,
     moderation_level: ModerationLevel = "mid",
 ) -> ContentCategory:
-    """Compatibility API gọi object classifier chính."""
+    """Phân loại text bằng resource ngắn hạn và luôn cleanup model."""
 
-    return classifier.classify(text, moderation_level)
+    classifier = Classifier()
+    try:
+        return classifier.classify(text, moderation_level)
+    finally:
+        classifier.close()
 
 
 # Public exports
-__all__ = ["classifier"]
+__all__ = [
+    "Classifier",
+    "content_classifier",
+    "local_ai_classifier",
+    "rule_based_classifier",
+]

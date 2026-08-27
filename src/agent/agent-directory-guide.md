@@ -25,7 +25,7 @@ ham create runtime chiu trach nhiem tao object agent runtime on dinh theo platfo
 hien tai.
 
 ```python
-# src/agent/runtime.py
+# src/agent/runtime/agent_runtime.py
 from agent.platform import PlatformServices, create_platform_services
 
 """
@@ -127,7 +127,7 @@ Doc theo thu tu:
 3. `src/agent/platform/__init__.py`
 4. `src/agent/platform/linux/browser.py`
 5. `src/agent/platform/windows/browser.py`
-6. `src/agent/runtime.py`
+6. `src/agent/runtime/agent_runtime.py`
 
 Luon doc feature chung truoc, sau do doc contract, object gom services, adapter tung
 OS va cuoi cung la runtime tao dependency nhu the nao.
@@ -160,8 +160,23 @@ Khi tu them feature moi, co the dung checklist sau:
 4. Tao adapter cho Linux va Windows trong package platform tuong ung.
 5. Cho feature nhan `PlatformServices` tu caller; fallback default chi dung khi can
    compatibility.
-6. Doc `runtime.py` de dam bao runtime tao services mot lan va owner lifecycle ro rang.
+6. Doc `agent_runtime.py` de dam bao runtime tao services mot lan va owner lifecycle ro rang.
 7. Test feature bang fake operation, khong goi OS that trong safe test.
+
+## Đăng ký feature với Agent Runtime
+
+Feature package export theo lifecycle:
+
+```text
+Service       -> class có start()/stop()
+Resource      -> class có close()
+Stateless API -> function
+```
+
+Runtime không dùng global instance từ feature module. Thêm `FeatureDefinition` vào
+`agent.runtime.feature_registry`, khai báo tên, loại, factory và điều kiện config.
+`FeatureManager` tạo instance, kiểm tra contract và cleanup; command chỉ truy cập
+feature qua manager.
 
 ## Cach de tu build mot service moi
 1. Đầu tiên, xác định lifecycle trong `agent/protocols.py` và capability trong

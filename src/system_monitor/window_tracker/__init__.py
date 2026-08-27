@@ -31,3 +31,6 @@ def get_all_open_windows(
     """Trả mapping title sang process name của cửa sổ đang mở."""
 
     return _get_operations(operations).get_open_windows()
+
+
+__all__ = ["get_active_window_name", "get_all_open_windows"]
