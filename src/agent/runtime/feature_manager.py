@@ -7,14 +7,17 @@ Nguyên lý: validate contract ngay sau factory; start một lần và shutdown 
 """
 
 import logging
+from typing import TypeVar
 
 from agent.platform import PlatformServices
 from agent.protocols import Resource, Service
-from agent.runtime.feature_registry import FeatureRegistry
+from agent.runtime.feature_registry import FeatureInstance, FeatureRegistry
+from agent.runtime.request_types import FeatureName
 from config import AgentConfig
 
 
 logger = logging.getLogger(__name__)
+FeatureType = TypeVar("FeatureType", bound=FeatureInstance)
 
 
 class FeatureManager:
@@ -29,45 +32,53 @@ class FeatureManager:
         self._registry = registry
         self._services = services
         self._config = config
-        self._instances: dict[str, object] = {}
-        self._creation_order: list[str] = []
+        self._instances: dict[FeatureName, FeatureInstance] = {}
+        self._creation_order: list[FeatureName] = []
         self._started = False
         self._closed = False
 
     def start_enabled(self) -> None:
         if self._started:
             return
+
         for definition in self._registry.definitions():
             if definition.enabled(self._config):
                 self._create(definition.name)
+
         self._started = True
 
-    def _create(self, name: str) -> object:
+    def _create(self, name: FeatureName) -> FeatureInstance:
         definition = self._registry.get(name)
         instance = definition.factory(self._services, self._config)
-        expected = Service if definition.kind == "service" else Resource
-        if not isinstance(instance, expected):
-            raise TypeError(f"Feature {name} must implement {expected.__name__}")
-        if isinstance(instance, Service):
+        if definition.kind == "service":
+            if not isinstance(instance, Service):
+                raise TypeError(f"Feature {name} must implement Service")
             instance.start()
+        elif not isinstance(instance, Resource):
+            raise TypeError(f"Feature {name} must implement Resource")
+
         self._instances[name] = instance
         self._creation_order.append(name)
         logger.info("Started feature: %s", name)
+
         return instance
 
-    def get(self, name: str) -> object:
+    def get(self, name: FeatureName, expected_type: type[FeatureType]) -> FeatureType:
         self._registry.get(name)
         try:
-            return self._instances[name]
+            instance = self._instances[name]
         except KeyError as error:
             raise RuntimeError(f"Feature is not enabled: {name}") from error
+        if not isinstance(instance, expected_type):
+            raise TypeError(f"Feature {name} has an invalid type")
+        return instance
 
-    def available_features(self) -> tuple[str, ...]:
+    def available_features(self) -> tuple[FeatureName, ...]:
         """Trả mọi feature Runtime biết cách tạo."""
 
         return self._registry.names()
 
-    def active_features(self) -> tuple[str, ...]:
+    def active_features(self) -> tuple[FeatureName, ...]:
         """Trả feature đã được tạo theo thứ tự đăng ký."""
 
         return tuple(self._creation_order)

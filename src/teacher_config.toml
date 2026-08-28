@@ -1,0 +1,57 @@
+# Research only. AgentConfig does not load or map this file yet.
+
+# ========================== Basic control ========================
+[web_blocking]
+enabled = true
+blocked_categories = ["game", "gore", "porn", "social", "messaging", "entertainment"]
+custom_allowlist = []
+custom_blocklist = []
+
+[process_blocking]
+enabled = true
+blocked_categories = ["game", "vpn", "proxy", "unmanaged_browser", "entertainment"]
+custom_allowlist = []
+custom_blocklist = []
+
+[content_filtering]
+enabled = true
+strictness = "medium"
+blocked_categories = ["game", "gore", "porn"]
+
+[screen_lock]
+enabled = false
+timeout_seconds = 402
+message = "This workstation has been restricted. Contact your teacher."
+
+[monitoring]
+window = true
+keyboard = true
+mouse = true
+screen = true
+
+# ========================= Advanced control =====================
+# Các giá trị này dự kiến ghi đè thông số low-level tương ứng.
+[advanced.system]
+config_update_check_interval_seconds = 6.7
+
+[advanced.process_guard]
+scan_interval_seconds = 1.6767
+
+[advanced.window_monitor]
+scan_interval_seconds = 1.6767
+scope = "active"
+
+[advanced.keylogger]
+max_buffer_chars = 6767
+
+[advanced.mouse_tracker]
+interval_seconds = 0.067
+max_positions = 1000
+
+[advanced.classifier]
+default_strictness = "medium"
+
+[advanced.screen_monitor]
+max_fps_scale = 67.0
+max_fps = 30.0
+min_fps = 1.0

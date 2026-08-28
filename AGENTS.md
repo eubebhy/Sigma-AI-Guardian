@@ -38,6 +38,7 @@ Phần mềm quản lý phòng tin học dành cho giáo viên, tích hợp AI A
 ### Python
 * Follow PEP 8 extreme strictly.
 * Use complete type hints compatible with Pyright strict mode.
+* Không dùng `object` trong type hint khi có thể khai báo type cụ thể hơn.
 * Do not complicate logic only to satisfy typing.
 * Use absolute imports.
 * Avoid unnecessarily complex, obscure, or high-level Python syntax and tools.

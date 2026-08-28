@@ -8,7 +8,6 @@ Nguyên lý: inject registry nhỏ để kiểm tra Runtime độc lập với f
 
 import sys
 import unittest
-from dataclasses import dataclass
 from typing import cast
 from uuid import uuid4
 
@@ -20,9 +19,21 @@ add_source_path()
 from agent.platform import PlatformServices
 from agent.runtime import AgentRuntime
 from agent.runtime.feature_manager import FeatureManager
-from agent.runtime.feature_registry import FeatureDefinition, FeatureRegistry
-from agent.runtime.request_types import Request, RequestFailed, RequestSuccessful
+from agent.runtime.feature_registry import (
+    FeatureDefinition,
+    FeatureInstance,
+    FeatureRegistry,
+)
+from agent.runtime.request_types import (
+    AgentState,
+    AgentStatus,
+    CommandName,
+    FeatureName,
+    Request,
+    RequestStatus,
+)
 from config import AgentConfig
+from device_controller.screen_locker import ScreenLocker
 
 
 class _Service:
@@ -45,16 +56,25 @@ class _Resource:
         self.closes += 1
 
 
-@dataclass
-class _Locker:
-    locks: int = 0
-    closes: int = 0
+class _Locker(ScreenLocker):
+    def __init__(self) -> None:
+        self.locks = 0
+        self.closes = 0
 
-    def lock(self) -> None:
+    def lock(
+        self,
+        header_text: str | None = None,
+        body_text: str | None = None,
+    ) -> None:
+        del header_text, body_text
         self.locks += 1
 
     def close(self) -> None:
         self.closes += 1
+
+
+class _BrokenFeature:
+    pass
 
 
 class FeatureManagerTests(unittest.TestCase):
@@ -64,8 +84,16 @@ class FeatureManagerTests(unittest.TestCase):
         resource = _Resource()
         registry = FeatureRegistry(
             (
-                FeatureDefinition("worker", "service", lambda _s, _c: service),
-                FeatureDefinition("model", "resource", lambda _s, _c: resource),
+                FeatureDefinition(
+                    FeatureName.PROCESS_GUARD,
+                    "service",
+                    lambda _s, _c: service,
+                ),
+                FeatureDefinition(
+                    FeatureName.WEB_BLOCKER,
+                    "resource",
+                    lambda _s, _c: resource,
+                ),
             )
         )
         manager = FeatureManager(
@@ -85,7 +113,13 @@ class FeatureManagerTests(unittest.TestCase):
     @test_modes("fake")
     def test_rejects_factory_result_with_wrong_contract(self) -> None:
         registry = FeatureRegistry(
-            (FeatureDefinition("broken", "service", lambda _s, _c: object()),)
+            (
+                FeatureDefinition(
+                    FeatureName.PROCESS_GUARD,
+                    "service",
+                    lambda _s, _c: cast(FeatureInstance, _BrokenFeature()),
+                ),
+            )
         )
         manager = FeatureManager(
             registry,
@@ -93,7 +127,7 @@ class FeatureManagerTests(unittest.TestCase):
             AgentConfig(),
         )
 
-        with self.assertRaisesRegex(TypeError, "broken.*Service"):
+        with self.assertRaisesRegex(TypeError, "process_guard.*Service"):
             manager.start_enabled()
 
 
@@ -102,7 +136,13 @@ class AgentRuntimeTests(unittest.TestCase):
     def test_status_and_lock_screen_use_allowlisted_commands(self) -> None:
         locker = _Locker()
         registry = FeatureRegistry(
-            (FeatureDefinition("screen_locker", "resource", lambda _s, _c: locker),)
+            (
+                FeatureDefinition(
+                    FeatureName.SCREEN_LOCKER,
+                    "resource",
+                    lambda _s, _c: locker,
+                ),
+            )
         )
         runtime = AgentRuntime(
             services=cast(PlatformServices, object()),
@@ -111,20 +151,29 @@ class AgentRuntimeTests(unittest.TestCase):
         )
         runtime.start()
 
-        status = runtime.execute(Request(uuid4(), "get_agent_status"))
-        locked = runtime.execute(Request(uuid4(), "lock_screen"))
-        unknown = runtime.execute(Request(uuid4(), "unknown"))
+        status = runtime.execute(Request(uuid4(), CommandName.GET_AGENT_STATUS))
+        locked = runtime.execute(Request(uuid4(), CommandName.LOCK_SCREEN))
         runtime.shutdown()
 
-        self.assertIsInstance(status.status, RequestSuccessful)
+        self.assertEqual(status.status, RequestStatus.SUCCEEDED)
         self.assertEqual(
             status.data,
-            {"state": "running", "active_features": ("screen_locker",)},
+            AgentStatus(AgentState.RUNNING, (FeatureName.SCREEN_LOCKER,)),
         )
-        self.assertIsInstance(locked.status, RequestSuccessful)
+        self.assertEqual(locked.status, RequestStatus.SUCCEEDED)
         self.assertEqual(locker.locks, 1)
-        self.assertIsInstance(unknown.status, RequestFailed)
         self.assertEqual(locker.closes, 1)
+
+    @test_modes("fake")
+    def test_fails_early_when_command_feature_is_not_registered(self) -> None:
+        registry = FeatureRegistry(())
+
+        with self.assertRaisesRegex(RuntimeError, "screen_locker"):
+            AgentRuntime(
+                services=cast(PlatformServices, object()),
+                config=AgentConfig(),
+                registry=registry,
+            )
 
 
 if __name__ == "__main__":

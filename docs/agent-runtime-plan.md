@@ -287,7 +287,7 @@ environment và temporary directory, không ghi path hệ thống.
 
 Files dự kiến:
 
-- `src/agent/runtime.py`
+- `src/agent/runtime/agent_runtime.py`
 - `src/config.py` nếu cần bổ sung API tối thiểu
 - test runtime mới phù hợp với lifecycle hiện tại
 
@@ -308,7 +308,7 @@ Chỉ thêm contract fake trước; chưa chọn socket, pipe hoặc dependency 
 
 Files dự kiến:
 
-- `src/agent/runtime.py`
+- `src/agent/runtime/agent_runtime.py`
 - `src/main.py`
 - test local API/loop mới khi các protocol được triển khai
 
@@ -319,7 +319,7 @@ từng request. Verify loop không busy-wait và dừng khi API đóng.
 
 Files dự kiến:
 
-- `src/agent/runtime.py`
+- `src/agent/runtime/agent_runtime.py`
 - feature modules liên quan khi cần hook lifecycle tối thiểu
 - test runtime/lifecycle mới phù hợp với các module thực tế
 

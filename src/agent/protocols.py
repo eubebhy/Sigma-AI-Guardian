@@ -42,4 +42,12 @@ class Resource(Protocol):
     def close(self) -> None: ...
 
 
+def is_resource(obj: object) -> bool:
+    return isinstance(obj, Resource)
+
+
+def is_service(obj: object) -> bool:
+    return not is_resource(obj) and isinstance(obj, Service)
+
+
 __all__ = ["Resource", "Service"]

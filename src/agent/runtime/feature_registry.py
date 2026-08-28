@@ -6,17 +6,29 @@ Output: `FeatureRegistry` tra cứu definition ổn định theo tên.
 Nguyên lý: không scan package hoặc dựa vào import side effect; mọi feature phải đăng ký.
 """
 
+from __future__ import annotations
+
 from collections.abc import Callable, Iterable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 
 from agent.platform import PlatformServices
+from agent.protocols import Resource, Service
+from agent.runtime.request_types import FeatureName
 from config import AgentConfig
 
 
+if TYPE_CHECKING:
+    from content_classifier import Classifier
+    from device_controller.process_guard import ProcessGuard
+    from device_controller.screen_locker import ScreenLocker
+    from device_controller.web_blocker import WebBlocker
+
+
 FeatureKind = Literal["service", "resource"]
-FeatureFactory = Callable[[PlatformServices, AgentConfig], object]
+FeatureInstance = Service | Resource
+FeatureFactory = Callable[[PlatformServices, AgentConfig], FeatureInstance]
 FeatureEnabled = Callable[[AgentConfig], bool]
 
 
@@ -28,7 +40,7 @@ def _always_enabled(_config: AgentConfig) -> bool:
 class FeatureDefinition:
     """Khai báo cách Runtime tạo và quản lý một feature."""
 
-    name: str
+    name: FeatureName  # Hoac de la str cung duoc nhung FeatureName clean hon
     kind: FeatureKind
     factory: FeatureFactory
     enabled: FeatureEnabled = _always_enabled
@@ -38,16 +50,19 @@ class FeatureRegistry:
     """Danh mục feature không trùng tên và không tự discovery."""
 
     def __init__(self, definitions: Iterable[FeatureDefinition]) -> None:
-        self._definitions: dict[str, FeatureDefinition] = {}
+        self._definitions: dict[FeatureName, FeatureDefinition] = {}
+
         for definition in definitions:
             if definition.name in self._definitions:
                 raise ValueError(f"Duplicate feature: {definition.name}")
+
             self._definitions[definition.name] = definition
 
     def definitions(self) -> tuple[FeatureDefinition, ...]:
+        """Tra ve danh sach cac FeatureDefinition da dang ky"""
         return tuple(self._definitions.values())
 
-    def names(self, kind: FeatureKind | None = None) -> tuple[str, ...]:
+    def names(self, kind: FeatureKind | None = None) -> tuple[FeatureName, ...]:
         """Trả tên feature đã đăng ký, có thể lọc theo lifecycle type."""
 
         return tuple(
@@ -56,14 +71,17 @@ class FeatureRegistry:
             if kind is None or definition.kind == kind
         )
 
-    def get(self, name: str) -> FeatureDefinition:
+    def get(self, name: FeatureName) -> FeatureDefinition:
         try:
             return self._definitions[name]
         except KeyError as error:
             raise KeyError(f"Unknown feature: {name}") from error
 
 
-def _create_process_guard(services: PlatformServices, config: AgentConfig) -> object:
+def _create_process_guard(
+    services: PlatformServices,
+    config: AgentConfig,
+) -> ProcessGuard:
     from device_controller.process_guard import ProcessGuard
 
     guard = ProcessGuard(services.processes)
@@ -73,19 +91,28 @@ def _create_process_guard(services: PlatformServices, config: AgentConfig) -> ob
     return guard
 
 
-def _create_web_blocker(services: PlatformServices, _config: AgentConfig) -> object:
+def _create_web_blocker(
+    services: PlatformServices,
+    _config: AgentConfig,
+) -> WebBlocker:
     from device_controller.web_blocker import WebBlocker
 
     return WebBlocker(hosts_path=Path(services.hosts.get_hosts_path()))
 
 
-def _create_classifier(_services: PlatformServices, _config: AgentConfig) -> object:
+def _create_classifier(
+    _services: PlatformServices,
+    _config: AgentConfig,
+) -> Classifier:
     from content_classifier import Classifier
 
     return Classifier()
 
 
-def _create_screen_locker(services: PlatformServices, _config: AgentConfig) -> object:
+def _create_screen_locker(
+    services: PlatformServices,
+    _config: AgentConfig,
+) -> ScreenLocker:
     from device_controller.screen_locker import ScreenLocker
 
     return ScreenLocker(services.input_blocker, services.cursor_controller)
@@ -97,25 +124,25 @@ def create_default_registry() -> FeatureRegistry:
     return FeatureRegistry(
         (
             FeatureDefinition(
-                "process_guard",
+                FeatureName.PROCESS_GUARD,
                 "service",
                 _create_process_guard,
                 lambda config: config.process_guard.enabled,
             ),
             FeatureDefinition(
-                "web_blocker",
+                FeatureName.WEB_BLOCKER,
                 "resource",
                 _create_web_blocker,
                 lambda config: config.web_blocker.enabled,
             ),
             FeatureDefinition(
-                "classifier",
+                FeatureName.CLASSIFIER,
                 "resource",
                 _create_classifier,
                 lambda config: config.classifier.enabled,
             ),
             FeatureDefinition(
-                "screen_locker",
+                FeatureName.SCREEN_LOCKER,
                 "resource",
                 _create_screen_locker,
                 lambda config: config.screen_lock.enabled,

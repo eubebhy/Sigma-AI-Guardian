@@ -16,8 +16,8 @@ Teacher Console và cơ chế giao tiếp giữa chúng chưa tồn tại.
 
 ## Chạy Agent
 
-`main.py` hiện chỉ bootstrap runtime. Runtime đã có command dispatch nội bộ qua
-allowlist; IPC giữa SAG Service và Agent chưa tồn tại.
+`main.py` hiện chỉ bootstrap runtime. Command dispatch sẽ được bổ sung cùng Agent
+Runtime về sau.
 
 ## Thành phần và luồng chạy
 
@@ -65,9 +65,11 @@ Muốn thêm feature Runtime-managed, đăng ký `FeatureDefinition` trong
 `agent.runtime.feature_registry`; không scan package hoặc dispatch object/method động.
 
 `main.py` hiện chỉ cấu hình logging, tạo runtime và kết thúc process. Runtime tạo một
-`PlatformServices` đúng một lần, start feature enabled và shutdown lifecycle qua
-`FeatureManager`. Compatibility API public cũ dùng `get_default_platform_services()`
-được cache theo process. Command handler dùng cùng runtime đó thay vì tự phát hiện OS.
+`PlatformServices` đúng một lần. Lifecycle shutdown đầy đủ vẫn là phần kế hoạch,
+chưa được triển khai trong `AgentRuntime` hiện tại. Compatibility API public cũ dùng
+`get_default_platform_services()` được cache theo process. Khi Agent phát triển
+thêm command nội bộ, command handler phải nhận cùng runtime đó thay vì tự phát
+hiện OS.
 
 ## Phân lớp và hướng import
 
