@@ -1,22 +1,16 @@
-from __future__ import annotations
-
 from dataclasses import dataclass
 from enum import Enum, auto
 from typing import Callable, Any
 from logging import getLogger
 
 from config import AgentConfig
+from agent.protocols import Service, Resource, get_type, FeatureType
 
 logger = getLogger(__name__)
 
 
 class FeatureName(Enum):
     SCREEN_LOCKER = auto()
-
-
-class FeatureType(Enum):
-    SERVICE = auto()
-    RESOURCE = auto()
 
 
 class Command(Enum):
@@ -57,9 +51,12 @@ class FeatureRegistry:
         for fea_def in self.fea_defs:
             if fea_def.feature_name == feature_name:
                 return fea_def
+
         raise KeyError(f"FeatureDefinition not found: {feature_name}")
 
     def get_all_fea_def(self) -> list[FeatureDefinition[Any, AgentConfig]]:
+        if not self.fea_defs:
+            logger.warning("Feature registry is empty")
         return self.fea_defs
 
 
@@ -78,3 +75,46 @@ def create_default_fea_def() -> list[FeatureDefinition[Any, AgentConfig]]:
             },
         )
     ]
+
+
+@dataclass
+class FeatureManager:
+    act_services: dict[FeatureName, Service]
+    act_resources: dict[FeatureName, Resource]
+    config: AgentConfig
+    fea_reg: FeatureRegistry
+
+    def start_enabled(self):
+        for fea_def in self.fea_reg.get_all_fea_def():
+            if not fea_def.enabled(self.config):
+                continue
+
+            instance = fea_def.factory()
+
+            detected_type = get_type(instance)
+
+            if not isinstance(detected_type, instance.feature_type):
+                raise RuntimeError(
+                    "Declared feature type does not match detected type."
+                )
+
+            if instance.feature_type == FeatureType.SERVICE:
+                self.act_services[fea_def.feature_name] = instance
+
+            elif instance.feature_type == FeatureType.RESOURCE:
+                self.act_resources[fea_def.feature_name] = instance
+
+    def shutdown_all(self):
+        for name, serv in self.act_services.items():
+            serv.stop()
+            logger.info(f"Stopped {name} service")
+
+        self.act_services.clear()
+        logger.info("All services stopped successfully")
+
+        for name, resource in self.act_resources.items():
+            resource.close()
+            logger.info(f"Released {name} resource")
+
+        self.act_resources.clear()
+        logger.info("All resource Released successfully")
