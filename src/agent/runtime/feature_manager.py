@@ -101,17 +101,20 @@ class FeatureManager:
     fea_reg: FeatureRegistry
 
     def start_enabled(self) -> None:
+        logger.info("Starting all enabled feature")
         self._start_enabled_services()
         self._start_enabled_resources()
 
     def sync(self) -> None:
         """Synchronize active features with the current configuration."""
+        logger.info("Syncing features with current configuration")
         self._stop_disabled_services()
         self._stop_disabled_resources()
         self._start_enabled_services()
         self._start_enabled_resources()
 
     def shutdown_all(self) -> None:
+        logger.info("Shuting down all feature")
         for name, service in self.act_services.items():
             service.stop()
             logger.info("Stopped %s service", name)
