@@ -1,104 +1,80 @@
-"""Tạo và quản lý lifecycle feature của một SAG Agent Runtime.
+from __future__ import annotations
 
-File path: `src/agent/runtime/feature_manager.py`.
-Input: registry, platform services và Agent config.
-Output: instance feature theo tên và cleanup tập trung.
-Nguyên lý: validate contract ngay sau factory; start một lần và shutdown theo thứ tự ngược.
-"""
+from dataclasses import dataclass
+from enum import Enum, auto
+from typing import Callable, Any
+from logging import getLogger
 
-import logging
-from typing import TypeVar
-
-from agent.platform import PlatformServices
-from agent.protocols import Resource, Service
-from agent.runtime.feature_registry import FeatureInstance, FeatureRegistry
-from agent.runtime.request_types import FeatureName
 from config import AgentConfig
 
-
-logger = logging.getLogger(__name__)
-FeatureType = TypeVar("FeatureType", bound=FeatureInstance)
+logger = getLogger(__name__)
 
 
-class FeatureManager:
-    """Owner duy nhất của service và resource được Runtime tạo."""
-
-    def __init__(
-        self,
-        registry: FeatureRegistry,
-        services: PlatformServices,
-        config: AgentConfig,
-    ) -> None:
-        self._registry = registry
-        self._services = services
-        self._config = config
-        self._instances: dict[FeatureName, FeatureInstance] = {}
-        self._creation_order: list[FeatureName] = []
-        self._started = False
-        self._closed = False
-
-    def start_enabled(self) -> None:
-        if self._started:
-            return
-
-        for definition in self._registry.definitions():
-            if definition.enabled(self._config):
-                self._create(definition.name)
-
-        self._started = True
-
-    def _create(self, name: FeatureName) -> FeatureInstance:
-        definition = self._registry.get(name)
-        instance = definition.factory(self._services, self._config)
-        if definition.kind == "service":
-            if not isinstance(instance, Service):
-                raise TypeError(f"Feature {name} must implement Service")
-            instance.start()
-        elif not isinstance(instance, Resource):
-            raise TypeError(f"Feature {name} must implement Resource")
-
-        self._instances[name] = instance
-        self._creation_order.append(name)
-        logger.info("Started feature: %s", name)
-
-        return instance
-
-    def get(self, name: FeatureName, expected_type: type[FeatureType]) -> FeatureType:
-        self._registry.get(name)
-        try:
-            instance = self._instances[name]
-        except KeyError as error:
-            raise RuntimeError(f"Feature is not enabled: {name}") from error
-        if not isinstance(instance, expected_type):
-            raise TypeError(f"Feature {name} has an invalid type")
-        return instance
-
-    def available_features(self) -> tuple[FeatureName, ...]:
-        """Trả mọi feature Runtime biết cách tạo."""
-
-        return self._registry.names()
-
-    def active_features(self) -> tuple[FeatureName, ...]:
-        """Trả feature đã được tạo theo thứ tự đăng ký."""
-
-        return tuple(self._creation_order)
-
-    def shutdown(self) -> None:
-        if self._closed:
-            return
-        errors: list[Exception] = []
-        for name in reversed(self._creation_order):
-            instance = self._instances[name]
-            try:
-                if isinstance(instance, Service):
-                    instance.stop()
-                if isinstance(instance, Resource):
-                    instance.close()
-            except Exception as error:
-                errors.append(error)
-        self._closed = True
-        if errors:
-            raise ExceptionGroup("Feature shutdown failed", errors)
+class FeatureName(Enum):
+    SCREEN_LOCKER = auto()
 
 
-__all__ = ["FeatureManager"]
+class FeatureType(Enum):
+    SERVICE = auto()
+    RESOURCE = auto()
+
+
+class Command(Enum):
+    LOCK_SCREEN = auto()
+    UNLOCK_SCREEN = auto()
+
+
+@dataclass
+# Cu phap python 3.12+; Hien tai ko co ke hoach dung ban cu hon
+class FeatureDefinition[TFeature, TConfig]:
+    """Day la mot object dinh nghia mot Feature
+    Cung cap cac thong tin giup phan loai feature, su dung"""
+
+    feature_name: FeatureName
+    feature_type: FeatureType
+    enabled: Callable[[TConfig], bool]
+    # Hàm dùng để tạo instance của Feature
+    factory: Callable[[], TFeature]
+
+    # Command -> method của Feature
+    commands: dict[Command, Callable[[TFeature], None]]
+
+
+class FeatureRegistry:
+    """Chiu trach nhiem dang ki cac feature
+    xac dinh dang co nhung feature nao, la service hay resource hay stateless
+    factory de tao object
+    cac command map voi api nao"""
+
+    def __init__(self, _fea_defs: list[FeatureDefinition[object, AgentConfig]]):
+        self.fea_defs: list[FeatureDefinition[object, AgentConfig]] = (
+            _fea_defs or create_default_fea_def()
+        )
+
+    def get_fea_def(
+        self, feature_name: FeatureName
+    ) -> FeatureDefinition[Any, AgentConfig]:
+        for fea_def in self.fea_defs:
+            if fea_def.feature_name == feature_name:
+                return fea_def
+        raise KeyError(f"FeatureDefinition not found: {feature_name}")
+
+    def get_all_fea_def(self) -> list[FeatureDefinition[Any, AgentConfig]]:
+        return self.fea_defs
+
+
+def create_default_fea_def() -> list[FeatureDefinition[Any, AgentConfig]]:
+    from device_controller.screen_locker import ScreenLocker
+
+    return [
+        FeatureDefinition[ScreenLocker, AgentConfig](
+            feature_name=FeatureName.SCREEN_LOCKER,
+            feature_type=FeatureType.RESOURCE,
+            enabled=lambda config: config.screen_lock.enabled,
+            factory=ScreenLocker,
+            commands={
+                Command.LOCK_SCREEN: ScreenLocker.lock,
+                Command.UNLOCK_SCREEN: ScreenLocker.close,
+            },
+        )
+    ]
