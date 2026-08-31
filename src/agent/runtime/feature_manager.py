@@ -7,6 +7,26 @@ from config import AgentConfig
 from agent.protocols import Service, Resource, get_type, FeatureType
 
 logger = getLogger(__name__)
+"""
+Giai thich nhanh logic hoat dong
+
+[FeatureRegistry]
+FeatureRegistry dung nhu cai ten cua no, no chiu trach nhiem dang ki cac feature
+mot feature se duoc dang ki va dai dien bang FeatureDefinition.
+Cac FeatureDefinition se co cac thuoc tinh dac trung va type safe
+=> Noi cach khac, FeatureRegistry = bang dang ki / khai bao cac feature
+
+
+[FeatureManager]
+Thu nay chiu trach nhiem quan ly cac feature. Vi du nhu bat, tat.
+Cung cap API tien loi de quan ly life cycle cua feature mot cach sach se
+FeatureManager phu thuoc vao FeatureRegustry.
+=> Tom lai, FeatureManager dung "ban dang ki" FeatureRegistry de tao va quan ly
+life cycle cua feature
+
+"""
+
+# ===================== Tai nguyen dng chung ====================
 
 
 # Dung StrEnum de tien lam key map / show list danh sach feature
@@ -35,6 +55,9 @@ class FeatureDefinition[TFeature, TConfig]:
     commands: dict[Command, Callable[[TFeature], None]]
 
 
+# ===============================================================
+# ==================== Phan feature registry ====================
+# ===============================================================
 class FeatureRegistry:
     """Chiu trach nhiem dang ki cac feature
     xac dinh dang co nhung feature nao, la service hay resource hay stateless
@@ -78,6 +101,9 @@ def create_default_fea_def() -> list[FeatureDefinition[Any, AgentConfig]]:
     ]
 
 
+# ===============================================================
+# ========================= Phan feature manager ================
+# ===============================================================
 def _format_unknown_feature(
     feature_name: FeatureName,
     services: dict[FeatureName, Service],
