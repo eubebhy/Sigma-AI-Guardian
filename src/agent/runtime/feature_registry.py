@@ -1,154 +1,111 @@
-"""Danh mục tường minh các feature do SAG Agent Runtime quản lý.
-
-File path: `src/agent/runtime/feature_registry.py`.
-Input: tên, loại lifecycle, factory và điều kiện enable của feature.
-Output: `FeatureRegistry` tra cứu definition ổn định theo tên.
-Nguyên lý: không scan package hoặc dựa vào import side effect; mọi feature phải đăng ký.
-"""
-
-from __future__ import annotations
-
-from collections.abc import Callable, Iterable
+# Dung StrEnum de tien lam key map / show list danh sach feature
 from dataclasses import dataclass
-from pathlib import Path
-from typing import TYPE_CHECKING, Literal
+from enum import Enum, auto, StrEnum
+from typing import Callable, Any
+from logging import getLogger
 
-from agent.platform import PlatformServices
-from agent.protocols import Resource, Service
-from agent.runtime.request_types import FeatureName
 from config import AgentConfig
+from agent.protocols import FeatureType
 
 
-if TYPE_CHECKING:
-    from content_classifier import Classifier
-    from device_controller.process_guard import ProcessGuard
-    from device_controller.screen_locker import ScreenLocker
-    from device_controller.web_blocker import WebBlocker
+logger = getLogger(__name__)
 
 
-FeatureKind = Literal["service", "resource"]
-FeatureInstance = Service | Resource
-FeatureFactory = Callable[[PlatformServices, AgentConfig], FeatureInstance]
-FeatureEnabled = Callable[[AgentConfig], bool]
+class FeatureName(StrEnum):
+    SCREEN_LOCKER = auto()
 
 
-def _always_enabled(_config: AgentConfig) -> bool:
-    return True
+class Command(Enum):
+    LOCK_SCREEN = auto()
+    UNLOCK_SCREEN = auto()
 
 
-@dataclass(frozen=True)
-class FeatureDefinition:
-    """Khai báo cách Runtime tạo và quản lý một feature."""
+@dataclass
+# Cu phap python 3.12+; Hien tai ko co ke hoach dung ban cu hon
+class FeatureDefinition[TFeature, TConfig]:
+    """Day la mot object dinh nghia mot Feature
+    Cung cap cac thong tin giup phan loai feature, su dung"""
 
-    name: FeatureName  # Hoac de la str cung duoc nhung FeatureName clean hon
-    kind: FeatureKind
-    factory: FeatureFactory
-    enabled: FeatureEnabled = _always_enabled
+    feature_name: FeatureName
+    feature_type: FeatureType
+    enabled: Callable[[TConfig], bool]
+    # Hàm dùng để tạo instance của Feature
+    factory: Callable[[], TFeature]
+
+    # Command -> method của Feature
+    commands: dict[Command, Callable[[TFeature], None]]
 
 
+# ===============================================================
+# ==================== Phan feature registry ====================
+# ===============================================================
 class FeatureRegistry:
-    """Danh mục feature không trùng tên và không tự discovery."""
+    """Chiu trach nhiem dang ki cac feature
+    xac dinh dang co nhung feature nao, la service hay resource hay stateless
+    factory de tao object
+    cac command map voi api nao"""
 
-    def __init__(self, definitions: Iterable[FeatureDefinition]) -> None:
-        self._definitions: dict[FeatureName, FeatureDefinition] = {}
-
-        for definition in definitions:
-            if definition.name in self._definitions:
-                raise ValueError(f"Duplicate feature: {definition.name}")
-
-            self._definitions[definition.name] = definition
-
-    def definitions(self) -> tuple[FeatureDefinition, ...]:
-        """Tra ve danh sach cac FeatureDefinition da dang ky"""
-        return tuple(self._definitions.values())
-
-    def names(self, kind: FeatureKind | None = None) -> tuple[FeatureName, ...]:
-        """Trả tên feature đã đăng ký, có thể lọc theo lifecycle type."""
-
-        return tuple(
-            definition.name
-            for definition in self._definitions.values()
-            if kind is None or definition.kind == kind
+    def __init__(self, _fea_defs: list[FeatureDefinition[object, AgentConfig]]):
+        self.fea_defs: list[FeatureDefinition[object, AgentConfig]] = (
+            _fea_defs or create_default_fea_def()
         )
+        self._validate()
 
-    def get(self, name: FeatureName) -> FeatureDefinition:
-        try:
-            return self._definitions[name]
-        except KeyError as error:
-            raise KeyError(f"Unknown feature: {name}") from error
+    def get_fea_def(
+        self, feature_name: FeatureName
+    ) -> FeatureDefinition[Any, AgentConfig]:
+        for fea_def in self.fea_defs:
+            if fea_def.feature_name == feature_name:
+                return fea_def
+
+        raise KeyError(f"FeatureDefinition not found: {feature_name}")
+
+    def get_all_fea_def(self) -> list[FeatureDefinition[Any, AgentConfig]]:
+        if not self.fea_defs:
+            logger.warning("Feature registry is empty")
+        return self.fea_defs
+
+    def _validate(self) -> None:
+        """Kiem tra cac dau hieu dang ngo / tim nang loi ngam:
+        - duplicate feature
+        - duplicate command"""
+
+        # Neu rong, khong loi nhung rat dang ngo
+        if not self.fea_defs:
+            logger.warning("Feature registry is empty!")
+            return
+
+        # Check duplicate command / feature_name
+        registered_features: set[FeatureName] = set()
+        registered_commands: set[Command] = set()
+
+        for fea_def in self.fea_defs:
+            # Check duplicate feature
+            if fea_def.feature_name in registered_features:
+                raise ValueError(f"Feature already registered: {fea_def.feature_name}")
+
+            registered_features.add(fea_def.feature_name)
+
+            # Check duplicate commands
+            for command in fea_def.commands:
+                if command in registered_commands:
+                    raise ValueError(f"Command already registered: {command}")
+
+                registered_commands.add(command)
 
 
-def _create_process_guard(
-    services: PlatformServices,
-    config: AgentConfig,
-) -> ProcessGuard:
-    from device_controller.process_guard import ProcessGuard
-
-    guard = ProcessGuard(services.processes)
-    guard.interval = config.process_guard.scan_interval_seconds
-    guard.set_whitelist(config.process_guard.custom_allowlist)
-    guard.set_blacklist(config.process_guard.custom_blocklist)
-    return guard
-
-
-def _create_web_blocker(
-    services: PlatformServices,
-    _config: AgentConfig,
-) -> WebBlocker:
-    from device_controller.web_blocker import WebBlocker
-
-    return WebBlocker(hosts_path=Path(services.hosts.get_hosts_path()))
-
-
-def _create_classifier(
-    _services: PlatformServices,
-    _config: AgentConfig,
-) -> Classifier:
-    from content_classifier import Classifier
-
-    return Classifier()
-
-
-def _create_screen_locker(
-    services: PlatformServices,
-    _config: AgentConfig,
-) -> ScreenLocker:
+def create_default_fea_def() -> list[FeatureDefinition[Any, AgentConfig]]:
     from device_controller.screen_locker import ScreenLocker
 
-    return ScreenLocker(services.input_blocker, services.cursor_controller)
-
-
-def create_default_registry() -> FeatureRegistry:
-    """Tạo danh mục feature low-level hiện được Agent Runtime sở hữu."""
-
-    return FeatureRegistry(
-        (
-            FeatureDefinition(
-                FeatureName.PROCESS_GUARD,
-                "service",
-                _create_process_guard,
-                lambda config: config.process_guard.enabled,
-            ),
-            FeatureDefinition(
-                FeatureName.WEB_BLOCKER,
-                "resource",
-                _create_web_blocker,
-                lambda config: config.web_blocker.enabled,
-            ),
-            FeatureDefinition(
-                FeatureName.CLASSIFIER,
-                "resource",
-                _create_classifier,
-                lambda config: config.classifier.enabled,
-            ),
-            FeatureDefinition(
-                FeatureName.SCREEN_LOCKER,
-                "resource",
-                _create_screen_locker,
-                lambda config: config.screen_lock.enabled,
-            ),
+    return [
+        FeatureDefinition[ScreenLocker, AgentConfig](
+            feature_name=FeatureName.SCREEN_LOCKER,
+            feature_type=FeatureType.RESOURCE,
+            enabled=lambda config: config.screen_lock.enabled,
+            factory=ScreenLocker,
+            commands={
+                Command.LOCK_SCREEN: ScreenLocker.lock,
+                Command.UNLOCK_SCREEN: ScreenLocker.close,
+            },
         )
-    )
-
-
-__all__ = ["FeatureDefinition", "FeatureRegistry", "create_default_registry"]
+    ]
