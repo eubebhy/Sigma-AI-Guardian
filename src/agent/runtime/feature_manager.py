@@ -68,6 +68,7 @@ class FeatureRegistry:
         self.fea_defs: list[FeatureDefinition[object, AgentConfig]] = (
             _fea_defs or create_default_fea_def()
         )
+        self._validate()
 
     def get_fea_def(
         self, feature_name: FeatureName
@@ -82,6 +83,34 @@ class FeatureRegistry:
         if not self.fea_defs:
             logger.warning("Feature registry is empty")
         return self.fea_defs
+
+    def _validate(self) -> None:
+        """Kiem tra cac dau hieu dang ngo / tim nang loi ngam:
+        - duplicate feature
+        - duplicate command"""
+
+        # Neu rong, khong loi nhung rat dang ngo
+        if not self.fea_defs:
+            logger.warning("Feature registry is empty!")
+            return
+
+        # Check duplicate command / feature_name
+        registered_features: set[FeatureName] = set()
+        registered_commands: set[Command] = set()
+
+        for fea_def in self.fea_defs:
+            # Check duplicate feature
+            if fea_def.feature_name in registered_features:
+                raise ValueError(f"Feature already registered: {fea_def.feature_name}")
+
+            registered_features.add(fea_def.feature_name)
+
+            # Check duplicate commands
+            for command in fea_def.commands:
+                if command in registered_commands:
+                    raise ValueError(f"Command already registered: {command}")
+
+                registered_commands.add(command)
 
 
 def create_default_fea_def() -> list[FeatureDefinition[Any, AgentConfig]]:
@@ -119,12 +148,13 @@ def _format_unknown_feature(
     )
 
 
-@dataclass
 class FeatureManager:
+    def __init__(self, config: AgentConfig, fea_reg: FeatureRegistry) -> None:
+        self.config: AgentConfig = config
+        self.fea_reg: FeatureRegistry = fea_reg
+
     act_services: dict[FeatureName, Service]
     act_resources: dict[FeatureName, Resource]
-    config: AgentConfig
-    fea_reg: FeatureRegistry
 
     def start_enabled(self) -> None:
         logger.info("Starting all enabled feature")
