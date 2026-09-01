@@ -162,7 +162,7 @@ class FeatureManager:
 
     def _create_feature(
         self,
-        fea_def: FeatureDefinition[Any, AgentConfig],
+        fea_def: FeatureDefinition[Any,],
     ) -> Any:
         instance = fea_def.factory()
 
