@@ -12,7 +12,7 @@ Nguyên lý:
 """
 
 from typing import Protocol, runtime_checkable
-
+from enum import Enum, auto
 # @runtime_checkable la decorator quan trong de co the kiem tra:
 # isinstance(Object, Service)
 
@@ -42,12 +42,23 @@ class Resource(Protocol):
     def close(self) -> None: ...
 
 
+class FeatureType(Enum):
+    SERVICE = auto()
+    RESOURCE = auto()
+
+
 def is_resource(obj: object) -> bool:
     return isinstance(obj, Resource)
 
 
 def is_service(obj: object) -> bool:
     return not is_resource(obj) and isinstance(obj, Service)
+
+
+def get_type(obj: object) -> FeatureType:
+    if is_service(obj):
+        return FeatureType.SERVICE
+    return FeatureType.RESOURCE
 
 
 __all__ = ["Resource", "Service"]
