@@ -1,12 +1,12 @@
 # Dung StrEnum de tien lam key map / show list danh sach feature
 from dataclasses import dataclass
-from enum import Enum, auto, StrEnum
+from enum import auto, StrEnum
 from typing import Callable, Any
 from logging import getLogger
 
 from config import AgentConfig
 from agent.protocols import FeatureType
-
+from agent.ipc_protocols import Command
 
 logger = getLogger(__name__)
 
@@ -15,20 +15,15 @@ class FeatureName(StrEnum):
     SCREEN_LOCKER = auto()
 
 
-class Command(Enum):
-    LOCK_SCREEN = auto()
-    UNLOCK_SCREEN = auto()
-
-
 @dataclass
 # Cu phap python 3.12+; Hien tai ko co ke hoach dung ban cu hon
-class FeatureDefinition[TFeature, TConfig]:
+class FeatureDefinition[TFeature]:
     """Day la mot object dinh nghia mot Feature
     Cung cap cac thong tin giup phan loai feature, su dung"""
 
     feature_name: FeatureName
     feature_type: FeatureType
-    enabled: Callable[[TConfig], bool]
+    enabled: Callable[[AgentConfig], bool]
     # Hàm dùng để tạo instance của Feature
     factory: Callable[[], TFeature]
 
@@ -45,22 +40,20 @@ class FeatureRegistry:
     factory de tao object
     cac command map voi api nao"""
 
-    def __init__(self, _fea_defs: list[FeatureDefinition[object, AgentConfig]]):
-        self.fea_defs: list[FeatureDefinition[object, AgentConfig]] = (
+    def __init__(self, _fea_defs: list[FeatureDefinition[object,]]):
+        self.fea_defs: list[FeatureDefinition[object,]] = (
             _fea_defs or create_default_fea_def()
         )
         self._validate()
 
-    def get_fea_def(
-        self, feature_name: FeatureName
-    ) -> FeatureDefinition[Any, AgentConfig]:
+    def get_fea_def(self, feature_name: FeatureName) -> FeatureDefinition[Any,]:
         for fea_def in self.fea_defs:
             if fea_def.feature_name == feature_name:
                 return fea_def
 
         raise KeyError(f"FeatureDefinition not found: {feature_name}")
 
-    def get_all_fea_def(self) -> list[FeatureDefinition[Any, AgentConfig]]:
+    def get_all_fea_def(self) -> list[FeatureDefinition[Any,]]:
         if not self.fea_defs:
             logger.warning("Feature registry is empty")
         return self.fea_defs
@@ -94,11 +87,11 @@ class FeatureRegistry:
                 registered_commands.add(command)
 
 
-def create_default_fea_def() -> list[FeatureDefinition[Any, AgentConfig]]:
+def create_default_fea_def() -> list[FeatureDefinition[Any,]]:
     from device_controller.screen_locker import ScreenLocker
 
     return [
-        FeatureDefinition[ScreenLocker, AgentConfig](
+        FeatureDefinition[ScreenLocker,](
             feature_name=FeatureName.SCREEN_LOCKER,
             feature_type=FeatureType.RESOURCE,
             enabled=lambda config: config.screen_lock.enabled,
